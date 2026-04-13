@@ -1,0 +1,45 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f172a; /* Bleu très foncé */
+    color: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: #1e293b;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.logo { width: 80px; margin-bottom: 1rem; }
+
+h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+p { color: #94a3b8; margin-bottom: 2rem; }
+
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #1e293b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.google-btn:hover { background-color: #e2e8f0; }
+.google-btn img { width: 20px; }
