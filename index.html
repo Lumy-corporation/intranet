@@ -61,30 +61,41 @@
         </div>
     </div>
 
-    <script>
-        function handleCredentialResponse(response) {
-            // Décodage du jeton pour vérifier le mail
-            const responsePayload = parseJwt(response.credential);
+<script>
+    function handleCredentialResponse(response) {
+        // 1. On décode les infos de Google
+        const responsePayload = parseJwt(response.credential);
+        
+        // 2. On vérifie si c'est un mail @lumycorp.com
+        if (responsePayload.email.endsWith("@lumycorp.com")) {
             
-            if (responsePayload.email.endsWith("@lumycorp.com")) {
-                console.log("ID: " + responsePayload.sub);
-                console.log('Email: ' + responsePayload.email);
-                // Redirection vers ton intranet
-                window.location.href = "dashboard.html";
-            } else {
-                document.getElementById('error-msg').style.display = 'block';
-            }
-        }
+            // --- ÉTAPE CRUCIALE : On enregistre les infos pour le Dashboard ---
+            localStorage.setItem('userName', responsePayload.name);
+            localStorage.setItem('userPic', responsePayload.picture);
+            localStorage.setItem('userEmail', responsePayload.email);
 
-        // Fonction pour lire les infos envoyées par Google
-        function parseJwt (token) {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        };
-    </script>
+            console.log("Accès autorisé, redirection...");
+            
+            // 3. On va sur le dashboard
+            window.location.href = "dashboard.html";
+            
+        } else {
+            // Si c'est un mail Gmail perso par exemple
+            document.getElementById('error-msg').style.display = 'block';
+            document.getElementById('error-msg').innerText = "Accès refusé. Seul le domaine @lumycorp.com est autorisé.";
+        }
+    }
+
+    // Fonction pour lire le jeton Google (ne pas toucher)
+    function parseJwt (token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    };
+</script>
+    
 </body>
 </html>
