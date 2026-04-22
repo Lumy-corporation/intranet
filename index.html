@@ -2,102 +2,22 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TERMINAL D'ACCÈS | LUMY CORP</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <style>
-        :root {
-            --bg-color: #000000;
-            --card-bg: rgba(10, 10, 10, 0.9);
-            --accent: #007bff;
-            --error: #ff4444;
-            --text-dim: #444;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 50px 40px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .logo-img { 
-            width: 80px; 
-            margin-bottom: 30px; 
-            filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.2));
-        }
-
-        h1 { 
-            font-family: 'Orbitron'; 
-            font-size: 1.2rem; 
-            letter-spacing: 6px; 
-            margin-bottom: 40px;
-            color: #fff;
-        }
-
-        #google_btn_container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            min-height: 40px;
-        }
-
-        .legal-notice {
-            font-size: 10px;
-            color: var(--text-dim);
-            margin-top: 25px;
-            line-height: 1.5;
-        }
-
-        .legal-notice a { color: #666; text-decoration: none; border-bottom: 1px solid #333; }
-
-        #error-msg {
-            display: none;
-            color: var(--error);
-            margin-top: 25px;
-            font-size: 0.85rem;
-            padding: 12px;
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.2);
-            border-radius: 6px;
-            animation: shake 0.4s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
+        body { background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .login-card { background: rgba(10, 10, 10, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; backdrop-filter: blur(15px); }
+        h1 { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 6px; margin-bottom: 40px; }
+        .logo-img { width: 80px; margin-bottom: 20px; }
+        #error-msg { display: none; color: #ff4444; margin-top: 20px; font-size: 0.8rem; padding: 10px; background: rgba(255, 68, 68, 0.1); border-radius: 6px; }
+        .legal { font-size: 9px; color: #444; margin-top: 30px; line-height: 1.5; }
     </style>
 </head>
 <body>
-
     <div class="login-card">
         <img src="https://lumycorp.com/logo.png" alt="Lumy" class="logo-img">
         <h1>LUMY CORE</h1>
-
         <div id="google_btn_container">
             <div id="g_id_onload"
                  data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
@@ -107,86 +27,46 @@
                  data-auto_prompt="false"
                  data-hd="lumycorp.com">
             </div>
-
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-shape="rectangular"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-size="large"
-                 data-logo_alignment="left">
-            </div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-size="large"></div>
         </div>
-
         <div id="error-msg"></div>
-
-        <p class="legal-notice">
-            ACCÈS RÉSERVÉ AUX AGENTS LUMY CORP.<br>
-            En continuant, vous acceptez le traitement sécurisé de vos données de profil conforme au RGPD. 
-            <br><a href="privacy.html">Politique de confidentialité</a>
-        </p>
+        <p class="legal">SYSTÈME PROPRIÉTAIRE LUMY CORP. ACCÈS RÉSERVÉ.<br>© 2026 ToUs DrOiTs RéSeRvÉs.</p>
     </div>
 
 <script>
-    "use strict"; // Mode strict pour éviter les erreurs de code silencieuses
-
     function handleCredentialResponse(response) {
         try {
-            // 1. Décodage sécurisé
             const payload = parseJwt(response.credential);
-            const now = Date.now();
             
-            // 2. Validation stricte du domaine ET de la vérification email
-            if (payload.email.endsWith("@lumycorp.com") && payload.email_verified === true) {
-                
-                // --- SÉCURITÉ MILITAIRE : Génération d'une session temporaire ---
-                // On crée une signature de session pour éviter le copier-coller de localStorage
-                const sessionKey = btoa(payload.sub + now);
-                
-                localStorage.clear(); // On nettoie tout avant d'écrire
-                
+            // VERIFICATION STRICTE DU DOMAINE
+            if (payload.email && payload.email.endsWith("@lumycorp.com")) {
+                // NETTOYAGE ET STOCKAGE
+                localStorage.clear();
                 localStorage.setItem('userName', payload.name);
                 localStorage.setItem('userPic', payload.picture);
                 localStorage.setItem('userEmail', payload.email);
-                localStorage.setItem('sessionID', sessionKey);
-                localStorage.setItem('authTimestamp', now);
+                localStorage.setItem('isAuth', 'true'); // Flag simple de sécurité
 
-                console.log("SÉCURITÉ : Identité vérifiée. Accès Dashboard autorisé.");
-                
-                // Utilisation de .replace pour empêcher le retour en arrière dans l'historique
+                // REDIRECTION PROPRE
                 window.location.replace("dashboard.html");
-                
             } else {
-                showError("ACCÈS RÉFUSÉ : Ce terminal ne reconnaît pas votre accréditation.");
+                showError("ACCÈS RÉSERVÉ AU DOMAINE @LUMYCORP.COM");
             }
-        } catch (error) {
-            showError("ERREUR SYSTÈME : Échec de l'authentification.");
-            console.error("Auth Critical Error:", error);
+        } catch (e) {
+            showError("ERREUR DE CRYPTAGE : ÉCHEC DE L'IDENTIFICATION");
         }
-    }
-
-    function showError(msg) {
-        const errorDiv = document.getElementById('error-msg');
-        errorDiv.innerText = msg;
-        errorDiv.style.display = 'block';
     }
 
     function parseJwt(token) {
-        try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        } catch (e) {
-            throw new Error("Invalid Token");
-        }
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
 
-    // Protection supplémentaire : Empêcher le clic droit sur la page de login
-    document.addEventListener('contextmenu', event => event.preventDefault());
+    function showError(m) {
+        const e = document.getElementById('error-msg');
+        e.innerText = m; e.style.display = 'block';
+    }
 </script>
-    
 </body>
 </html>
