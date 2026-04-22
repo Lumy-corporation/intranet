@@ -99,43 +99,23 @@
     </div>
 
 <script>
-    // 1. VÉRIFICATION DE SÉCURITÉ IMMÉDIATE
-    const userEmail = localStorage.getItem('userEmail');
-    
-    // Si pas de mail ou si ce n'est pas un @lumycorp.com, on bloque TOUT de suite
-    if (!userEmail || !userEmail.endsWith("@lumycorp.com")) {
-        // On efface tout par précaution
-        localStorage.clear();
-        // On redirige vers l'accueil
-        window.location.replace("index.html"); 
-    }
+    // BLOQUAGE INSTANTANÉ AVANT RENDU
+    (function() {
+        const sessionActive = localStorage.getItem('userEmail');
+        const token = localStorage.getItem('authToken'); // On ajoute un faux jeton de session
 
-    // 2. CHARGEMENT DES DONNÉES UNE FOIS VALIDÉ
-    window.onload = function() {
-        const name = localStorage.getItem('userName');
-        const pic = localStorage.getItem('userPic');
-
-        if (name) {
-            document.getElementById('user-name').innerText = name;
-            document.getElementById('full-name').innerText = name;
-            document.getElementById('welcome-title').innerText = "BIENVENUE, " + name.toUpperCase();
+        if (!sessionActive || !sessionActive.endsWith("@lumycorp.com") || !token) {
+            localStorage.clear();
+            // On utilise location.replace pour effacer cette page de l'historique
+            window.location.replace("index.html?error=unauthorized");
         }
-
-        if (pic) {
-            document.getElementById('nav-avatar').src = pic;
-            document.getElementById('modal-avatar').src = pic.replace('s96-c', 's300-c');
-        }
-
-        document.getElementById('full-email').innerText = userEmail;
-    };
-
-    // 3. DÉCONNEXION SÉCURISÉE (Nettoyage RGPD)
-    function logout() {
-        // On vide la mémoire du navigateur (suppression des données personnelles)
-        localStorage.clear();
-        // Redirection forcée sans retour arrière possible
-        window.location.replace("index.html");
-    }
+    })();
 </script>
+
+<style>
+    /* Sécurité visuelle : on cache tout le body par défaut via le CSS */
+    body { display: none; }
+    body.authorized { display: block; }
+</style>
 </body>
 </html>
