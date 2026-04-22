@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DASHBOARD | LUMY CORP SYSTEM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -22,171 +22,235 @@
             color: var(--primary);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Barre de Navigation */
+        /* --- NAVIGATION BAR --- */
         nav {
-            height: 70px;
+            height: 80px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 40px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             position: sticky;
             top: 0;
             z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
         }
 
         .nav-logo {
             font-family: 'Orbitron';
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             font-size: 1.2rem;
+            color: #fff;
         }
 
-        .user-info {
+        .user-profile {
             display: flex;
             align-items: center;
             gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 15px 5px 5px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+
+        #user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #user-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #eee;
         }
 
         .logout-btn {
             background: none;
-            border: 1px solid #ff4444;
+            border: none;
             color: #ff4444;
-            padding: 8px 16px;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding-left: 10px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
             transition: 0.3s;
         }
 
-        .logout-btn:hover {
-            background: #ff4444;
-            color: white;
-        }
+        .logout-btn:hover { color: #ff8888; }
 
-        /* Contenu Principal */
+        /* --- MAIN CONTENT --- */
         main {
             padding: 40px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .welcome-section {
-            margin-bottom: 40px;
+        .header-section {
+            margin-bottom: 50px;
         }
 
-        h2 { font-family: 'Orbitron'; margin-bottom: 10px; }
-        .status-badge {
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #00ff00;
+            border-radius: 50%;
             display: inline-block;
-            padding: 4px 12px;
-            background: rgba(0, 255, 0, 0.1);
+            margin-right: 8px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .status-text {
             color: #00ff00;
-            border-radius: 20px;
             font-size: 0.7rem;
             text-transform: uppercase;
-            border: 1px solid #00ff00;
+            letter-spacing: 2px;
+            font-weight: 600;
         }
 
-        /* Grille de Widgets */
-        .grid {
+        h2 { 
+            font-family: 'Orbitron'; 
+            font-size: 2rem; 
+            margin-top: 15px;
+            letter-spacing: -1px;
+        }
+
+        /* --- GRID --- */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            padding: 25px;
-            border-radius: 12px;
-            transition: 0.3s;
+            padding: 30px;
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
 
         .card:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-8px);
+            background: rgba(20, 20, 20, 0.95);
         }
 
         .card h3 {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            color: #888;
+            letter-spacing: 2px;
+            color: #666;
+            margin-bottom: 20px;
         }
 
-        .stats { font-size: 2rem; font-weight: 600; margin-bottom: 10px; }
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-family: 'Orbitron';
+        }
 
-        .btn-action {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: black;
-            text-align: center;
+        .card-subtext {
+            color: #444;
+            font-size: 0.8rem;
+        }
+
+        .action-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: var(--accent);
             text-decoration: none;
-            border-radius: 6px;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-top: 20px;
+            transition: 0.3s;
         }
+
+        .action-link:hover { text-decoration: underline; }
+
     </style>
 </head>
 <body>
 
     <nav>
         <div class="nav-logo">LUMY CORE</div>
-        <div class="user-info">
-            <span id="user-email" style="color: #888; font-size: 0.9rem;">Chargement...</span>
-            <button class="logout-btn" onclick="logout()">DÉCONNEXION</button>
+        
+        <div class="user-profile">
+            <img id="user-avatar" src="https://via.placeholder.com/35" alt="Avatar">
+            <span id="user-name">Agent</span>
+            <button class="logout-btn" onclick="logout()">Quitter</button>
         </div>
     </nav>
 
     <main>
-        <section class="welcome-section">
-            <div class="status-badge">Système Opérationnel</div>
-            <h2 style="margin-top: 15px;">BIENVENUE, AGENT</h2>
-            <p style="color: #666;">Accès autorisé au terminal de gestion Lumy Corporation.</p>
+        <section class="header-section">
+            <div>
+                <span class="status-dot"></span>
+                <span class="status-text">Système LumyCorp actif</span>
+            </div>
+            <h2 id="welcome-title">BIENVENUE</h2>
         </section>
 
-        <div class="grid">
+        <div class="dashboard-grid">
             <div class="card">
-                <h3>Utilisateurs Actifs</h3>
-                <div class="stats">12</div>
-                <p style="color: #444; font-size: 0.8rem;">+2 depuis la dernière session</p>
-                <a href="#" class="btn-action">Gérer l'équipe</a>
+                <h3>Unités Connectées</h3>
+                <div class="card-value">12</div>
+                <div class="card-subtext">Tous les membres @lumycorp.com</div>
+                <a href="#" class="action-link">Voir l'annuaire →</a>
             </div>
 
             <div class="card">
-                <h3>Serveurs Cloud</h3>
-                <div class="stats">99.9%</div>
-                <p style="color: #444; font-size: 0.8rem;">Latence : 14ms</p>
-                <a href="#" class="btn-action">Logs Système</a>
+                <h3>Base de Données</h3>
+                <div class="card-value">4.2 TB</div>
+                <div class="card-subtext">Stockage Cloud Lumy sécurisé</div>
+                <a href="#" class="action-link">Accéder aux fichiers →</a>
             </div>
 
             <div class="card">
-                <h3>Sécurité</h3>
-                <div class="stats">ON</div>
-                <p style="color: #444; font-size: 0.8rem;">Pare-feu actif</p>
-                <a href="#" class="btn-action">Vérifier</a>
+                <h3>Niveau d'Accès</h3>
+                <div class="card-value" style="color: #007bff;">ADM</div>
+                <div class="card-subtext">Autorisation de niveau 5</div>
+                <a href="#" class="action-link">Paramètres sécurité →</a>
             </div>
         </div>
     </main>
 
     <script>
-        // Vérification de la session (si tu utilises Firebase ou juste un test local)
-        // Pour l'instant, on simule l'affichage de l'utilisateur
         window.onload = function() {
-            const userEmail = localStorage.getItem('userEmail') || "theo.rabillard@lumycorp.com";
-            document.getElementById('user-email').innerText = userEmail;
-        }
+            // On récupère les données envoyées par Google depuis le localStorage
+            const name = localStorage.getItem('userName');
+            const pic = localStorage.getItem('userPic');
+            const email = localStorage.getItem('userEmail');
+
+            if (name) {
+                document.getElementById('user-name').innerText = name.split(' ')[0]; // Affiche juste le prénom
+                document.getElementById('welcome-title').innerText = "BIENVENUE, " + name.toUpperCase();
+            }
+
+            if (pic) {
+                document.getElementById('user-avatar').src = pic;
+            }
+
+            // Sécurité : Si pas d'email, on redirige vers le login
+            if (!email) {
+                window.location.href = "index.html";
+            }
+        };
 
         function logout() {
-            // Logique de déconnexion
             localStorage.clear();
             window.location.href = "index.html";
         }
     </script>
+
 </body>
 </html>
