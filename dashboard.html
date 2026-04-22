@@ -2,68 +2,24 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DASHBOARD | LUMY CORP</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --primary: #ffffff;
-            --bg: #000000;
-            --card-bg: rgba(20, 20, 20, 0.95);
-            --border: rgba(255, 255, 255, 0.1);
-            --accent: #007bff;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--primary); font-family: 'Inter', sans-serif; min-height: 100vh; }
-
-        /* --- NAV --- */
-        nav {
-            height: 70px; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-        }
+        :root { --accent: #007bff; --border: rgba(255,255,255,0.1); }
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: none; } /* CACHÉ PAR DÉFAUT */
+        nav { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(0,0,0,0.9); }
         .nav-logo { font-family: 'Orbitron'; letter-spacing: 3px; }
-
-        /* Avatar cliquable */
-        .profile-trigger {
-            cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s; padding: 5px; border-radius: 50px;
-        }
-        .profile-trigger:hover { background: rgba(255,255,255,0.1); }
+        .profile-trigger { cursor: pointer; }
         #nav-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); }
-
-        /* --- MODAL (FENÊTRE DE PROFIL) --- */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-        .profile-card {
-            background: var(--card-bg); border: 1px solid var(--border);
-            width: 350px; padding: 30px; border-radius: 20px; text-align: center;
-            position: relative; animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        #modal-avatar { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px; border: 3px solid var(--accent); }
-        .info-label { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; }
-        .info-value { font-size: 1rem; color: #fff; margin-bottom: 5px; }
         
-        .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; color: #444; font-size: 1.5rem; }
-        .close-modal:hover { color: #fff; }
-
-        .btn-logout-modal {
-            margin-top: 30px; width: 100%; padding: 12px;
-            background: #ff4444; color: white; border: none; border-radius: 8px;
-            font-weight: 600; cursor: pointer; transition: 0.3s;
-        }
-        .btn-logout-modal:hover { background: #cc0000; }
-
-        /* --- CONTENU --- */
+        /* MODAL PROFIL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .profile-card { background: #111; border: 1px solid var(--border); width: 320px; padding: 30px; border-radius: 20px; text-align: center; }
+        #modal-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); margin-bottom: 15px; }
+        .logout-btn { background: #ff4444; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 20px; width: 100%; font-weight: 600; }
+        
         main { padding: 50px; text-align: center; }
-        h1 { font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 20px; }
+        h1 { font-family: 'Orbitron'; font-size: 2rem; }
     </style>
 </head>
 <body>
@@ -71,51 +27,53 @@
     <nav>
         <div class="nav-logo">LUMY CORE</div>
         <div class="profile-trigger" onclick="toggleModal()">
-            <img id="nav-avatar" src="" alt="User">
+            <img id="nav-avatar" src="" alt="">
         </div>
     </nav>
 
     <main>
-        <h1>BIENVENUE DANS L'UNITÉ</h1>
-        <p style="color: #555;">Clique sur ta photo en haut à droite pour voir tes informations d'agent.</p>
+        <h1 id="welcome-msg">ACCÈS AGENT AUTORISÉ</h1>
+        <p style="color: #444;">Système de gestion centralisé Lumy Corporation.</p>
     </main>
 
-    <div class="modal-overlay" id="modalOverlay" onclick="closeOnOut(event)">
+    <div class="modal-overlay" id="modalOverlay" onclick="if(event.target == this) toggleModal()">
         <div class="profile-card">
-            <span class="close-modal" onclick="toggleModal()">&times;</span>
-            <img id="modal-avatar" src="" alt="Photo de profil">
-            
-            <div class="info-label">Identité Complète</div>
-            <div id="full-name" class="info-value">---</div>
-
-            <div class="info-label">Adresse Email Professionnelle</div>
-            <div id="full-email" class="info-value">---</div>
-
-            <div class="info-label">ID Système LumyCorp</div>
-            <div id="system-id" class="info-value" style="font-family: monospace; font-size: 0.8rem; color: var(--accent);">---</div>
-
-            <button class="btn-logout-modal" onclick="logout()">DÉCONNEXION DU SYSTÈME</button>
+            <img id="modal-avatar" src="">
+            <div id="full-name" style="font-weight: 600; margin-bottom: 5px;"></div>
+            <div id="full-email" style="color: #666; font-size: 0.8rem;"></div>
+            <button class="logout-btn" onclick="logout()">DÉCONNEXION</button>
         </div>
     </div>
 
 <script>
-    // BLOQUAGE INSTANTANÉ AVANT RENDU
-    (function() {
-        const sessionActive = localStorage.getItem('userEmail');
-        const token = localStorage.getItem('authToken'); // On ajoute un faux jeton de session
+    // VÉRIFICATION DE SÉCURITÉ AVANT AFFICHAGE
+    const isAuth = localStorage.getItem('isAuth');
+    const email = localStorage.getItem('userEmail');
 
-        if (!sessionActive || !sessionActive.endsWith("@lumycorp.com") || !token) {
-            localStorage.clear();
-            // On utilise location.replace pour effacer cette page de l'historique
-            window.location.replace("index.html?error=unauthorized");
-        }
-    })();
+    if (isAuth === 'true' && email && email.endsWith('@lumycorp.com')) {
+        document.body.style.display = 'block'; // ON MONTRE LA PAGE
+    } else {
+        localStorage.clear();
+        window.location.replace("index.html"); // ON JETTE L'INTRUS
+    }
+
+    window.onload = function() {
+        document.getElementById('nav-avatar').src = localStorage.getItem('userPic');
+        document.getElementById('modal-avatar').src = localStorage.getItem('userPic').replace('s96-c', 's300-c');
+        document.getElementById('full-name').innerText = localStorage.getItem('userName');
+        document.getElementById('full-email').innerText = email;
+        document.getElementById('welcome-msg').innerText = "BIENVENUE, " + localStorage.getItem('userName').toUpperCase();
+    };
+
+    function toggleModal() {
+        const m = document.getElementById('modalOverlay');
+        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.replace("index.html");
+    }
 </script>
-
-<style>
-    /* Sécurité visuelle : on cache tout le body par défaut via le CSS */
-    body { display: none; }
-    body.authorized { display: block; }
-</style>
 </body>
 </html>
