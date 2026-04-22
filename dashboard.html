@@ -3,254 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASHBOARD | LUMY CORP SYSTEM</title>
+    <title>DASHBOARD | LUMY CORP</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #ffffff;
-            --accent: #007bff;
             --bg: #000000;
-            --card-bg: rgba(15, 15, 15, 0.9);
+            --card-bg: rgba(20, 20, 20, 0.95);
             --border: rgba(255, 255, 255, 0.1);
+            --accent: #007bff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background-color: var(--bg);
-            color: var(--primary);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+        body { background-color: var(--bg); color: var(--primary); font-family: 'Inter', sans-serif; min-height: 100vh; }
 
-        /* --- NAVIGATION BAR --- */
+        /* --- NAV --- */
         nav {
-            height: 80px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 40px;
-            backdrop-filter: blur(15px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.8);
+            height: 70px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
         }
+        .nav-logo { font-family: 'Orbitron'; letter-spacing: 3px; }
 
-        .nav-logo {
-            font-family: 'Orbitron';
-            letter-spacing: 4px;
-            font-size: 1.2rem;
-            color: #fff;
+        /* Avatar cliquable */
+        .profile-trigger {
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
+            transition: 0.3s; padding: 5px; border-radius: 50px;
         }
+        .profile-trigger:hover { background: rgba(255,255,255,0.1); }
+        #nav-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px 15px 5px 5px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
+        /* --- MODAL (FENÊTRE DE PROFIL) --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000;
+            align-items: center; justify-content: center;
         }
-
-        #user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .profile-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            width: 350px; padding: 30px; border-radius: 20px; text-align: center;
+            position: relative; animation: slideUp 0.3s ease-out;
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        #user-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #eee;
+        #modal-avatar { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px; border: 3px solid var(--accent); }
+        .info-label { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; }
+        .info-value { font-size: 1rem; color: #fff; margin-bottom: 5px; }
+        
+        .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; color: #444; font-size: 1.5rem; }
+        .close-modal:hover { color: #fff; }
+
+        .btn-logout-modal {
+            margin-top: 30px; width: 100%; padding: 12px;
+            background: #ff4444; color: white; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: 0.3s;
         }
+        .btn-logout-modal:hover { background: #cc0000; }
 
-        .logout-btn {
-            background: none;
-            border: none;
-            color: #ff4444;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding-left: 10px;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover { color: #ff8888; }
-
-        /* --- MAIN CONTENT --- */
-        main {
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header-section {
-            margin-bottom: 50px;
-        }
-
-        .status-dot {
-            height: 8px;
-            width: 8px;
-            background-color: #00ff00;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            box-shadow: 0 0 10px #00ff00;
-        }
-
-        .status-text {
-            color: #00ff00;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
-        }
-
-        h2 { 
-            font-family: 'Orbitron'; 
-            font-size: 2rem; 
-            margin-top: 15px;
-            letter-spacing: -1px;
-        }
-
-        /* --- GRID --- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 30px;
-            border-radius: 16px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateY(-8px);
-            background: rgba(20, 20, 20, 0.95);
-        }
-
-        .card h3 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .card-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            font-family: 'Orbitron';
-        }
-
-        .card-subtext {
-            color: #444;
-            font-size: 0.8rem;
-        }
-
-        .action-link {
-            display: inline-block;
-            margin-top: 25px;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .action-link:hover { text-decoration: underline; }
-
+        /* --- CONTENU --- */
+        main { padding: 50px; text-align: center; }
+        h1 { font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="nav-logo">LUMY CORE</div>
-        
-        <div class="user-profile">
-            <img id="user-avatar" src="https://via.placeholder.com/35" alt="Avatar">
-            <span id="user-name">Agent</span>
-            <button class="logout-btn" onclick="logout()">Quitter</button>
+        <div class="profile-trigger" onclick="toggleModal()">
+            <img id="nav-avatar" src="" alt="User">
         </div>
     </nav>
 
     <main>
-        <section class="header-section">
-            <div>
-                <span class="status-dot"></span>
-                <span class="status-text">Système LumyCorp actif</span>
-            </div>
-            <h2 id="welcome-title">BIENVENUE</h2>
-        </section>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>Unités Connectées</h3>
-                <div class="card-value">12</div>
-                <div class="card-subtext">Tous les membres @lumycorp.com</div>
-                <a href="#" class="action-link">Voir l'annuaire →</a>
-            </div>
-
-            <div class="card">
-                <h3>Base de Données</h3>
-                <div class="card-value">4.2 TB</div>
-                <div class="card-subtext">Stockage Cloud Lumy sécurisé</div>
-                <a href="#" class="action-link">Accéder aux fichiers →</a>
-            </div>
-
-            <div class="card">
-                <h3>Niveau d'Accès</h3>
-                <div class="card-value" style="color: #007bff;">ADM</div>
-                <div class="card-subtext">Autorisation de niveau 5</div>
-                <a href="#" class="action-link">Paramètres sécurité →</a>
-            </div>
-        </div>
+        <h1>BIENVENUE DANS L'UNITÉ</h1>
+        <p style="color: #555;">Clique sur ta photo en haut à droite pour voir tes informations d'agent.</p>
     </main>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeOnOut(event)">
+        <div class="profile-card">
+            <span class="close-modal" onclick="toggleModal()">&times;</span>
+            <img id="modal-avatar" src="" alt="Photo de profil">
+            
+            <div class="info-label">Identité Complète</div>
+            <div id="full-name" class="info-value">---</div>
+
+            <div class="info-label">Adresse Email Professionnelle</div>
+            <div id="full-email" class="info-value">---</div>
+
+            <div class="info-label">ID Système LumyCorp</div>
+            <div id="system-id" class="info-value" style="font-family: monospace; font-size: 0.8rem; color: var(--accent);">---</div>
+
+            <button class="btn-logout-modal" onclick="logout()">DÉCONNEXION DU SYSTÈME</button>
+        </div>
+    </div>
 
     <script>
         window.onload = function() {
-            // On récupère les données envoyées par Google depuis le localStorage
+            const email = localStorage.getItem('userEmail');
             const name = localStorage.getItem('userName');
             const pic = localStorage.getItem('userPic');
-            const email = localStorage.getItem('userEmail');
 
-            if (name) {
-                document.getElementById('user-name').innerText = name.split(' ')[0]; // Affiche juste le prénom
-                document.getElementById('welcome-title').innerText = "BIENVENUE, " + name.toUpperCase();
-            }
+            // Si pas d'infos, retour au login
+            if (!email) { window.location.href = "index.html"; return; }
 
-            if (pic) {
-                document.getElementById('user-avatar').src = pic;
-            }
-
-            // Sécurité : Si pas d'email, on redirige vers le login
-            if (!email) {
-                window.location.href = "index.html";
-            }
+            // Remplissage des infos
+            document.getElementById('nav-avatar').src = pic;
+            document.getElementById('modal-avatar').src = pic.replace('s96-c', 's300-c'); // On demande la photo en plus grand à Google
+            document.getElementById('full-name').innerText = name;
+            document.getElementById('full-email').innerText = email;
+            
+            // On simule un ID d'agent basé sur l'ID Google (sub) si tu l'as enregistré, 
+            // sinon on en génère un faux pour le style
+            document.getElementById('system-id').innerText = "LC-" + Math.random().toString(36).substr(2, 9).toUpperCase();
         };
+
+        function toggleModal() {
+            const modal = document.getElementById('modalOverlay');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function closeOnOut(e) {
+            if(e.target.id === "modalOverlay") toggleModal();
+        }
 
         function logout() {
             localStorage.clear();
             window.location.href = "index.html";
         }
     </script>
-
 </body>
 </html>
