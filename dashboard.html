@@ -98,39 +98,44 @@
         </div>
     </div>
 
-    <script>
-        window.onload = function() {
-            const email = localStorage.getItem('userEmail');
-            const name = localStorage.getItem('userName');
-            const pic = localStorage.getItem('userPic');
+<script>
+    // 1. VÉRIFICATION DE SÉCURITÉ IMMÉDIATE
+    const userEmail = localStorage.getItem('userEmail');
+    
+    // Si pas de mail ou si ce n'est pas un @lumycorp.com, on bloque TOUT de suite
+    if (!userEmail || !userEmail.endsWith("@lumycorp.com")) {
+        // On efface tout par précaution
+        localStorage.clear();
+        // On redirige vers l'accueil
+        window.location.replace("index.html"); 
+    }
 
-            // Si pas d'infos, retour au login
-            if (!email) { window.location.href = "index.html"; return; }
+    // 2. CHARGEMENT DES DONNÉES UNE FOIS VALIDÉ
+    window.onload = function() {
+        const name = localStorage.getItem('userName');
+        const pic = localStorage.getItem('userPic');
 
-            // Remplissage des infos
-            document.getElementById('nav-avatar').src = pic;
-            document.getElementById('modal-avatar').src = pic.replace('s96-c', 's300-c'); // On demande la photo en plus grand à Google
+        if (name) {
+            document.getElementById('user-name').innerText = name;
             document.getElementById('full-name').innerText = name;
-            document.getElementById('full-email').innerText = email;
-            
-            // On simule un ID d'agent basé sur l'ID Google (sub) si tu l'as enregistré, 
-            // sinon on en génère un faux pour le style
-            document.getElementById('system-id').innerText = "LC-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-        };
-
-        function toggleModal() {
-            const modal = document.getElementById('modalOverlay');
-            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+            document.getElementById('welcome-title').innerText = "BIENVENUE, " + name.toUpperCase();
         }
 
-        function closeOnOut(e) {
-            if(e.target.id === "modalOverlay") toggleModal();
+        if (pic) {
+            document.getElementById('nav-avatar').src = pic;
+            document.getElementById('modal-avatar').src = pic.replace('s96-c', 's300-c');
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
-    </script>
+        document.getElementById('full-email').innerText = userEmail;
+    };
+
+    // 3. DÉCONNEXION SÉCURISÉE (Nettoyage RGPD)
+    function logout() {
+        // On vide la mémoire du navigateur (suppression des données personnelles)
+        localStorage.clear();
+        // Redirection forcée sans retour arrière possible
+        window.location.replace("index.html");
+    }
+</script>
 </body>
 </html>
