@@ -7,24 +7,17 @@
         :root { --accent: #007bff; --danger: #dc3545; --bg: #0a0a0a; --card: #151515; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .grid-layout { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
-        
-        /* Formulaire à gauche */
         .sidebar { background: var(--card); padding: 25px; border-radius: 10px; border-top: 4px solid var(--accent); position: sticky; top: 20px; height: fit-content; }
-        
-        /* Liste à droite */
         .main-content { background: var(--card); padding: 25px; border-radius: 10px; }
-        
         .user-row { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; transition: 0.2s; }
         .user-row:hover { background: #1a1a1a; }
         .user-info { display: flex; align-items: center; gap: 15px; }
-        .profile-img { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--accent); }
-        
-        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+        .profile-img { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--accent); object-fit: cover; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
         button { cursor: pointer; font-weight: bold; border-radius: 5px; border: none; transition: 0.3s; }
         .btn-add { background: var(--accent); color: white; padding: 12px; width: 100%; margin-top: 10px; }
         .btn-del { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; font-size: 0.8em; }
         .btn-del:hover { background: var(--danger); color: white; }
-        
         .status-msg { margin-top: 10px; font-size: 0.8em; text-align: center; }
     </style>
 </head>
@@ -64,49 +57,107 @@
     <script>
         const CLIENT_ID = '280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyAkny1c8SJ6aULXbTWZT0QFXXmxjcSnAL4';
-        const SCOPES = 'https://www.googleapis.com/auth/admin.directory.user'; // Permission totale (Read/Write)
+        const SCOPES = 'https://www.googleapis.com/auth/admin.directory.user';
 
         let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
 
-        function gapiLoaded() { gapi.load('client', () => gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/admin/directory_1/rest']})); }
-        function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({client_id: CLIENT_ID, scope: SCOPES, callback: (resp) => { if (resp.access_token) listUsers(); }}); }
-
-        // --- LISTER LES USERS ---
-        async function listUsers() {
-            if (!gapi.client.getToken()) return tokenClient.requestAccessToken();
-            const response = await gapi.client.directory.users.list({ customer: 'my_customer', orderBy: 'email' });
-            const users = response.result.users || [];
-            let html = '';
-            users.forEach(user => {
-                const img = user.thumbnailPhotoUrl || 'https://www.w3schools.com/howto/img_avatar.png';
-                html += `
-                    <div class="user-row">
-                        <div class="user-info">
-                            <img src="${img}" class="profile-img">
-                            <div>
-                                <div class="user-name">${user.name.fullName}</div>
-                                <div class="user-email">${user.primaryEmail}</div>
-                            </div>
-                        </div>
-                        <button class="btn-del" onclick="deleteUser('${user.primaryEmail}')">SUPPRIMER</button>
-                    </div>`;
+        function gapiLoaded() {
+            gapi.load('client', async () => {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/admin/directory_1/rest'],
+                });
+                gapiInited = true;
+                checkAuth();
             });
-            document.getElementById('user_list_container').innerHTML = html;
         }
 
-        // --- CRÉER UN USER ---
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: (resp) => {
+                    if (resp.error) throw (resp);
+                    // Ligne magique : On enregistre le jeton dans GAPI
+                    gapi.client.setToken(resp);
+                    listUsers();
+                },
+            });
+            gisInited = true;
+            checkAuth();
+        }
+
+        function checkAuth() {
+            if (gapiInited && gisInited) {
+                // Prêt pour la connexion
+            }
+        }
+
+        async function listUsers() {
+            // Si pas de jeton, on demande la connexion
+            if (gapi.client.getToken() === null) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
+                return;
+            }
+
+            try {
+                const response = await gapi.client.directory.users.list({
+                    customer: 'my_customer',
+                    orderBy: 'email'
+                });
+                
+                const users = response.result.users || [];
+                let html = '';
+                
+                if (users.length === 0) {
+                    html = '<p>Aucun agent trouvé.</p>';
+                } else {
+                    users.forEach(user => {
+                        const img = user.thumbnailPhotoUrl || 'https://www.w3schools.com/howto/img_avatar.png';
+                        html += `
+                            <div class="user-row">
+                                <div class="user-info">
+                                    <img src="${img}" class="profile-img">
+                                    <div>
+                                        <div class="user-name">${user.name.fullName}</div>
+                                        <div class="user-email">${user.primaryEmail}</div>
+                                    </div>
+                                </div>
+                                <button class="btn-del" onclick="deleteUser('${user.primaryEmail}')">SUPPRIMER</button>
+                            </div>`;
+                    });
+                }
+                document.getElementById('user_list_container').innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                if (err.status === 401 || err.status === 403) {
+                    // Si le jeton est expiré ou invalide
+                    tokenClient.requestAccessToken({prompt: ''});
+                } else {
+                    document.getElementById('user_list_container').innerHTML = "❌ Erreur : " + err.result.error.message;
+                }
+            }
+        }
+
         async function createNewUser() {
-            if (!gapi.client.getToken()) return tokenClient.requestAccessToken();
+            if (gapi.client.getToken() === null) return tokenClient.requestAccessToken();
             
             const fname = document.getElementById('new_firstname').value;
             const lname = document.getElementById('new_lastname').value;
             const recovery = document.getElementById('new_recovery').value;
             const ou = document.getElementById('new_ou').value;
 
+            if(!fname || !lname) {
+                alert("Prénom et Nom requis !");
+                return;
+            }
+
             const userBody = {
                 primaryEmail: `${fname.toLowerCase().charAt(0)}.${lname.toLowerCase()}@lumycorp.com`,
                 name: { givenName: fname, familyName: lname },
-                password: Math.random().toString(36).slice(-10), // Mot de passe aléatoire
+                password: Math.random().toString(36).slice(-10) + "A1!",
                 changePasswordAtNextLogin: true,
                 recoveryEmail: recovery,
                 orgUnitPath: ou
@@ -115,13 +166,15 @@
             try {
                 await gapi.client.directory.users.insert({ resource: userBody });
                 document.getElementById('create_status').innerHTML = "✅ Agent déployé !";
+                // Réinitialiser le formulaire
+                document.getElementById('new_firstname').value = '';
+                document.getElementById('new_lastname').value = '';
                 listUsers();
             } catch (err) {
                 document.getElementById('create_status').innerHTML = "❌ Erreur : " + err.result.error.message;
             }
         }
 
-        // --- SUPPRIMER UN USER ---
         async function deleteUser(email) {
             if (confirm(`⚠️ VOULEZ-VOUS VRAIMENT RÉVOQUER L'AGENT ${email} ?`)) {
                 try {
