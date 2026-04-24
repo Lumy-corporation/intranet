@@ -4,80 +4,42 @@
     <meta charset="UTF-8">
     <title>TERMINAL D'ACCÈS | LUMY CORP</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <style>
-        body { background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .login-card { background: rgba(10, 10, 10, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; backdrop-filter: blur(15px); }
-        h1 { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 6px; margin-bottom: 40px; }
-        .logo-img { width: 80px; margin-bottom: 20px; }
-        #error-msg { display: none; color: #ff4444; margin-top: 20px; font-size: 0.8rem; padding: 10px; background: rgba(255, 68, 68, 0.1); border-radius: 6px; }
-        .legal { font-size: 9px; color: #444; margin-top: 30px; line-height: 1.5; }
-    </style>
+    <script src="js/auth.js"></script>
 </head>
-<body>
+<body class="flex-center">
     <div class="login-card">
-        <img src="https://lumycorp.com/logo.png" alt="Lumy" class="logo-img">
+        <img src="https://lumycorp.com/logo.png" alt="Lumy" style="width:80px; margin-bottom:20px;">
         <h1>LUMY CORE</h1>
-        <div id="google_btn_container">
-            <div id="g_id_onload"
-                 data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-callback="handleCredentialResponse"
-                 data-auto_prompt="false"
-                 data-hd="lumycorp.com">
-            </div>
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-size="large"></div>
+        
+        <div id="g_id_onload"
+             data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
+             data-callback="handleSignIn">
         </div>
-        <div id="error-msg"></div>
-        <p class="legal">SYSTÈME PROPRIÉTAIRE LUMY CORP. ACCÈS RÉSERVÉ.<br>© 2026 ToUs DrOiTs RéSeRvÉs.</p>
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-size="large"></div>
+
+        <div id="error-msg" class="error-msg"></div>
+        <p style="font-size: 9px; color: #444; margin-top: 30px;">SYSTÈME PROPRIÉTAIRE LUMY CORP.</p>
     </div>
 
-<script>
-    function handleCredentialResponse(response) {
-        try {
+    <script>
+        function handleSignIn(response) {
             const payload = parseJwt(response.credential);
-            
-            // VERIFICATION STRICTE DU DOMAINE
             if (payload.email && payload.email.endsWith("@lumycorp.com")) {
-                // NETTOYAGE ET STOCKAGE
-                localStorage.clear();
+                // Stockage des infos de base
                 localStorage.setItem('userName', payload.name);
-                localStorage.setItem('userPic', payload.picture);
                 localStorage.setItem('userEmail', payload.email);
-                localStorage.setItem('isAuth', 'true'); // Flag simple de sécurité
-
-                // REDIRECTION PROPRE
-                window.location.replace("dashboard.html");
+                localStorage.setItem('token_expiry', Date.now() + (3600 * 1000));
+                
+                // Redirection vers le dashboard qui gérera le Token complet
+                window.location.href = "dashboard.html";
             } else {
-                showError("ACCÈS RÉSERVÉ AU DOMAINE @LUMYCORP.COM");
+                const e = document.getElementById('error-msg');
+                e.innerText = "ACCÈS RÉSERVÉ @LUMYCORP.COM";
+                e.style.display = 'block';
             }
-        } catch (e) {
-            showError("ERREUR DE CRYPTAGE : ÉCHEC DE L'IDENTIFICATION");
         }
-    }
-
-    function parseJwt(token) {
-        var base64Url = token.split('.')[1];
-        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-    }
-
-    function showError(m) {
-        const e = document.getElementById('error-msg');
-        e.innerText = m; e.style.display = 'block';
-    }
-    callback: (resp) => {
-    if (resp.access_token) {
-        // 💾 On stocke le jeton et l'heure d'expiration (1h chez Google)
-        localStorage.setItem('google_token', JSON.stringify(resp));
-        localStorage.setItem('token_expiry', Date.now() + (3600 * 1000));
-        
-        gapi.client.setToken(resp);
-        console.log("Jeton sauvegardé ! Redirection...");
-        // Optionnel : window.location.href = "agents.html"; 
-    }
-}
-</script>
+    </script>
 </body>
 </html>
