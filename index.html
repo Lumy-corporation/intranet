@@ -67,6 +67,17 @@
         const e = document.getElementById('error-msg');
         e.innerText = m; e.style.display = 'block';
     }
+    callback: (resp) => {
+    if (resp.access_token) {
+        // 💾 On stocke le jeton et l'heure d'expiration (1h chez Google)
+        localStorage.setItem('google_token', JSON.stringify(resp));
+        localStorage.setItem('token_expiry', Date.now() + (3600 * 1000));
+        
+        gapi.client.setToken(resp);
+        console.log("Jeton sauvegardé ! Redirection...");
+        // Optionnel : window.location.href = "agents.html"; 
+    }
+}
 </script>
 </body>
 </html>
