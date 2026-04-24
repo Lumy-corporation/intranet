@@ -3,77 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>DASHBOARD | LUMY CORP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --accent: #007bff; --border: rgba(255,255,255,0.1); }
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: none; } /* CACHÉ PAR DÉFAUT */
-        nav { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(0,0,0,0.9); }
-        .nav-logo { font-family: 'Orbitron'; letter-spacing: 3px; }
-        .profile-trigger { cursor: pointer; }
-        #nav-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); }
-        
-        /* MODAL PROFIL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
-        .profile-card { background: #111; border: 1px solid var(--border); width: 320px; padding: 30px; border-radius: 20px; text-align: center; }
-        #modal-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); margin-bottom: 15px; }
-        .logout-btn { background: #ff4444; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 20px; width: 100%; font-weight: 600; }
-        
-        main { padding: 50px; text-align: center; }
-        h1 { font-family: 'Orbitron'; font-size: 2rem; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth.js"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client"></script>
 </head>
 <body>
+    <header style="padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between;">
+        <h1>LUMY DASHBOARD</h1>
+        <button onclick="logout()" style="background:none; color:red; border:1px solid red; cursor:pointer;">DÉCONNEXION</button>
+    </header>
 
-    <nav>
-        <div class="nav-logo">LUMY CORE</div>
-        <div class="profile-trigger" onclick="toggleModal()">
-            <img id="nav-avatar" src="" alt="">
-        </div>
-    </nav>
-
-    <main>
-        <h1 id="welcome-msg">ACCÈS AGENT AUTORISÉ</h1>
-        <p style="color: #444;">Système de gestion centralisé Lumy Corporation.</p>
+    <main style="padding: 40px;">
+        <h2>Bienvenue, <span id="user-display"></span></h2>
+        <p>C'est ici que tu créeras tes dizaines d'agents demain !</p>
     </main>
 
-    <div class="modal-overlay" id="modalOverlay" onclick="if(event.target == this) toggleModal()">
-        <div class="profile-card">
-            <img id="modal-avatar" src="">
-            <div id="full-name" style="font-weight: 600; margin-bottom: 5px;"></div>
-            <div id="full-email" style="color: #666; font-size: 0.8rem;"></div>
-            <button class="logout-btn" onclick="logout()">DÉCONNEXION</button>
-        </div>
-    </div>
+    <script>
+        // On vérifie l'auth direct
+        checkAuth();
+        document.getElementById('user-display').innerText = localStorage.getItem('userName');
 
-<script>
-    // VÉRIFICATION DE SÉCURITÉ AVANT AFFICHAGE
-    const isAuth = localStorage.getItem('isAuth');
-    const email = localStorage.getItem('userEmail');
+        let tokenClient;
 
-    if (isAuth === 'true' && email && email.endsWith('@lumycorp.com')) {
-        document.body.style.display = 'block'; // ON MONTRE LA PAGE
-    } else {
-        localStorage.clear();
-        window.location.replace("index.html"); // ON JETTE L'INTRUS
-    }
+        function initGapi() {
+            gapi.load('client', async () => {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/admin/directory_1/rest'],
+                });
+                
+                // Si on a déjà un token, on le met
+                const savedToken = localStorage.getItem('google_token');
+                if(savedToken) gapi.client.setToken(JSON.parse(savedToken));
 
-    window.onload = function() {
-        document.getElementById('nav-avatar').src = localStorage.getItem('userPic');
-        document.getElementById('modal-avatar').src = localStorage.getItem('userPic').replace('s96-c', 's300-c');
-        document.getElementById('full-name').innerText = localStorage.getItem('userName');
-        document.getElementById('full-email').innerText = email;
-        document.getElementById('welcome-msg').innerText = "BIENVENUE, " + localStorage.getItem('userName').toUpperCase();
-    };
+                // On prépare le client pour demander le token complet si besoin
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: SCOPES,
+                    callback: (resp) => {
+                        localStorage.setItem('google_token', JSON.stringify(resp));
+                        gapi.client.setToken(resp);
+                        location.reload(); 
+                    }
+                });
 
-    function toggleModal() {
-        const m = document.getElementById('modalOverlay');
-        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-    }
-
-    function logout() {
-        localStorage.clear();
-        window.location.replace("index.html");
-    }
-</script>
+                // Si on n'a pas le token complet de l'API Admin, on le demande une fois
+                if(!localStorage.getItem('google_token')) {
+                    tokenClient.requestAccessToken();
+                }
+            });
+        }
+    </script>
 </body>
 </html>
