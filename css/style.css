@@ -1,0 +1,45 @@
+:root {
+    --accent: #007bff;
+    --danger: #dc3545;
+    --bg: #0a0a0a;
+    --card: #151515;
+    --text: #ffffff;
+}
+
+body {
+    background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    height: 100vh;
+}
+
+/* Utile pour l'index */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background: rgba(21, 21, 21, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 50px 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    backdrop-filter: blur(15px);
+}
+
+h1 { font-family: 'Orbitron'; letter-spacing: 4px; }
+
+.error-msg {
+    display: none;
+    color: #ff4444;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    padding: 10px;
+    background: rgba(255, 68, 68, 0.1);
+    border-radius: 6px;
+}
