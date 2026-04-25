@@ -2,57 +2,69 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DASHBOARD | LUMY CORP</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/auth.js"></script>
-    <script async defer src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client"></script>
+    <title>DASHBOARD | LUMY CORE</title>
+    <link rel="stylesheet" href="css/style.css"> <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
-<body>
-    <header style="padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between;">
-        <h1>LUMY DASHBOARD</h1>
-        <button onclick="logout()" style="background:none; color:red; border:1px solid red; cursor:pointer;">DÉCONNEXION</button>
-    </header>
+<body style="background: #0a0a14; color: white; font-family: sans-serif;">
 
-    <main style="padding: 40px;">
-        <h2>Bienvenue, <span id="user-display"></span></h2>
-        <p>C'est ici que tu créeras tes dizaines d'agents demain !</p>
-    </main>
+    <nav style="padding: 20px; border-bottom: 1px solid #00d4ff; display: flex; justify-content: space-between;">
+        <span id="user-welcome" style="font-weight: bold; color: #00d4ff;">ACCÈS CORE...</span>
+        <button onclick="logout()" style="background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">DÉCONNEXION</button>
+    </nav>
+
+    <div style="padding: 30px;">
+        <h2>CANDIDATURES EN ATTENTE</h2>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 2px solid #333;">
+                    <th>Nom / Prénom</th>
+                    <th>Pôle</th>
+                    <th>Email</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="candidates-list">
+                </tbody>
+        </table>
+    </div>
 
     <script>
-        // On vérifie l'auth direct
-        checkAuth();
-        document.getElementById('user-display').innerText = localStorage.getItem('userName');
+        // Initialise Firebase (même config que la page login)
+        // ... (Config Firebase ici) ...
+        const db = firebase.firestore();
 
-        let tokenClient;
+        // Sécurité : Vérifier si l'utilisateur est connecté
+        const user = JSON.parse(localStorage.getItem('lumy_user'));
+        if(!user) window.location.href = "index.html";
+        document.getElementById('user-welcome').innerText = "OPÉRATEUR : " + user.name.toUpperCase();
 
-        function initGapi() {
-            gapi.load('client', async () => {
-                await gapi.client.init({
-                    apiKey: API_KEY,
-                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/admin/directory_1/rest'],
-                });
-                
-                // Si on a déjà un token, on le met
-                const savedToken = localStorage.getItem('google_token');
-                if(savedToken) gapi.client.setToken(JSON.parse(savedToken));
-
-                // On prépare le client pour demander le token complet si besoin
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: SCOPES,
-                    callback: (resp) => {
-                        localStorage.setItem('google_token', JSON.stringify(resp));
-                        gapi.client.setToken(resp);
-                        location.reload(); 
-                    }
-                });
-
-                // Si on n'a pas le token complet de l'API Admin, on le demande une fois
-                if(!localStorage.getItem('google_token')) {
-                    tokenClient.requestAccessToken();
-                }
+        // Charger les candidats en temps réel
+        db.collection("candidates").onSnapshot((snapshot) => {
+            const list = document.getElementById('candidates-list');
+            list.innerHTML = ""; // Vide la liste avant de recharger
+            
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                list.innerHTML += `
+                    <tr style="border-bottom: 1px solid #222; height: 50px;">
+                        <td>${data.nom} ${data.prenom}</td>
+                        <td><span style="color: #00d4ff;">${data.pole}</span></td>
+                        <td>${data.email_prive}</td>
+                        <td>${data.statut}</td>
+                        <td>
+                            <button onclick="valider('${doc.id}')" style="background: green; color: white; border: none; padding: 5px;">VALIDER</button>
+                        </td>
+                    </tr>
+                `;
             });
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
         }
     </script>
 </body>
