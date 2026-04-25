@@ -2,13 +2,31 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>TERMINAL D'ACCÈS | LUMY CORP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL D'ACCÈS | LUMY CORE</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="js/auth.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <style>
+        :root { --neon-blue: #00d4ff; --bg-dark: #0a0a14; }
+        body.flex-center { 
+            background: var(--bg-dark); color: white; font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px;
+            border: 1px solid rgba(0,212,255,0.2); text-align: center; width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; letter-spacing: 4px; color: var(--neon-blue); margin-bottom: 30px; }
+        .error-msg { color: #ff4b4b; background: rgba(255,75,75,0.1); padding: 10px; border-radius: 5px; display: none; margin-top: 20px; font-size: 0.8rem; }
+    </style>
 </head>
 <body class="flex-center">
+
     <div class="login-card">
         <img src="https://lumycorp.com/logo.png" alt="Lumy" style="width:80px; margin-bottom:20px;">
         <h1>LUMY CORE</h1>
@@ -17,28 +35,72 @@
              data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
              data-callback="handleSignIn">
         </div>
-        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-size="large"></div>
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-size="large" data-logo_alignment="left"></div>
 
         <div id="error-msg" class="error-msg"></div>
-        <p style="font-size: 9px; color: #444; margin-top: 30px;">SYSTÈME PROPRIÉTAIRE LUMY CORP.</p>
+        <p style="font-size: 9px; color: #444; margin-top: 30px; letter-spacing: 1px;">SÉCURITÉ NIVEAU 4 - INTRANET PROPRIÉTAIRE</p>
     </div>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-        function handleSignIn(response) {
+        // CONFIGURATION FIREBASE (À remplir avec tes clés Firebase)
+        const firebaseConfig = {
+            apiKey: "TON_API_KEY",
+            authDomain: "lumy-corp.firebaseapp.com",
+            projectId: "lumy-corp",
+            storageBucket: "lumy-corp.appspot.com",
+            messagingSenderId: "280639681515",
+            appId: "TON_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Fonction pour lire le Token Google
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(window.atob(base64));
+        };
+
+        async function handleSignIn(response) {
             const payload = parseJwt(response.credential);
+            const errorDiv = document.getElementById('error-msg');
+
+            // 1. Vérification du domaine
             if (payload.email && payload.email.endsWith("@lumycorp.com")) {
-                // Stockage des infos de base
-                localStorage.setItem('userName', payload.name);
-                localStorage.setItem('userEmail', payload.email);
-                localStorage.setItem('token_expiry', Date.now() + (3600 * 1000));
                 
-                // Redirection vers le dashboard qui gérera le Token complet
-                window.location.href = "dashboard.html";
+                try {
+                    // 2. Vérification dans la base de données Firestore
+                    const userDoc = await db.collection("users").doc(payload.email).get();
+
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        
+                        // 3. Stockage sécurisé pour la session
+                        localStorage.setItem('lumy_user', JSON.stringify({
+                            name: payload.name,
+                            email: payload.email,
+                            role: userData.role, // "admin", "rh", etc.
+                            photo: payload.picture
+                        }));
+
+                        window.location.href = "dashboard.html";
+                    } else {
+                        showError("ACCÈS RÉVOQUÉ : COMPTE NON RÉPERTORIÉ DANS LA BDD.");
+                    }
+                } catch (err) {
+                    showError("ERREUR DE LIAISON BDD.");
+                }
+
             } else {
-                const e = document.getElementById('error-msg');
-                e.innerText = "ACCÈS RÉSERVÉ @LUMYCORP.COM";
-                e.style.display = 'block';
+                showError("ACCÈS REFUSÉ : DOMAINE @LUMYCORP.COM REQUIS.");
             }
+        }
+
+        function showError(msg) {
+            const e = document.getElementById('error-msg');
+            e.innerText = msg;
+            e.style.display = 'block';
         }
     </script>
 </body>
