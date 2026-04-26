@@ -2,10 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORE | INTRANET V5</title>
+<title>LUMY CORE | INTRANET</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 body{
@@ -18,7 +17,7 @@ font-family:Inter;
 
 /* SIDEBAR */
 .sidebar{
-width:290px;
+width:280px;
 height:100vh;
 background:#0a0a0a;
 border-right:1px solid #1a1a1a;
@@ -28,23 +27,11 @@ flex-direction:column;
 }
 
 .logo{
-display:flex;
-align-items:center;
-gap:12px;
-margin-bottom:30px;
-}
-
-.logo img{
-width:42px;
-height:42px;
-border-radius:8px;
-}
-
-.logo span{
 font-family:Orbitron;
 color:#00f2ff;
-letter-spacing:2px;
+margin-bottom:25px;
 font-size:14px;
+letter-spacing:2px;
 }
 
 .menu button{
@@ -52,11 +39,11 @@ width:100%;
 padding:12px;
 margin-bottom:10px;
 background:#111;
-border:1px solid #1f1f1f;
+border:1px solid #1a1a1a;
 color:white;
+cursor:pointer;
 text-align:left;
 border-radius:8px;
-cursor:pointer;
 transition:0.2s;
 }
 
@@ -79,26 +66,26 @@ align-items:center;
 margin-bottom:20px;
 }
 
-.user{
+.profile{
 display:flex;
 align-items:center;
 gap:10px;
 cursor:pointer;
 }
 
-.user img{
-width:40px;
-height:40px;
+.profile img{
+width:42px;
+height:42px;
 border-radius:50%;
 border:1px solid #00f2ff;
 }
 
-/* CARD SYSTEM */
+/* CONTENT */
 .card{
 background:#0b0b0b;
 border:1px solid #1a1a1a;
-padding:20px;
-border-radius:12px;
+padding:15px;
+border-radius:10px;
 margin-bottom:10px;
 }
 
@@ -109,12 +96,12 @@ margin-bottom:15px;
 }
 
 /* INPUT */
-input,select{
+input{
 width:100%;
 padding:10px;
-margin-bottom:10px;
+margin-top:10px;
 background:#111;
-border:1px solid #1f1f1f;
+border:1px solid #1a1a1a;
 color:white;
 }
 
@@ -124,27 +111,8 @@ padding:10px;
 background:#00f2ff;
 border:none;
 cursor:pointer;
-margin-top:5px;
-}
-
-/* LIST */
-.item{
-padding:10px;
-border-bottom:1px solid #1a1a1a;
-cursor:pointer;
-}
-
-.item:hover{
-background:#111;
-}
-
-/* CHAT */
-.chat{
-height:350px;
-overflow:auto;
-border:1px solid #1a1a1a;
-padding:10px;
-margin-bottom:10px;
+margin-top:10px;
+width:100%;
 }
 </style>
 </head>
@@ -154,18 +122,13 @@ margin-bottom:10px;
 <!-- SIDEBAR -->
 <div class="sidebar">
 
-<div class="logo">
-<img src="https://i.postimg.cc/ZCfjHWMY/logo.png">
-<span>LUMY CORE</span>
-</div>
+<div class="logo">LUMY CORE INTRANET</div>
 
 <div class="menu">
-<button onclick="view('dashboard')">Dashboard</button>
-<button onclick="view('members')">Membres</button>
-<button onclick="view('create')">Créer membre</button>
-<button onclick="view('projects')">Projets</button>
-<button onclick="view('chat')">Chat</button>
-<button onclick="view('logs')">Logs</button>
+<button onclick="load('dashboard')">Dashboard</button>
+<button onclick="load('members')">Membres</button>
+<button onclick="load('chat')">Chat interne</button>
+<button onclick="logout()">Déconnexion</button>
 </div>
 
 </div>
@@ -175,12 +138,12 @@ margin-bottom:10px;
 
 <div class="topbar">
 <div id="welcome">Chargement...</div>
-<div class="user" onclick="profile()">
+<div class="profile">
 <img id="pp">
 </div>
 </div>
 
-<div class="card" id="content">Chargement...</div>
+<div id="content" class="card">Initialisation...</div>
 
 </div>
 
@@ -188,85 +151,64 @@ margin-bottom:10px;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
+getAuth,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
 getFirestore,
 collection,
 getDocs,
 addDoc,
-doc,
-getDoc,
-deleteDoc,
-onSnapshot,
 query,
-orderBy
+orderBy,
+onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-/* FIREBASE CONFIG */
+/* CONFIG */
 const firebaseConfig = {
 apiKey:"XXX",
 authDomain:"XXX",
-projectId:"XXX",
-storageBucket:"XXX",
-messagingSenderId:"XXX",
-appId:"XXX"
+projectId:"XXX"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-/* USER */
-const user = JSON.parse(localStorage.getItem("lumy_user"));
+let user = null;
 
-if(!user){
+/* AUTH PROTECTION */
+onAuthStateChanged(auth,(u)=>{
+
+if(!u){
 window.location.href="login.html";
+return;
 }
 
+user = u;
+
 document.getElementById("welcome").innerText =
-"Bienvenue " + user.given_name;
+"Bienvenue " + u.displayName;
 
-document.getElementById("pp").src = user.picture;
+document.getElementById("pp").src = u.photoURL;
 
-/* ROLE SIMPLE */
-const isAdmin = user.email?.includes("@lumycorp.com");
+load("dashboard");
+});
 
 /* ROUTER */
-window.view = function(page){
+window.load = async function(page){
 
 if(page==="dashboard"){
-document.getElementById("content").innerHTML =
-"<div class='title'>DASHBOARD</div>Système Lumy opérationnel.";
+document.getElementById("content").innerHTML=`
+<div class="title">DASHBOARD</div>
+Système intranet actif. Connexion sécurisée Firebase.
+`;
 }
 
 /* MEMBERS */
 if(page==="members"){
-loadMembers();
-}
-
-/* CREATE */
-if(page==="create"){
-createForm();
-}
-
-/* PROJECTS */
-if(page==="projects"){
-loadProjects();
-}
-
-/* CHAT */
-if(page==="chat"){
-loadChat();
-}
-
-/* LOGS */
-if(page==="logs"){
-loadLogs();
-}
-}
-
-/* MEMBERS */
-async function loadMembers(){
 
 const snap = await getDocs(collection(db,"users"));
 
@@ -276,7 +218,7 @@ snap.forEach(d=>{
 const u=d.data();
 
 html+=`
-<div class="item" onclick="openUser('${d.id}')">
+<div class="card">
 <b>${u.firstName} ${u.lastName}</b><br>
 ${u.email}<br>
 <small>${u.role}</small>
@@ -287,87 +229,13 @@ ${u.email}<br>
 document.getElementById("content").innerHTML=html;
 }
 
-/* USER PROFILE */
-window.openUser = async function(id){
-
-const snap = await getDoc(doc(db,"users",id));
-const u=snap.data();
-
-document.getElementById("content").innerHTML=`
-<div class="title">PROFIL</div>
-
-<b>${u.firstName} ${u.lastName}</b><br><br>
-Email: ${u.email}<br>
-Role: ${u.role}<br>
-Ville: ${u.city}<br>
-Téléphone: ${u.phone}<br>
-
-${isAdmin ? `<button class="btn" onclick="deleteUser('${id}')">Supprimer</button>` : ""}
-`;
-}
-
-/* DELETE */
-window.deleteUser = async function(id){
-if(!isAdmin) return;
-await deleteDoc(doc(db,"users",id));
-view("members");
-}
-
-/* CREATE FORM */
-function createForm(){
-document.getElementById("content").innerHTML=`
-<div class="title">CRÉER MEMBRE</div>
-
-<input id="fn" placeholder="Prénom">
-<input id="ln" placeholder="Nom">
-<input id="email" placeholder="Email">
-<input id="role" placeholder="Rôle">
-<input id="phone" placeholder="Téléphone">
-<input id="city" placeholder="Ville">
-
-<button class="btn" onclick="createUser()">Créer</button>
-`;
-}
-
-/* CREATE USER */
-window.createUser = async function(){
-
-await addDoc(collection(db,"users"),{
-firstName:fn.value,
-lastName:ln.value,
-email:email.value,
-role:role.value,
-phone:phone.value,
-city:city.value,
-createdAt:Date.now()
-});
-
-view("members");
-}
-
-/* PROJECTS */
-async function loadProjects(){
-
-const snap=await getDocs(collection(db,"projects"));
-
-let html="<div class='title'>PROJETS</div>";
-
-snap.forEach(d=>{
-const p=d.data();
-
-html+=`<div class="item">${p.name} - ${p.status}</div>`;
-});
-
-document.getElementById("content").innerHTML=html;
-}
-
 /* CHAT */
-function loadChat(){
+if(page==="chat"){
 
 document.getElementById("content").innerHTML=`
-<div class="title">CHAT</div>
+<div class="title">CHAT INTERNE</div>
 
-<div class="chat" id="chat"></div>
+<div id="chat"></div>
 
 <input id="msg">
 <button class="btn" onclick="send()">Envoyer</button>
@@ -376,20 +244,26 @@ document.getElementById("content").innerHTML=`
 const q=query(collection(db,"messages"),orderBy("time"));
 
 onSnapshot(q,(snap)=>{
+
 let box=document.getElementById("chat");
 box.innerHTML="";
 
 snap.forEach(d=>{
 const m=d.data();
-box.innerHTML+=`<div class="item"><b>${m.user}</b>: ${m.text}</div>`;
+box.innerHTML+=`
+<div class="card"><b>${m.user}</b><br>${m.text}</div>
+`;
 });
+
 });
 }
+}
 
-/* SEND MSG */
+/* SEND MESSAGE */
 window.send = async function(){
+
 await addDoc(collection(db,"messages"),{
-user:user.given_name,
+user:user.displayName,
 text:msg.value,
 time:Date.now()
 });
@@ -397,19 +271,11 @@ time:Date.now()
 msg.value="";
 }
 
-/* LOGS */
-async function loadLogs(){
-document.getElementById("content").innerHTML=
-"<div class='title'>LOGS SYSTÈME</div>Module prêt backend.";
+/* LOGOUT */
+window.logout = async function(){
+await signOut(auth);
+window.location.href="login.html";
 }
-
-/* PROFILE */
-window.profile = function(){
-alert(user.name + "\n" + user.email);
-}
-
-/* INIT */
-view("dashboard");
 
 </script>
 
