@@ -3,258 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORE | SaaS Dashboard</title>
+<title>LUMY CORE | Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --bg:#0b0c10;
-    --panel:#12141b;
-    --panel2:#161925;
-    --text:#ffffff;
-    --muted:#8b8f98;
-    --accent:#00f2ff;
-    --border:rgba(255,255,255,0.08);
+:root {
+    --bg: #0b0b0f;
+    --card: #141420;
+    --text: #ffffff;
+    --muted: #9aa0a6;
+    --accent: #00f2ff;
+    --border: rgba(255,255,255,0.08);
 }
 
-/* LIGHT MODE AUTO */
-@media (prefers-color-scheme: light){
-:root{
-    --bg:#f4f6fb;
-    --panel:#ffffff;
-    --panel2:#eef2f7;
-    --text:#0b0c10;
-    --muted:#5c6470;
-    --border:rgba(0,0,0,0.08);
-}}
-
-body{
-    margin:0;
-    font-family:Inter;
-    background:var(--bg);
-    color:var(--text);
-    display:flex;
+/* MODE CLAIR AUTO */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #0b0b0f;
+        --muted: #555;
+        --border: rgba(0,0,0,0.1);
+    }
 }
 
-/* SIDEBAR */
-.sidebar{
-    width:240px;
-    height:100vh;
-    background:var(--panel);
-    border-right:1px solid var(--border);
-    padding:20px;
-    box-sizing:border-box;
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
-.logo{
-    font-family:Orbitron;
-    color:var(--accent);
-    font-size:14px;
-    margin-bottom:30px;
+/* TOP BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 25px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.nav-item{
-    padding:10px;
-    margin:6px 0;
-    border-radius:10px;
-    color:var(--muted);
-    cursor:pointer;
-    font-size:13px;
+.logo {
+    font-family: Orbitron;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-size: 14px;
 }
 
-.nav-item:hover{
-    background:var(--panel2);
-    color:var(--accent);
+.nav {
+    display: flex;
+    gap: 20px;
 }
 
-/* MAIN */
-.main{
-    flex:1;
-    display:flex;
-    flex-direction:column;
+.nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
 }
 
-/* TOPBAR */
-.topbar{
-    height:60px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 20px;
-    border-bottom:1px solid var(--border);
-    background:var(--panel);
-}
-
-.search{
-    background:var(--panel2);
-    border:1px solid var(--border);
-    padding:8px 12px;
-    border-radius:10px;
-    width:300px;
-    color:var(--text);
+.nav a:hover {
+    color: var(--accent);
 }
 
 /* PROFILE */
-.profile{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    cursor:pointer;
-    position:relative;
+.profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
 }
 
-.profile img{
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    border:2px solid var(--accent);
+.profile img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
 }
 
-.dropdown{
-    position:absolute;
-    right:0;
-    top:45px;
-    background:var(--panel);
-    border:1px solid var(--border);
-    width:220px;
-    border-radius:12px;
-    padding:12px;
-    display:none;
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 12px;
+    width: 220px;
+    display: none;
 }
 
-.dropdown p{
-    font-size:12px;
-    margin:5px 0;
-    color:var(--muted);
+.dropdown p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: var(--muted);
 }
 
-.logout{
-    width:100%;
-    margin-top:10px;
-    padding:8px;
-    border:1px solid red;
-    background:transparent;
-    color:red;
-    border-radius:8px;
-    cursor:pointer;
+.logout {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid red;
+    background: transparent;
+    color: red;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
-/* CONTENT */
-.content{
-    padding:20px;
+/* MAIN */
+.container {
+    padding: 50px;
 }
 
-/* KPI CARDS */
-.kpi-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:15px;
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
 }
 
-.card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    padding:15px;
-    border-radius:15px;
+h1 {
+    font-size: 22px;
 }
 
-.kpi{
-    font-size:20px;
-    font-weight:700;
+.accent {
+    color: var(--accent);
 }
-
-.label{
-    font-size:12px;
-    color:var(--muted);
-}
-
-/* WELCOME */
-.welcome{
-    margin:20px 0;
-    font-size:20px;
-}
-
-.accent{color:var(--accent);}
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<!-- TOP MENU -->
+<div class="topbar">
     <div class="logo">LUMY CORE</div>
 
-    <div class="nav-item">📊 Dashboard</div>
-    <div class="nav-item">👥 Membres</div>
-    <div class="nav-item">⚙ Apps</div>
-    <div class="nav-item">📁 Projets</div>
-    <div class="nav-item">🔐 Sécurité</div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-        <input class="search" placeholder="Rechercher...">
-
-        <div class="profile" onclick="toggle()">
-            <img id="pp">
-            <div class="dropdown" id="dd">
-                <p id="name"></p>
-                <p id="email"></p>
-                <button class="logout" onclick="logout()">Déconnexion</button>
-            </div>
-        </div>
+    <div class="nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Membres</a>
+        <a href="#">Apps</a>
+        <a href="#">Projets</a>
     </div>
 
-    <!-- CONTENT -->
-    <div class="content">
-
-        <div class="welcome">
-            Salut <span class="accent" id="fullname"></span> 👋
+    <!-- PROFILE -->
+    <div class="profile" onclick="toggleDropdown()">
+        <img id="pp" src="">
+        <div class="dropdown" id="dropdown">
+            <p id="name"></p>
+            <p id="email"></p>
+            <button class="logout" onclick="logout()">Déconnexion</button>
         </div>
+    </div>
+</div>
 
-        <!-- KPI -->
-        <div class="kpi-grid">
-
-            <div class="card">
-                <div class="kpi">128</div>
-                <div class="label">Utilisateurs actifs</div>
-            </div>
-
-            <div class="card">
-                <div class="kpi">12</div>
-                <div class="label">Applications</div>
-            </div>
-
-            <div class="card">
-                <div class="kpi">3</div>
-                <div class="label">Services critiques</div>
-            </div>
-
-        </div>
-
+<!-- CONTENT -->
+<div class="container">
+    <div class="card">
+        <h1>Salut <span class="accent" id="fullname"></span> 👋</h1>
+        <p style="color: var(--muted); font-size: 13px;">
+            Bienvenue sur le système Lumy Core
+        </p>
     </div>
 </div>
 
 <script>
-const user = JSON.parse(localStorage.getItem("lumy_user"));
+let user = JSON.parse(localStorage.getItem("lumy_user"));
+
+if (!user) {
+    window.location.href = "index.html";
+}
+
+document.getElementById("pp").src = user.photo || "";
+document.getElementById("fullname").innerText = (user.given_name || user.name || "");
+document.getElementById("name").innerText = user.name || "";
+document.getElementById("email").innerText = user.email || "";
+
+function toggleDropdown() {
+    const d = document.getElementById("dropdown");
+    d.style.display = d.style.display === "block" ? "none" : "block";
+}
+
+function logout() {
+    localStorage.removeItem("lumy_user");
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>}
+
+.status{
+    margin-top:20px;
+    color:var(--gray);
+    font-size:14px;
+    line-height:1.6;
+}
+
+.alert{
+    margin-top:25px;
+    color:var(--red);
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.user{
+    margin-top:15px;
+    color:white;
+    font-size:16px;
+}
+
+/* BTN DECO */
+.logout{
+    margin-top:35px;
+    padding:10px 18px;
+    border:1px solid var(--red);
+    background:none;
+    color:var(--red);
+    cursor:pointer;
+    border-radius:8px;
+    font-family:Orbitron;
+    font-size:12px;
+    transition:0.3s;
+}
+
+.logout:hover{
+    background:var(--red);
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>LUMY CORE SYSTEM</h1>
+
+    <div class="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <div class="user" id="user">Chargement...</div>
+
+    <div class="alert">
+        MAINTENANCE EN COURS
+    </div>
+
+    <div class="status">
+        Les services intranet sont temporairement indisponibles.<br>
+        Mise à jour système en cours.
+    </div>
+
+    <div class="status">
+        Merci de réessayer ultérieurement.
+    </div>
+
+    <button class="logout" onclick="logout()">DÉCONNEXION</button>
+
+</div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("lumy_user"));
 
 if(!user){
     window.location.href="index.html";
 }
 
-document.getElementById("pp").src = user.photo || "";
-document.getElementById("fullname").innerText = user.given_name || user.name || "";
-document.getElementById("name").innerText = user.name || "";
-document.getElementById("email").innerText = user.email || "";
+let split = (user.name || "").split(" ");
+let prenom = split[0] || "";
+let nom = split.slice(1).join(" ") || "";
 
-function toggle(){
-    const d=document.getElementById("dd");
-    d.style.display = d.style.display==="block"?"none":"block";
-}
+document.getElementById("user").innerText =
+"Connecté : " + prenom + " " + nom;
 
 function logout(){
     localStorage.removeItem("lumy_user");
@@ -264,3 +292,4 @@ function logout(){
 
 </body>
 </html>
+
