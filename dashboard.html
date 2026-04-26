@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORE | INTRANET FINAL</title>
+<title>LUMY CORE | INTRANET V5</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
@@ -18,29 +18,33 @@ font-family:Inter;
 
 /* SIDEBAR */
 .sidebar{
-width:280px;
+width:290px;
 height:100vh;
 background:#0a0a0a;
 border-right:1px solid #1a1a1a;
 padding:20px;
+display:flex;
+flex-direction:column;
 }
 
 .logo{
 display:flex;
 align-items:center;
-gap:10px;
+gap:12px;
 margin-bottom:30px;
 }
 
 .logo img{
-width:40px;
-height:40px;
-border-radius:6px;
+width:42px;
+height:42px;
+border-radius:8px;
 }
 
 .logo span{
 font-family:Orbitron;
 color:#00f2ff;
+letter-spacing:2px;
+font-size:14px;
 }
 
 .menu button{
@@ -53,10 +57,12 @@ color:white;
 text-align:left;
 border-radius:8px;
 cursor:pointer;
+transition:0.2s;
 }
 
 .menu button:hover{
 border-color:#00f2ff;
+transform:translateX(3px);
 }
 
 /* MAIN */
@@ -73,37 +79,37 @@ align-items:center;
 margin-bottom:20px;
 }
 
-.profile{
+.user{
 display:flex;
 align-items:center;
 gap:10px;
 cursor:pointer;
 }
 
-.profile img{
+.user img{
 width:40px;
 height:40px;
 border-radius:50%;
 border:1px solid #00f2ff;
 }
 
-/* CARD */
+/* CARD SYSTEM */
 .card{
 background:#0b0b0b;
 border:1px solid #1a1a1a;
 padding:20px;
 border-radius:12px;
+margin-bottom:10px;
 }
 
-/* TITRE */
 .title{
 font-family:Orbitron;
 color:#00f2ff;
 margin-bottom:15px;
 }
 
-/* INPUTS */
-input, select{
+/* INPUT */
+input,select{
 width:100%;
 padding:10px;
 margin-bottom:10px;
@@ -112,7 +118,7 @@ border:1px solid #1f1f1f;
 color:white;
 }
 
-/* BTN */
+/* BUTTON */
 .btn{
 padding:10px;
 background:#00f2ff;
@@ -121,15 +127,24 @@ cursor:pointer;
 margin-top:5px;
 }
 
-/* USER CARD */
-.user{
+/* LIST */
+.item{
 padding:10px;
 border-bottom:1px solid #1a1a1a;
 cursor:pointer;
 }
 
-.user:hover{
+.item:hover{
 background:#111;
+}
+
+/* CHAT */
+.chat{
+height:350px;
+overflow:auto;
+border:1px solid #1a1a1a;
+padding:10px;
+margin-bottom:10px;
 }
 </style>
 </head>
@@ -145,11 +160,12 @@ background:#111;
 </div>
 
 <div class="menu">
-<button onclick="loadDashboard()">Dashboard</button>
-<button onclick="loadUsers()">Membres</button>
-<button onclick="openCreateUser()">Créer membre</button>
-<button onclick="loadProjects()">Projets</button>
-<button onclick="loadChat()">Chat</button>
+<button onclick="view('dashboard')">Dashboard</button>
+<button onclick="view('members')">Membres</button>
+<button onclick="view('create')">Créer membre</button>
+<button onclick="view('projects')">Projets</button>
+<button onclick="view('chat')">Chat</button>
+<button onclick="view('logs')">Logs</button>
 </div>
 
 </div>
@@ -158,8 +174,8 @@ background:#111;
 <div class="main">
 
 <div class="topbar">
-<div id="welcome"></div>
-<div class="profile" onclick="myProfile()">
+<div id="welcome">Chargement...</div>
+<div class="user" onclick="profile()">
 <img id="pp">
 </div>
 </div>
@@ -186,7 +202,7 @@ orderBy
 
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* FIREBASE */
+/* FIREBASE CONFIG */
 const firebaseConfig = {
 apiKey:"XXX",
 authDomain:"XXX",
@@ -208,33 +224,59 @@ window.location.href="login.html";
 }
 
 document.getElementById("welcome").innerText =
-"Salut " + user.given_name;
+"Bienvenue " + user.given_name;
 
 document.getElementById("pp").src = user.picture;
 
-/* ROLE CHECK (simple front) */
-function isAdmin(){
-return user.email?.includes("@lumycorp.com");
-}
+/* ROLE SIMPLE */
+const isAdmin = user.email?.includes("@lumycorp.com");
 
-/* DASHBOARD */
-window.loadDashboard = function(){
+/* ROUTER */
+window.view = function(page){
+
+if(page==="dashboard"){
 document.getElementById("content").innerHTML =
-"<div class='title'>DASHBOARD</div>Intranet opérationnel.";
+"<div class='title'>DASHBOARD</div>Système Lumy opérationnel.";
 }
 
-/* USERS */
-window.loadUsers = async function(){
+/* MEMBERS */
+if(page==="members"){
+loadMembers();
+}
+
+/* CREATE */
+if(page==="create"){
+createForm();
+}
+
+/* PROJECTS */
+if(page==="projects"){
+loadProjects();
+}
+
+/* CHAT */
+if(page==="chat"){
+loadChat();
+}
+
+/* LOGS */
+if(page==="logs"){
+loadLogs();
+}
+}
+
+/* MEMBERS */
+async function loadMembers(){
 
 const snap = await getDocs(collection(db,"users"));
 
-let html = "<div class='title'>MEMBRES</div>";
+let html="<div class='title'>MEMBRES</div>";
 
 snap.forEach(d=>{
-const u = d.data();
+const u=d.data();
 
-html += `
-<div class="user" onclick="viewUser('${d.id}')">
+html+=`
+<div class="item" onclick="openUser('${d.id}')">
 <b>${u.firstName} ${u.lastName}</b><br>
 ${u.email}<br>
 <small>${u.role}</small>
@@ -242,42 +284,38 @@ ${u.email}<br>
 `;
 });
 
-document.getElementById("content").innerHTML = html;
+document.getElementById("content").innerHTML=html;
 }
 
-/* VIEW USER PROFILE */
-window.viewUser = async function(id){
+/* USER PROFILE */
+window.openUser = async function(id){
 
-const ref = doc(db,"users",id);
-const snap = await getDoc(ref);
+const snap = await getDoc(doc(db,"users",id));
+const u=snap.data();
 
-const u = snap.data();
-
-document.getElementById("content").innerHTML = `
+document.getElementById("content").innerHTML=`
 <div class="title">PROFIL</div>
 
 <b>${u.firstName} ${u.lastName}</b><br><br>
 Email: ${u.email}<br>
-Rôle: ${u.role}<br>
-Téléphone: ${u.phone}<br>
+Role: ${u.role}<br>
 Ville: ${u.city}<br>
+Téléphone: ${u.phone}<br>
 
-${isAdmin() ? `<button class="btn" onclick="deleteUser('${id}')">Supprimer</button>` : ""}
+${isAdmin ? `<button class="btn" onclick="deleteUser('${id}')">Supprimer</button>` : ""}
 `;
 }
 
-/* DELETE USER */
+/* DELETE */
 window.deleteUser = async function(id){
-if(!isAdmin()) return;
-
+if(!isAdmin) return;
 await deleteDoc(doc(db,"users",id));
-loadUsers();
+view("members");
 }
 
-/* CREATE USER */
-window.openCreateUser = function(){
-
-document.getElementById("content").innerHTML = `
+/* CREATE FORM */
+function createForm(){
+document.getElementById("content").innerHTML=`
 <div class="title">CRÉER MEMBRE</div>
 
 <input id="fn" placeholder="Prénom">
@@ -291,6 +329,7 @@ document.getElementById("content").innerHTML = `
 `;
 }
 
+/* CREATE USER */
 window.createUser = async function(){
 
 await addDoc(collection(db,"users"),{
@@ -303,31 +342,32 @@ city:city.value,
 createdAt:Date.now()
 });
 
-loadUsers();
+view("members");
 }
 
 /* PROJECTS */
-window.loadProjects = async function(){
+async function loadProjects(){
 
-const snap = await getDocs(collection(db,"projects"));
+const snap=await getDocs(collection(db,"projects"));
 
 let html="<div class='title'>PROJETS</div>";
 
 snap.forEach(d=>{
 const p=d.data();
-html+=`<div class="user">${p.name} - ${p.status}</div>`;
+
+html+=`<div class="item">${p.name} - ${p.status}</div>`;
 });
 
 document.getElementById("content").innerHTML=html;
 }
 
-/* CHAT REALTIME */
-window.loadChat = function(){
+/* CHAT */
+function loadChat(){
 
 document.getElementById("content").innerHTML=`
 <div class="title">CHAT</div>
 
-<div id="chat"></div>
+<div class="chat" id="chat"></div>
 
 <input id="msg">
 <button class="btn" onclick="send()">Envoyer</button>
@@ -341,13 +381,13 @@ box.innerHTML="";
 
 snap.forEach(d=>{
 const m=d.data();
-box.innerHTML+=`<div class="user"><b>${m.user}</b>: ${m.text}</div>`;
+box.innerHTML+=`<div class="item"><b>${m.user}</b>: ${m.text}</div>`;
 });
 });
 }
 
+/* SEND MSG */
 window.send = async function(){
-
 await addDoc(collection(db,"messages"),{
 user:user.given_name,
 text:msg.value,
@@ -357,17 +397,19 @@ time:Date.now()
 msg.value="";
 }
 
+/* LOGS */
+async function loadLogs(){
+document.getElementById("content").innerHTML=
+"<div class='title'>LOGS SYSTÈME</div>Module prêt backend.";
+}
+
 /* PROFILE */
-window.myProfile = function(){
+window.profile = function(){
 alert(user.name + "\n" + user.email);
 }
 
-/* LOGOUT */
-window.logout = function(){
-localStorage.removeItem("lumy_user");
-signOut(auth);
-window.location.href="login.html";
-}
+/* INIT */
+view("dashboard");
 
 </script>
 
