@@ -1,65 +1,162 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>LUMY CORE | AUTH</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400&display=swap" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<meta charset="UTF-8">
+<title>LUMY CORE | AUTH</title>
 
-    <style>
-        body { background: #050505; color: white; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .auth-card { background: #111; padding: 50px; border-radius: 20px; border: 1px solid #222; text-align: center; box-shadow: 0 0 40px rgba(0, 242, 255, 0.1); width: 350px; }
-        h1 { font-family: 'Orbitron'; color: #00f2ff; letter-spacing: 5px; margin-bottom: 30px; }
-        #g_id_onload { margin-top: 20px; }
-    </style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+:root{
+    --bg:#05070c;
+    --panel:rgba(15,20,35,0.65);
+    --accent:#00f2ff;
+    --text:#e8f0ff;
+    --muted:#7c8aa3;
+    --border:rgba(255,255,255,0.08);
+}
+
+/* BACKGROUND */
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0,242,255,0.08), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0,242,255,0.05), transparent 40%),
+        var(--bg);
+    font-family:Inter;
+    color:var(--text);
+    overflow:hidden;
+}
+
+/* GRID OVERLAY (subtil) */
+body::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+}
+
+/* CARD */
+.auth-card{
+    position:relative;
+    background:var(--panel);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    padding:50px;
+    border-radius:18px;
+    text-align:center;
+    width:360px;
+
+    box-shadow:
+        0 0 40px rgba(0,0,0,0.6),
+        0 0 80px rgba(0,242,255,0.08);
+}
+
+/* TOP GLOW LINE */
+.auth-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+/* TITLE */
+h1{
+    font-family:Orbitron;
+    color:var(--accent);
+    letter-spacing:6px;
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+/* SUBTEXT */
+.subtitle{
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:2px;
+    margin-bottom:30px;
+}
+
+/* STATUS */
+#status{
+    margin-top:25px;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:1px;
+}
+
+/* GOOGLE BUTTON WRAP */
+.g_id_signin{
+    display:flex;
+    justify-content:center;
+}
+
+/* HOVER GLOW */
+.auth-card:hover{
+    box-shadow:
+        0 0 50px rgba(0,0,0,0.7),
+        0 0 120px rgba(0,242,255,0.12);
+    transition:0.4s;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="auth-card">
-        <h1>LUMY CORE</h1>
-        <p style="opacity: 0.5; font-size: 0.8rem; margin-bottom: 30px;">ACCÈS UNITÉ DE CONTRÔLE</p>
+<div class="auth-card">
+    <h1>LUMY CORE</h1>
+    <div class="subtitle">ACCÈS SYSTÈME INTERNE</div>
 
-        <div id="g_id_onload"
-             data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="rectangular"
-             data-theme="outline"
-             data-text="signin_with"
-             data-size="large"
-             data-logo_alignment="left">
-        </div>
-
-        <p id="status" style="margin-top:20px; font-size:0.7rem; color:#444;">En attente d'identification...</p>
+    <div id="g_id_onload"
+         data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
     </div>
 
-    <script>
-        function handleCredentialResponse(response) {
-    // 1. Décoder les infos du jeton (c'est du Base64)
+    <div class="g_id_signin"
+         data-type="standard"
+         data-theme="outline"
+         data-size="large">
+    </div>
+
+    <div id="status">En attente d'identification...</div>
+</div>
+
+<script>
+function handleCredentialResponse(response) {
+
     const base64Url = response.credential.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    ).join(''));
 
     const user = JSON.parse(jsonPayload);
 
-    // 2. Enregistrer les infos dans le navigateur
     localStorage.setItem('lumy_user', JSON.stringify(user));
 
-    // 3. Envoyer vers le Dashboard
-    document.getElementById('status').innerText = "VÉRIFICATION RÉUSSIE... BIENVENUE " + user.given_name;
-    
+    document.getElementById('status').innerText =
+        "AUTHENTIFICATION VALIDÉE — " + user.given_name;
+
     setTimeout(() => {
         window.location.href = "dashboard.html";
-    }, 1200);
+    }, 1000);
 }
-    </script>
+</script>
+
 </body>
 </html>
