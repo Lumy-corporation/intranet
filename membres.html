@@ -3,227 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUMY CORE | GESTION UNITÉ</title>
+    <title>LUMY CORE | ACCÈS SÉCURISÉ</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --cyan: #00f2ff;
-            --purple: #b400ff;
-            --bg: #0a0a0c;
-            --card-bg: #141417;
-            --text: #ffffff;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            padding: 40px 5%;
-        }
-
-        h1 { font-family: 'Orbitron'; letter-spacing: 4px; color: var(--cyan); text-align: center; margin-bottom: 40px; }
+        :root { --cyan: #00f2ff; --purple: #b400ff; --bg: #0a0a0c; --card: #141417; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
+        /* ÉCRAN DE LOGIN */
+        #login-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
+        .login-box { background: var(--card); padding: 40px; border-radius: 20px; border: 1px solid var(--cyan); text-align: center; width: 320px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; }
+        .btn-login { background: var(--cyan); color: black; border: none; width: 100%; padding: 12px; font-family: 'Orbitron'; cursor: pointer; font-weight: 900; }
 
-        .admin-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .admin-card h3 {
-            font-family: 'Orbitron';
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--purple);
-        }
-
-        /* Tables Look */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #666; padding: 15px; border-bottom: 1px solid #222; }
-        td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid #1a1a1a; }
+        /* DASHBOARD (Caché par défaut) */
+        #dashboard { display: none; padding: 40px 5%; }
+        .header-dash { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        .admin-card { background: var(--card); border-radius: 15px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); }
         
-        .badge-pole {
-            background: rgba(180, 0, 255, 0.1);
-            color: var(--purple);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
-        /* Boutons */
-        .btn-paff {
-            background: var(--cyan);
-            color: #000;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: 900;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            transition: 0.3s;
-        }
-        .btn-paff:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--cyan); }
-
-        .status-active { color: #00ff88; font-weight: bold; font-size: 0.7rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.7rem; color: #555; text-transform: uppercase; padding: 15px; }
+        td { padding: 15px; border-bottom: 1px solid #1a1a1a; font-size: 0.85rem; }
         
-        small { color: #555; }
+        .badge { background: rgba(0, 242, 255, 0.1); color: var(--cyan); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; }
+        .btn-paff { background: var(--purple); color: white; border: none; padding: 8px 15px; border-radius: 5px; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <h1>LUMY CORE <span style="color:white; opacity:0.2;">//</span> INTRANET</h1>
+    <div id="login-overlay">
+        <h1 style="font-family:'Orbitron'; color:var(--cyan); margin-bottom:20px;">LUMY CORE ACCESS</h1>
+        <div class="login-box">
+            <input type="email" id="email" placeholder="Email Admin">
+            <input type="password" id="password" placeholder="Code d'accès">
+            <button class="btn-login" onclick="login()">INITIALISER CONNEXION</button>
+        </div>
+    </div>
 
-    <div class="grid-layout">
-        
+    <div id="dashboard">
+        <div class="header-dash">
+            <h1 style="font-family:'Orbitron'; font-size: 1.2rem;">UNITÉ DE CONTRÔLE // <span id="user-email" style="color:var(--cyan)"></span></h1>
+            <button onclick="logout()" style="background:none; color:red; border:1px solid red; cursor:pointer; padding:5px 10px; border-radius:5px;">DÉCONNEXION</button>
+        </div>
+
         <div class="admin-card">
-            <h3><i class="fas fa-id-badge"></i> RECRUES POTENTIELLES (INBOX)</h3>
+            <h2 style="font-size:0.9rem; font-family:'Orbitron'; color:var(--purple); margin-bottom:20px;"><i class="fas fa-download"></i> NOUVELLES RECRUES (BOÎTE DE RÉCEPTION)</h2>
             <table>
                 <thead>
-                    <tr>
-                        <th>Candidat</th>
-                        <th>Localisation</th>
-                        <th>Pôle Visé</th>
-                        <th>Action</th>
-                    </tr>
+                    <tr><th>Candidat</th><th>Localisation</th><th>Domaine Visé</th><th>Action</th></tr>
                 </thead>
-                <tbody id="candidats-body">
-                    </tbody>
+                <tbody id="table-inscriptions"></tbody>
             </table>
         </div>
 
-        <div class="admin-card" style="border-top: 2px solid var(--cyan);">
-            <h3><i class="fas fa-user-shield"></i> MEMBRES DE L'UNITÉ ACTIFS</h3>
+        <div class="admin-card">
+            <h2 style="font-size:0.9rem; font-family:'Orbitron'; color:var(--cyan); margin-bottom:20px;"><i class="fas fa-users"></i> MEMBRES DE L'UNITÉ (VALIDÉS)</h2>
             <table>
                 <thead>
-                    <tr>
-                        <th>Nom & Prénom</th>
-                        <th>Email Lumy Pro</th>
-                        <th>Poste</th>
-                        <th>Statut</th>
-                    </tr>
+                    <tr><th>Nom complet</th><th>Email Pro</th><th>Poste</th><th>Statut</th></tr>
                 </thead>
-                <tbody id="membres-body">
-                    </tbody>
+                <tbody id="table-membres"></tbody>
             </table>
         </div>
-
     </div>
 
     <script>
-        // CONFIGURATION FIREBASE (À lier avec ton config.js)
-        // Utilise les mêmes identifiants que ton formulaire d'enrôlement
+        // CONFIGURATION FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCjIUOQogsQUhRgYJgN1OlErEt3FsihZuo",
             authDomain: "lumy-corporation-1db3f.firebaseapp.com",
+            databaseURL: "https://lumy-corporation-1db3f-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "lumy-corporation-1db3f",
-            storageBucket: "lumy-corporation-1db3f.firebasestorage.app",
-            messagingSenderId: "1023452628363",
             appId: "1:1023452628363:web:0806d0bc81436c0446db8e"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // --- 1. ÉCOUTE DES NOUVELLES INSCRIPTIONS ---
-        db.collection("inscriptions").onSnapshot((snapshot) => {
-            const tbody = document.getElementById('candidats-body');
-            tbody.innerHTML = "";
-            
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                tbody.innerHTML += `
-                    <tr>
-                        <td>
-                            <strong>${data.prenom} ${data.nom}</strong><br>
-                            <small>${data.email}</small>
-                        </td>
-                        <td>${data.ville || 'NC'} <br><small>${data.pays || 'Europe'}</small></td>
-                        <td><span class="badge-pole">${data.secteur_lumy}</span></td>
-                        <td>
-                            <button class="btn-paff" onclick="paffEnrolement('${doc.id}')">PAFF !</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        });
+        // --- GESTION DE LA CONNEXION ---
+        function login() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(e, p).catch(err => alert("Accès refusé : " + err.message));
+        }
 
-        // --- 2. ÉCOUTE DE L'UNITÉ OFFICIELLE ---
-        db.collection("users").onSnapshot((snapshot) => {
-            const tbody = document.getElementById('membres-body');
-            tbody.innerHTML = "";
-            
-            snapshot.forEach((doc) => {
-                const user = doc.data();
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${user.prenom} ${user.nom}</td>
-                        <td><code style="color:var(--cyan)">${user.email_pro}</code></td>
-                        <td>${user.poste}</td>
-                        <td><span class="status-active"><i class="fas fa-check-circle"></i> ACTIF</span></td>
-                    </tr>
-                `;
-            });
-        });
+        function logout() { auth.signOut().then(() => window.location.reload()); }
 
-        // --- 3. FONCTION MAGIQUE "PAFF" ---
-        async function paffEnrolement(idDoc) {
-            try {
-                // Récupération des données du candidat
-                const docRef = db.collection("inscriptions").doc(idDoc);
-                const snap = await docRef.get();
-                const data = snap.data();
-
-                // Formatage propre
-                const prenomPropre = data.prenom.charAt(0).toUpperCase() + data.prenom.slice(1).toLowerCase();
-                const nomPropre = data.nom.toUpperCase();
-                
-                // Nettoyage de l'alias pour l'email
-                const alias = (data.prenom.charAt(0) + "." + data.nom)
-                              .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlève accents
-                              .replace(/\s+/g, '') // Enlève espaces
-                              .toLowerCase();
-                
-                const emailPro = alias + "@lumycorp.com";
-
-                // Création dans l'Unité Officielle
-                await db.collection("users").doc(emailPro).set({
-                    nom: nomPropre,
-                    prenom: prenomPropre,
-                    email_pro: emailPro,
-                    email_perso: data.email,
-                    tel: data.telephone || 'NC',
-                    poste: data.secteur_lumy,
-                    ville: data.ville || 'NC',
-                    date_entree: new Date().toLocaleDateString('fr-FR'),
-                    statut: "ACTIF"
-                });
-
-                // Suppression de la boîte de réception
-                await docRef.delete();
-
-                alert("SYSTÈME : " + prenomPropre + " enrôlé avec succès sous " + emailPro);
-
-            } catch (error) {
-                console.error(error);
-                alert("ERREUR CRITIQUE DANS LE PROTOCOLE.");
+        // --- SURVEILLANCE DE L'ÉTAT AUTH ---
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('user-email').innerText = user.email.toUpperCase();
+                chargerDonnees();
+            } else {
+                document.getElementById('login-overlay').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'none';
             }
+        });
+
+        // --- CHARGEMENT DES DONNÉES SÉCURISÉES ---
+        function chargerDonnees() {
+            // Liste des inscriptions
+            db.ref('inscriptions').on('value', snap => {
+                const tbody = document.getElementById('table-inscriptions');
+                tbody.innerHTML = "";
+                snap.forEach(child => {
+                    const d = child.val();
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${d.prenom} ${d.nom}</strong><br><small>${d.email}</small></td>
+                            <td>${d.ville || 'NC'}</td>
+                            <td><span class="badge">${d.secteur_lumy}</span></td>
+                            <td><button class="btn-paff" onclick="paff('${child.key}')">VALIDER PAFF !</button></td>
+                        </tr>`;
+                });
+            });
+
+            // Liste des membres validés
+            db.ref('users').on('value', snap => {
+                const tbody = document.getElementById('table-membres');
+                tbody.innerHTML = "";
+                snap.forEach(child => {
+                    const u = child.val();
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${u.prenom} ${u.nom}</td>
+                            <td><code style="color:var(--cyan)">${u.email_pro}</code></td>
+                            <td>${u.poste}</td>
+                            <td style="color:#00ff88; font-weight:bold; font-size:0.7rem;">ACTIF</td>
+                        </tr>`;
+                });
+            });
+        }
+
+        // --- FONCTION DE VALIDATION (TRANSFERT) ---
+        async function paff(key) {
+            if(!confirm("Transformer ce candidat en membre officiel Lumy Corp ?")) return;
+
+            const snap = await db.ref('inscriptions/' + key).once('value');
+            const d = snap.val();
+
+            // Création de l'alias pro
+            const alias = (d.prenom.charAt(0) + "." + d.nom).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+            const emailPro = alias + "@lumycorp.com";
+
+            // 1. On l'ajoute aux membres
+            await db.ref('users/' + key).set({
+                nom: d.nom.toUpperCase(),
+                prenom: d.prenom.charAt(0).toUpperCase() + d.prenom.slice(1).toLowerCase(),
+                email_pro: emailPro,
+                email_perso: d.email,
+                poste: d.secteur_lumy,
+                date_entree: new Date().toLocaleDateString('fr-FR')
+            });
+
+            // 2. On le retire des inscriptions
+            await db.ref('inscriptions/' + key).remove();
+            
+            alert("PAFF ! Membre activé.");
         }
     </script>
 </body>
