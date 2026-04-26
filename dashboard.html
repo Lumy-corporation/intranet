@@ -26,7 +26,7 @@ font-family:Inter;
 overflow:hidden;
 }
 
-/* animation background grid */
+/* fond animé discret */
 .grid{
 position:absolute;
 width:200%;
@@ -36,8 +36,8 @@ linear-gradient(#111 1px, transparent 1px),
 linear-gradient(90deg, #111 1px, transparent 1px);
 background-size:60px 60px;
 transform:rotate(25deg);
-opacity:0.25;
-animation:move 20s linear infinite;
+opacity:0.2;
+animation:move 25s linear infinite;
 }
 
 @keyframes move{
@@ -48,25 +48,25 @@ to{transform:translateY(-200px) rotate(25deg);}
 .container{
 z-index:2;
 text-align:center;
-background:rgba(10,10,10,0.8);
+background:rgba(10,10,10,0.85);
 border:1px solid #1a1a1a;
-padding:50px;
-border-radius:20px;
+padding:45px;
+border-radius:18px;
 backdrop-filter: blur(10px);
 width:420px;
-box-shadow:0 0 60px rgba(0,242,255,0.05);
+box-shadow:0 0 50px rgba(0,242,255,0.04);
 }
 
 .logo{
 font-family:Orbitron;
 color:var(--cyan);
-font-size:16px;
+font-size:15px;
 letter-spacing:3px;
 margin-bottom:20px;
 }
 
 .title{
-font-size:22px;
+font-size:20px;
 font-weight:600;
 margin-bottom:10px;
 }
@@ -78,8 +78,8 @@ margin-bottom:25px;
 }
 
 .loader{
-width:60px;
-height:60px;
+width:55px;
+height:55px;
 border:3px solid #1a1a1a;
 border-top:3px solid var(--cyan);
 border-radius:50%;
@@ -91,35 +91,36 @@ animation:spin 1s linear infinite;
 to{transform:rotate(360deg);}
 }
 
-.status{
-font-size:12px;
-opacity:0.7;
-margin-top:15px;
-}
-
 .progress{
 width:100%;
 height:4px;
 background:#111;
-margin-top:20px;
 border-radius:10px;
 overflow:hidden;
+margin-top:20px;
 }
 
 .bar{
 height:100%;
 width:0%;
 background:var(--cyan);
-animation:load 5s ease-in-out infinite;
+animation:load 6s ease-in-out infinite;
 }
 
 @keyframes load{
 0%{width:0%}
-50%{width:80%}
+50%{width:85%}
 100%{width:100%}
 }
 
-.btn{
+.status{
+font-size:12px;
+opacity:0.7;
+margin-top:15px;
+min-height:20px;
+}
+
+button{
 margin-top:25px;
 padding:10px;
 width:100%;
@@ -128,9 +129,10 @@ border:1px solid var(--cyan);
 color:var(--cyan);
 cursor:pointer;
 transition:0.3s;
+border-radius:6px;
 }
 
-.btn:hover{
+button:hover{
 background:var(--cyan);
 color:black;
 }
@@ -165,11 +167,10 @@ Mise à jour système en cours
 <div class="bar"></div>
 </div>
 
-<div class="status" id="status">
-Initialisation des services...
-</div>
+<div class="status" id="status">Initialisation système...</div>
 
-<button class="btn" onclick="logout()">Déconnexion</button>
+<!-- IMPORTANT : aucun redirect, aucun login cassé -->
+<button onclick="checkStatus()">Vérifier statut système</button>
 
 </div>
 
@@ -183,22 +184,22 @@ const messages = [
 "Initialisation des services...",
 "Synchronisation Firestore...",
 "Vérification des permissions...",
-"Optimisation des modules internes...",
-"Reconstruction du cache sécurisé...",
-"Système prêt bientôt..."
+"Optimisation des modules...",
+"Reconstruction du cache...",
+"Sécurisation des endpoints...",
+"Système en cours de stabilisation..."
 ];
 
 let i = 0;
 
 setInterval(()=>{
 document.getElementById("status").innerText = messages[i];
-i = (i+1) % messages.length;
+i = (i + 1) % messages.length;
 },2000);
 
-/* logout simple */
-function logout(){
-localStorage.removeItem("lumy_user");
-window.location.href="login.html";
+/* aucun crash, aucune redirection */
+function checkStatus(){
+alert("Système en maintenance. Aucun accès autorisé.");
 }
 
 </script>
