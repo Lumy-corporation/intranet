@@ -1,16 +1,89 @@
-<table>
-  <thead>
-    <tr>
-      <th>Nom</th>
-      <th>Rôle</th>
-      <th>Statut</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Théo</td>
-      <td>Président</td>
-      <td class="badge-active">Actif</td>
-    </tr>
-  </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>LUMY CORE | GESTION DES BÉNÉVOLES</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>UNITÉ DE GESTION DES BÉNÉVOLES</h1>
+
+<div class="admin-card">
+    <h3><i class="fas fa-user-plus"></i> Enrôlement d'une nouvelle recrue</h3>
+    <div class="form-grid">
+        <input type="text" id="prenom" placeholder="Prénom">
+        <input type="text" id="nom" placeholder="Nom">
+        <input type="date" id="date_naissance" title="Date de naissance">
+        
+        <input type="email" id="email_prive" placeholder="Email Personnel">
+        <input type="tel" id="tel_prive" placeholder="Téléphone">
+        
+        <input type="text" id="alias" placeholder="Identifiant Lumy (ex: m.sprimont)">
+        <input type="date" id="date_entree" title="Date d'entrée chez Lumy Corp" value="2026-04-26">
+        
+        <select id="poste">
+            <option value="">-- Choisir un poste --</option>
+            <option value="Dev">Développeur</option>
+            <option value="Cyber">Cyber-Sécurité</option>
+            <option value="RH">Ressources Humaines</option>
+            <option value="Comm">Communication</option>
+            <option value="Logistique">Logistique</option>
+        </select>
+        
+        <select id="role_acces">
+            <option value="benevole">Bénévole (Standard)</option>
+            <option value="responsable">Responsable (Manager)</option>
+            <option value="directeur">Directeur (Admin)</option>
+        </select>
+
+        <button onclick="recruterMembre()" class="btn-main">CRÉER COMPTE GOOGLE & BDD</button>
+    </div>
+</div>
+      
+    <script src="js/config.js"></script>
+    <script>
+        // Affichage des membres en temps réel depuis Firestore
+        db.collection("users").onSnapshot((snapshot) => {
+            const tbody = document.getElementById('membres-body');
+            tbody.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const user = doc.data();
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.prenom} ${user.nom}</td>
+                        <td>${doc.id}</td>
+                        <td>${user.poste}</td>
+                        <td><span class="status-active">ACTIF</span></td>
+                    </tr>
+                `;
+            });
+        });
+
+        async function recruterMembres() {
+            const data = {
+                nom: document.getElementById('nom').value,
+                prenom: document.getElementById('prenom').value,
+                email_prive: document.getElementById('email_prive').value,
+                alias: document.getElementById('alias').value,
+                role: document.getElementById('role').value
+            };
+
+            // 1. Envoyer à ton API personnalisée qui crée le compte Google
+            // C'est ici que l'équipe web doit coder la liaison API Admin Google
+            alert("Lancement de la création Google Workspace et Firestore...");
+            
+            // Simulation de l'appel API
+            try {
+                // Cette fonction sera reliée à Google Admin SDK
+                await createGoogleAccount(data); 
+                alert("Compte @lumycorp.com créé et enregistré dans la base !");
+            } catch(e) {
+                alert("Erreur : " + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
