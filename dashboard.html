@@ -1,181 +1,294 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>LUMY CORE | Maintenance</title>
+<title>LUMY CORE | Enterprise</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --bg: #050505;
-    --card: rgba(18,18,18,0.85);
-    --text: #ffffff;
-    --muted: #8b8b8b;
-    --accent: #00f2ff;
-    --danger: #ff3b3b;
+:root{
+--bg:#05070c;
+--panel:#0e1522;
+--text:#e8f1ff;
+--muted:#7b8aa0;
+--accent:#00f2ff;
+--good:#00ff9d;
+--warn:#ffcc00;
+--bad:#ff3b3b;
 }
 
-/* Auto light mode */
-@media (prefers-color-scheme: light) {
-    :root {
-        --bg: #f5f7fa;
-        --card: rgba(255,255,255,0.85);
-        --text: #0a0a0a;
-        --muted: #666;
-        --accent: #0077ff;
-    }
+body{
+margin:0;
+font-family:Inter;
+background:var(--bg);
+color:var(--text);
 }
 
-body {
-    margin:0;
-    font-family: Inter, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+left:0;top:0;bottom:0;
+width:240px;
+background:#0a0f18;
+padding:20px;
+border-right:1px solid rgba(255,255,255,0.05);
 }
 
-/* glow background */
-body::before {
-    content:"";
-    position:fixed;
-    width:600px;
-    height:600px;
-    background: radial-gradient(circle, var(--accent), transparent 60%);
-    filter: blur(120px);
-    top:-200px;
-    left:-200px;
-    opacity:0.25;
+.brand{
+font-family:Orbitron;
+color:var(--accent);
+margin-bottom:30px;
 }
 
-.card {
-    width: 420px;
-    padding: 35px;
-    border-radius: 25px;
-    background: var(--card);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    text-align:center;
+.nav button{
+width:100%;
+padding:10px;
+margin-bottom:8px;
+background:transparent;
+border:1px solid rgba(255,255,255,0.05);
+color:var(--text);
+cursor:pointer;
+border-radius:8px;
+text-align:left;
 }
 
-.logo {
-    font-family: Orbitron;
-    letter-spacing: 3px;
-    color: var(--accent);
-    font-size: 18px;
-    margin-bottom:10px;
+.nav button:hover{
+border-color:var(--accent);
 }
 
-.title {
-    font-size: 22px;
-    font-weight:700;
-    margin-bottom:10px;
+/* TOP */
+.topbar{
+position:fixed;
+left:240px;right:0;top:0;
+height:60px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 20px;
+background:#0b1220;
+border-bottom:1px solid rgba(255,255,255,0.05);
 }
 
-.status {
-    font-size: 14px;
-    color: var(--muted);
-    margin-bottom:25px;
+.main{
+margin-left:240px;
+padding:80px 20px;
 }
 
-.pulse {
-    width:12px;
-    height:12px;
-    background: var(--accent);
-    border-radius:50%;
-    display:inline-block;
-    margin-right:8px;
-    animation:pulse 1.5s infinite;
+.grid{
+display:grid;
+grid-template-columns:repeat(12,1fr);
+gap:15px;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); opacity:1; }
-    50% { transform: scale(1.8); opacity:0.4; }
-    100% { transform: scale(1); opacity:1; }
+.card{
+background:var(--panel);
+padding:15px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.05);
 }
 
-.user {
-    margin-top:20px;
-    padding:15px;
-    border-radius:15px;
-    background: rgba(0,0,0,0.25);
-    text-align:left;
-    font-size:13px;
+.large{grid-column:span 12;}
+.medium{grid-column:span 6;}
+.small{grid-column:span 4;}
+
+.title{
+font-family:Orbitron;
+color:var(--accent);
+font-size:12px;
+margin-bottom:10px;
 }
 
-.label {
-    font-size:10px;
-    color: var(--muted);
-    text-transform:uppercase;
+/* CHAT */
+.chatBox{
+height:250px;
+overflow:auto;
+background:#05070c;
+padding:10px;
+border-radius:10px;
 }
 
-.btn {
-    margin-top:25px;
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid var(--danger);
-    background:transparent;
-    color:var(--danger);
-    cursor:pointer;
-    font-family: Orbitron;
-    transition:0.2s;
+.msg{
+font-size:12px;
+margin-bottom:8px;
+color:var(--muted);
 }
 
-.btn:hover {
-    background: var(--danger);
-    color:white;
+input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid rgba(255,255,255,0.1);
+background:#0a0f18;
+color:white;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<!-- SIDEBAR -->
+<div class="sidebar">
+<div class="brand">LUMY CORE</div>
 
-    <div class="logo">LUMY CORE</div>
+<div class="nav">
+<button onclick="show('dashboard')">📊 Dashboard</button>
+<button onclick="show('users')">👥 Membres</button>
+<button onclick="show('projects')">📁 Projets</button>
+<button onclick="show('chat')">💬 Chat</button>
+<button onclick="logout()">🚪 Déconnexion</button>
+</div>
+</div>
 
-    <div class="title">
-        <span class="pulse"></span>
-        Maintenance en cours
-    </div>
+<!-- TOP -->
+<div class="topbar">
+<div id="userInfo"></div>
+<div id="role"></div>
+</div>
 
-    <div class="status">
-        Les services sont temporairement indisponibles.<br>
-        Mise à jour système en cours.
-    </div>
+<!-- MAIN -->
+<div class="main">
 
-    <div class="user" id="userBox">
-        <div class="label">Utilisateur connecté</div>
-        <div id="name">Chargement...</div>
-        <div id="email" style="color:var(--accent);"></div>
-    </div>
+<!-- DASHBOARD -->
+<div id="dashboard" class="grid">
 
-    <button class="btn" onclick="logout()">Déconnexion</button>
+<div class="card large">
+<div class="title">WELCOME</div>
+<h2 id="welcome"></h2>
+</div>
+
+<div class="card small">
+<div class="title">MEMBRES</div>
+<div id="userCount">0</div>
+</div>
+
+<div class="card small">
+<div class="title">PROJETS</div>
+<div id="projectCount">0</div>
+</div>
+
+<div class="card small">
+<div class="title">MESSAGES</div>
+<div id="msgCount">0</div>
+</div>
 
 </div>
 
+<!-- USERS -->
+<div id="users" class="grid" style="display:none;">
+<div class="card large">
+<div class="title">MEMBRES ACTIFS</div>
+<div id="usersList"></div>
+</div>
+</div>
+
+<!-- PROJECTS -->
+<div id="projects" class="grid" style="display:none;">
+<div class="card large">
+<div class="title">PROJETS</div>
+<div id="projectsList"></div>
+</div>
+</div>
+
+<!-- CHAT -->
+<div id="chat" class="grid" style="display:none;">
+
+<div class="card large">
+<div class="title">CHAT INTERNE</div>
+
+<div class="chatBox" id="chatBox"></div>
+
+<input id="msgInput" placeholder="Message..." onkeydown="send(event)">
+</div>
+
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
-const user = JSON.parse(localStorage.getItem("lumy_user"));
+firebase.initializeApp({
+apiKey:"XXX",
+projectId:"lumy-corporation-1db3f"
+});
 
-if (user) {
-    document.getElementById("name").innerText =
-        (user.given_name || "") + " " + (user.family_name || user.name || "");
+const db=firebase.firestore();
 
-    document.getElementById("email").innerText = user.email || "";
-} else {
-    document.getElementById("name").innerText = "Non connecté";
+/* USER */
+const user=JSON.parse(localStorage.getItem("lumy_user"));
+
+if(!user) window.location="index.html";
+
+document.getElementById("welcome").innerText=
+"Salut "+user.name;
+
+document.getElementById("userInfo").innerText=user.email;
+
+/* ROLE */
+db.collection("users").doc(user.uid).get().then(doc=>{
+document.getElementById("role").innerText=doc.data().role;
+});
+
+/* NAV */
+function show(page){
+document.querySelectorAll(".grid").forEach(e=>e.style.display="none");
+document.getElementById(page).style.display="grid";
 }
 
-function logout() {
-    localStorage.removeItem("lumy_user");
-    window.location.href = "index.html";
+/* USERS */
+db.collection("users").onSnapshot(s=>{
+document.getElementById("userCount").innerText=s.size;
+
+let html="";
+s.forEach(d=>{
+html+=`<div>${d.data().name} - ${d.data().role}</div>`;
+});
+document.getElementById("usersList").innerHTML=html;
+});
+
+/* PROJECTS */
+db.collection("projects").onSnapshot(s=>{
+document.getElementById("projectCount").innerText=s.size;
+
+let html="";
+s.forEach(d=>{
+html+=`<div>${d.data().name} (${d.data().status})</div>`;
+});
+document.getElementById("projectsList").innerHTML=html;
+});
+
+/* CHAT */
+db.collection("messages")
+.orderBy("createdAt")
+.onSnapshot(s=>{
+document.getElementById("msgCount").innerText=s.size;
+
+let html="";
+s.forEach(d=>{
+html+=`<div class="msg">${d.data().userName}: ${d.data().text}</div>`;
+});
+document.getElementById("chatBox").innerHTML=html;
+});
+
+function send(e){
+if(e.key==="Enter"){
+db.collection("messages").add({
+text:e.target.value,
+userName:user.name,
+createdAt:Date.now()
+});
+e.target.value="";
+}
+}
+
+function logout(){
+localStorage.removeItem("lumy_user");
+location.href="index.html";
 }
 </script>
 
