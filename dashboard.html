@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORP | INTRANET</title>
+<title>LUMY CORE | INTRANET FINAL</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
 <style>
 body{
 margin:0;
-font-family:Inter;
+display:flex;
 background:#050505;
 color:white;
-display:flex;
+font-family:Inter;
 }
 
 /* SIDEBAR */
@@ -23,8 +23,6 @@ height:100vh;
 background:#0a0a0a;
 border-right:1px solid #1a1a1a;
 padding:20px;
-display:flex;
-flex-direction:column;
 }
 
 .logo{
@@ -37,13 +35,12 @@ margin-bottom:30px;
 .logo img{
 width:40px;
 height:40px;
-border-radius:8px;
+border-radius:6px;
 }
 
 .logo span{
 font-family:Orbitron;
 color:#00f2ff;
-letter-spacing:2px;
 }
 
 .menu button{
@@ -56,18 +53,16 @@ color:white;
 text-align:left;
 border-radius:8px;
 cursor:pointer;
-transition:0.2s;
 }
 
 .menu button:hover{
 border-color:#00f2ff;
-transform:translateX(3px);
 }
 
 /* MAIN */
 .main{
 flex:1;
-padding:25px;
+padding:20px;
 }
 
 /* TOPBAR */
@@ -86,8 +81,8 @@ cursor:pointer;
 }
 
 .profile img{
-width:38px;
-height:38px;
+width:40px;
+height:40px;
 border-radius:50%;
 border:1px solid #00f2ff;
 }
@@ -100,41 +95,41 @@ padding:20px;
 border-radius:12px;
 }
 
-/* TITLES */
+/* TITRE */
 .title{
 font-family:Orbitron;
 color:#00f2ff;
 margin-bottom:15px;
 }
 
-/* LIST */
-.item{
-padding:10px;
-border-bottom:1px solid #1a1a1a;
-}
-
-/* CHAT */
-.chatBox{
-height:400px;
-overflow:auto;
-border:1px solid #1a1a1a;
+/* INPUTS */
+input, select{
+width:100%;
 padding:10px;
 margin-bottom:10px;
-}
-
-input{
-width:80%;
-padding:10px;
 background:#111;
 border:1px solid #1f1f1f;
 color:white;
 }
 
-.sendBtn{
+/* BTN */
+.btn{
 padding:10px;
 background:#00f2ff;
 border:none;
 cursor:pointer;
+margin-top:5px;
+}
+
+/* USER CARD */
+.user{
+padding:10px;
+border-bottom:1px solid #1a1a1a;
+cursor:pointer;
+}
+
+.user:hover{
+background:#111;
 }
 </style>
 </head>
@@ -145,15 +140,16 @@ cursor:pointer;
 <div class="sidebar">
 
 <div class="logo">
-<img src="https://i.postimg.cc/ZCfjHWMY/logo.png" alt="logo">
+<img src="https://i.postimg.cc/ZCfjHWMY/logo.png">
 <span>LUMY CORE</span>
 </div>
 
 <div class="menu">
-<button onclick="dashboard()">Dashboard</button>
-<button onclick="members()">Membres</button>
-<button onclick="projects()">Projets</button>
-<button onclick="chat()">Chat</button>
+<button onclick="loadDashboard()">Dashboard</button>
+<button onclick="loadUsers()">Membres</button>
+<button onclick="openCreateUser()">Créer membre</button>
+<button onclick="loadProjects()">Projets</button>
+<button onclick="loadChat()">Chat</button>
 </div>
 
 </div>
@@ -162,18 +158,13 @@ cursor:pointer;
 <div class="main">
 
 <div class="topbar">
-
-<div id="welcome">Chargement...</div>
-
-<div class="profile" onclick="profile()">
+<div id="welcome"></div>
+<div class="profile" onclick="myProfile()">
 <img id="pp">
 </div>
-
 </div>
 
-<div class="card" id="content">
-Chargement...
-</div>
+<div class="card" id="content">Chargement...</div>
 
 </div>
 
@@ -185,9 +176,12 @@ getFirestore,
 collection,
 getDocs,
 addDoc,
+doc,
+getDoc,
+deleteDoc,
+onSnapshot,
 query,
-orderBy,
-onSnapshot
+orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -214,18 +208,23 @@ window.location.href="login.html";
 }
 
 document.getElementById("welcome").innerText =
-"Bienvenue " + user.given_name + " " + user.family_name;
+"Salut " + user.given_name;
 
 document.getElementById("pp").src = user.picture;
 
-/* DASHBOARD */
-window.dashboard = function(){
-document.getElementById("content").innerHTML =
-"<div class='title'>DASHBOARD</div>Intranet Lumy Core V3 opérationnel.";
+/* ROLE CHECK (simple front) */
+function isAdmin(){
+return user.email?.includes("@lumycorp.com");
 }
 
-/* MEMBERS */
-window.members = async function(){
+/* DASHBOARD */
+window.loadDashboard = function(){
+document.getElementById("content").innerHTML =
+"<div class='title'>DASHBOARD</div>Intranet opérationnel.";
+}
+
+/* USERS */
+window.loadUsers = async function(){
 
 const snap = await getDocs(collection(db,"users"));
 
@@ -235,83 +234,131 @@ snap.forEach(d=>{
 const u = d.data();
 
 html += `
-<div class="item">
-<b>${u.firstName||""} ${u.lastName||""}</b><br>
-${u.email||""}<br>
-<small>${u.role||"user"}</small>
+<div class="user" onclick="viewUser('${d.id}')">
+<b>${u.firstName} ${u.lastName}</b><br>
+${u.email}<br>
+<small>${u.role}</small>
 </div>
 `;
 });
 
 document.getElementById("content").innerHTML = html;
+}
+
+/* VIEW USER PROFILE */
+window.viewUser = async function(id){
+
+const ref = doc(db,"users",id);
+const snap = await getDoc(ref);
+
+const u = snap.data();
+
+document.getElementById("content").innerHTML = `
+<div class="title">PROFIL</div>
+
+<b>${u.firstName} ${u.lastName}</b><br><br>
+Email: ${u.email}<br>
+Rôle: ${u.role}<br>
+Téléphone: ${u.phone}<br>
+Ville: ${u.city}<br>
+
+${isAdmin() ? `<button class="btn" onclick="deleteUser('${id}')">Supprimer</button>` : ""}
+`;
+}
+
+/* DELETE USER */
+window.deleteUser = async function(id){
+if(!isAdmin()) return;
+
+await deleteDoc(doc(db,"users",id));
+loadUsers();
+}
+
+/* CREATE USER */
+window.openCreateUser = function(){
+
+document.getElementById("content").innerHTML = `
+<div class="title">CRÉER MEMBRE</div>
+
+<input id="fn" placeholder="Prénom">
+<input id="ln" placeholder="Nom">
+<input id="email" placeholder="Email">
+<input id="role" placeholder="Rôle">
+<input id="phone" placeholder="Téléphone">
+<input id="city" placeholder="Ville">
+
+<button class="btn" onclick="createUser()">Créer</button>
+`;
+}
+
+window.createUser = async function(){
+
+await addDoc(collection(db,"users"),{
+firstName:fn.value,
+lastName:ln.value,
+email:email.value,
+role:role.value,
+phone:phone.value,
+city:city.value,
+createdAt:Date.now()
+});
+
+loadUsers();
 }
 
 /* PROJECTS */
-window.projects = async function(){
+window.loadProjects = async function(){
 
 const snap = await getDocs(collection(db,"projects"));
 
-let html = "<div class='title'>PROJETS</div>";
+let html="<div class='title'>PROJETS</div>";
 
 snap.forEach(d=>{
-const p = d.data();
-
-html += `
-<div class="item">
-<b>${p.name}</b><br>
-${p.status||"pending"}
-</div>
-`;
+const p=d.data();
+html+=`<div class="user">${p.name} - ${p.status}</div>`;
 });
 
-document.getElementById("content").innerHTML = html;
+document.getElementById("content").innerHTML=html;
 }
 
 /* CHAT REALTIME */
-window.chat = function(){
+window.loadChat = function(){
 
-document.getElementById("content").innerHTML = `
-<div class="title">CHAT INTERNE</div>
+document.getElementById("content").innerHTML=`
+<div class="title">CHAT</div>
 
-<div class="chatBox" id="chat"></div>
+<div id="chat"></div>
 
 <input id="msg">
-<button class="sendBtn" onclick="send()">Envoyer</button>
+<button class="btn" onclick="send()">Envoyer</button>
 `;
 
-const q = query(collection(db,"messages"),orderBy("time"));
+const q=query(collection(db,"messages"),orderBy("time"));
 
 onSnapshot(q,(snap)=>{
-let box = document.getElementById("chat");
+let box=document.getElementById("chat");
 box.innerHTML="";
 
 snap.forEach(d=>{
 const m=d.data();
-box.innerHTML += `<div class="item"><b>${m.user}</b> : ${m.text}</div>`;
+box.innerHTML+=`<div class="user"><b>${m.user}</b>: ${m.text}</div>`;
 });
-
-box.scrollTop = box.scrollHeight;
 });
 }
 
-/* SEND */
 window.send = async function(){
 
-let input = document.getElementById("msg");
-
-if(!input.value) return;
-
 await addDoc(collection(db,"messages"),{
-text:input.value,
 user:user.given_name,
+text:msg.value,
 time:Date.now()
 });
 
-input.value="";
+msg.value="";
 }
 
 /* PROFILE */
-window.profile = function(){
+window.myProfile = function(){
 alert(user.name + "\n" + user.email);
 }
 
