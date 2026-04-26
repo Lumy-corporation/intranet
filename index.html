@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>LUMY CORE | AUTHENTIFICATION</title>
+<title>LUMY CORE | INTERNAL ACCESS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Orbitron:wght@600&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -28,68 +28,102 @@ body{
     color:var(--text);
 }
 
-/* HEADER ENTREPRISE */
+/* HEADER */
 .header{
-    height:60px;
-    border-bottom:1px solid var(--border);
+    height:64px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 25px;
+    background:linear-gradient(180deg,#0b1220,#0a0f1a);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.left{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    padding:0 30px;
-    background:#0b1220;
+    gap:12px;
 }
 
-.logo{
-    font-family:Orbitron;
+.logo-img{
+    width:34px;
+    height:34px;
+    object-fit:contain;
+    filter: drop-shadow(0 0 6px rgba(37,99,235,0.4));
+}
+
+.brand-name{
+    font-size:13px;
+    font-weight:600;
     letter-spacing:2px;
-    font-size:14px;
-    color:white;
 }
 
-.system-label{
-    font-size:12px;
+.brand-sub{
+    font-size:10px;
     color:var(--muted);
+}
+
+.right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:10px;
+    color:var(--muted);
+}
+
+.status-dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 8px #22c55e;
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    0%{opacity:0.3}
+    50%{opacity:1}
+    100%{opacity:0.3}
 }
 
 /* MAIN */
 .main{
     flex:1;
     display:flex;
-    align-items:center;
     justify-content:center;
+    align-items:center;
 }
 
-/* CARD */
+/* LOGIN BOX */
 .auth{
     width:420px;
     background:var(--panel);
     border:1px solid var(--border);
     border-radius:10px;
     padding:40px;
+    text-align:center;
 }
 
-/* TITLE */
 .title{
-    font-size:18px;
+    font-size:16px;
     font-weight:500;
     margin-bottom:5px;
 }
 
 .subtitle{
-    font-size:12px;
+    font-size:11px;
     color:var(--muted);
-    margin-bottom:30px;
+    margin-bottom:25px;
 }
 
-/* BUTTON ZONE */
+/* GOOGLE BTN */
 .g_id_signin{
     display:flex;
     justify-content:center;
 }
 
-/* STATUS */
 #status{
-    margin-top:20px;
+    margin-top:15px;
     font-size:11px;
     color:var(--muted);
 }
@@ -102,7 +136,7 @@ body{
     justify-content:space-between;
     align-items:center;
     padding:0 20px;
-    font-size:11px;
+    font-size:10px;
     color:var(--muted);
 }
 
@@ -128,20 +162,19 @@ body{
 
 .modal-content{
     width:650px;
+    max-height:80vh;
+    overflow-y:auto;
     background:#111827;
     border:1px solid var(--border);
     border-radius:8px;
     padding:25px;
-    max-height:80vh;
-    overflow-y:auto;
 }
 
 .modal-header{
     display:flex;
     justify-content:space-between;
-    margin-bottom:15px;
     font-size:13px;
-    font-weight:500;
+    margin-bottom:15px;
 }
 
 .close{
@@ -150,13 +183,13 @@ body{
 
 .modal-body{
     font-size:12px;
-    line-height:1.6;
     color:#9ca3af;
+    line-height:1.6;
 }
 
 .modal-body h3{
-    font-size:12px;
     color:white;
+    font-size:12px;
     margin-top:15px;
 }
 </style>
@@ -166,8 +199,21 @@ body{
 
 <!-- HEADER -->
 <div class="header">
-    <div class="logo">LUMY CORE</div>
-    <div class="system-label">Système interne sécurisé</div>
+
+    <div class="left">
+        <img src="https://i.postimg.cc/ZCfjHWMY/lumy-logo.png" class="logo-img">
+
+        <div>
+            <div class="brand-name">LUMY CORE</div>
+            <div class="brand-sub">Internal Administration System</div>
+        </div>
+    </div>
+
+    <div class="right">
+        <div class="status-dot"></div>
+        SYSTEM ONLINE
+    </div>
+
 </div>
 
 <!-- MAIN -->
@@ -200,12 +246,13 @@ body{
 
 <!-- FOOTER -->
 <div class="footer">
-    <div>© Lumy Corporation — Accès interne</div>
-    <div><a href="#" onclick="openLegal()">Mentions légales</a></div>
+    <div>© Lumy Corporation — Internal System</div>
+    <a href="#" onclick="openLegal()">Mentions légales</a>
 </div>
 
 <!-- MODAL -->
 <div class="modal" id="legalModal">
+
     <div class="modal-content">
 
         <div class="modal-header">
@@ -223,19 +270,19 @@ body{
             contact@lumycorp.com
 
             <h3>Hébergement</h3>
-            GitHub Pages / Cloudflare<br>
-            Infrastructure UE
+            GitHub Pages / Cloudflare
 
             <h3>Propriété</h3>
-            LumyOS protégé — reproduction interdite
+            Système Lumy Core protégé
 
             <h3>Données</h3>
-            Données internes sécurisées<br>
-            Droit d'accès : contact@lumycorp.com
+            Usage interne sécurisé<br>
+            Contact RGPD : contact@lumycorp.com
 
         </div>
 
     </div>
+
 </div>
 
 <script>
@@ -250,16 +297,14 @@ function handleCredentialResponse(response){
 
     const user = JSON.parse(jsonPayload);
 
-    // sécurité intranet
-    if (!user.email.endsWith("@lumycorp.com")) {
+    if(!user.email.endsWith("@lumycorp.com")){
         document.getElementById("status").innerText = "Accès refusé";
         return;
     }
 
-    localStorage.setItem('lumy_user', JSON.stringify(user));
+    localStorage.setItem("lumy_user", JSON.stringify(user));
 
-    document.getElementById("status").innerText =
-        "Accès autorisé";
+    document.getElementById("status").innerText = "Accès autorisé";
 
     setTimeout(()=>{
         window.location.href = "dashboard.html";
