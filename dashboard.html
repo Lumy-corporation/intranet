@@ -3,296 +3,291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORP - Dashboard</title>
+<title>LUMY CORE | Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --bg:#05070c;
-    --panel:#0b111b;
-    --panel2:#0f1624;
-    --text:#e7eefc;
-    --muted:#7c8aa3;
-    --accent:#00f2ff;
-    --border:rgba(255,255,255,0.06);
+:root {
+    --bg: #0b0b0f;
+    --card: #141420;
+    --text: #ffffff;
+    --muted: #9aa0a6;
+    --accent: #00f2ff;
+    --border: rgba(255,255,255,0.08);
 }
 
-@media (prefers-color-scheme: light){
-:root{
-    --bg:#f6f8fb;
-    --panel:#ffffff;
-    --panel2:#f3f6fb;
-    --text:#0b1220;
-    --muted:#5d6b82;
-    --border:#e5ebf3;
-}
-}
-
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter;}
-
-body{
-    background:var(--bg);
-    color:var(--text);
+/* MODE CLAIR AUTO */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #0b0b0f;
+        --muted: #555;
+        --border: rgba(0,0,0,0.1);
+    }
 }
 
-/* SIDEBAR */
-.sidebar{
-    position:fixed;
-    top:0;left:0;bottom:0;
-    width:240px;
-    background:var(--panel);
-    border-right:1px solid var(--border);
-    padding:20px;
-    display:flex;
-    flex-direction:column;
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
-.brand{
-    font-family:Orbitron;
-    font-size:12px;
-    letter-spacing:2px;
-    color:var(--accent);
-    margin-bottom:25px;
+/* TOP BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 25px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.nav button{
-    width:100%;
-    background:transparent;
-    border:1px solid transparent;
-    color:var(--text);
-    text-align:left;
-    padding:10px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:13px;
+.logo {
+    font-family: Orbitron;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-size: 14px;
 }
 
-.nav button:hover{
-    background:var(--panel2);
-    border-color:var(--border);
+.nav {
+    display: flex;
+    gap: 20px;
 }
 
-.bottom{
-    margin-top:auto;
+.nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
 }
 
-/* TOPBAR */
-.topbar{
-    position:fixed;
-    left:240px;
-    right:0;
-    top:0;
-    height:52px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 18px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
+.nav a:hover {
+    color: var(--accent);
 }
 
-.userbox{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    cursor:pointer;
-    position:relative;
+/* PROFILE */
+.profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
 }
 
-.userbox img{
-    width:30px;
-    height:30px;
-    border-radius:50%;
-    border:1px solid var(--accent);
+.profile img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
 }
 
-/* DROPDOWN */
-.dropdown{
-    position:absolute;
-    right:0;
-    top:40px;
-    background:var(--panel);
-    border:1px solid var(--border);
-    width:220px;
-    padding:10px;
-    display:none;
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 12px;
+    width: 220px;
+    display: none;
 }
 
-.dropdown div{
-    font-size:12px;
-    margin-bottom:6px;
-    color:var(--muted);
+.dropdown p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: var(--muted);
 }
 
-.dropdown button{
-    width:100%;
-    margin-top:10px;
-    padding:8px;
-    background:transparent;
-    border:1px solid var(--border);
-    color:var(--text);
-    cursor:pointer;
+.logout {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid red;
+    background: transparent;
+    color: red;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
 /* MAIN */
-.main{
-    margin-left:240px;
-    padding:80px 20px;
+.container {
+    padding: 50px;
 }
 
-.card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    padding:20px;
-    border-radius:10px;
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
 }
 
-.chatbox{
-    height:300px;
-    overflow:auto;
-    border:1px solid var(--border);
-    padding:10px;
-    margin-top:10px;
+h1 {
+    font-size: 22px;
 }
 
-input{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    background:var(--panel2);
-    border:1px solid var(--border);
-    color:var(--text);
+.accent {
+    color: var(--accent);
 }
 </style>
 </head>
 
 <body>
 
-<div class="sidebar">
-    <div class="brand">LUMY CORE</div>
+<!-- TOP MENU -->
+<div class="topbar">
+    <div class="logo">LUMY CORE</div>
 
     <div class="nav">
-        <button onclick="show('dash')">Dashboard</button>
-        <button onclick="show('members')">Members</button>
-        <button onclick="show('projects')">Projects</button>
-        <button onclick="show('chat')">Chat</button>
+        <a href="#">Dashboard</a>
+        <a href="#">Membres</a>
+        <a href="#">Apps</a>
+        <a href="#">Projets</a>
     </div>
 
-    <div class="bottom">
-        <button onclick="logout()">Logout</button>
-    </div>
-</div>
-
-<div class="topbar">
-    <div style="font-size:12px;color:var(--muted)">Internal system</div>
-
-    <div class="userbox" onclick="toggleDrop()">
-        <img id="pp">
-        <div id="name"></div>
-
-        <div class="dropdown" id="drop">
-            <div id="d_name"></div>
-            <div id="d_email"></div>
-            <button onclick="logout()">Logout</button>
+    <!-- PROFILE -->
+    <div class="profile" onclick="toggleDropdown()">
+        <img id="pp" src="">
+        <div class="dropdown" id="dropdown">
+            <p id="name"></p>
+            <p id="email"></p>
+            <button class="logout" onclick="logout()">Déconnexion</button>
         </div>
     </div>
 </div>
 
-<div class="main">
+<!-- CONTENT -->
+<div class="container">
+    <div class="card">
+        <h1>Salut <span class="accent" id="fullname"></span> 👋</h1>
+        <p style="color: var(--muted); font-size: 13px;">
+            Bienvenue sur le système Lumy Core
+        </p>
+    </div>
+</div>
 
-    <div id="dash" class="card">
-        <h2>Dashboard</h2>
-        <p id="welcome"></p>
+<script>
+let user = JSON.parse(localStorage.getItem("lumy_user"));
+
+if (!user) {
+    window.location.href = "index.html";
+}
+
+document.getElementById("pp").src = user.photo || "";
+document.getElementById("fullname").innerText = (user.given_name || user.name || "");
+document.getElementById("name").innerText = user.name || "";
+document.getElementById("email").innerText = user.email || "";
+
+function toggleDropdown() {
+    const d = document.getElementById("dropdown");
+    d.style.display = d.style.display === "block" ? "none" : "block";
+}
+
+function logout() {
+    localStorage.removeItem("lumy_user");
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>}
+
+.status{
+    margin-top:20px;
+    color:var(--gray);
+    font-size:14px;
+    line-height:1.6;
+}
+
+.alert{
+    margin-top:25px;
+    color:var(--red);
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.user{
+    margin-top:15px;
+    color:white;
+    font-size:16px;
+}
+
+/* BTN DECO */
+.logout{
+    margin-top:35px;
+    padding:10px 18px;
+    border:1px solid var(--red);
+    background:none;
+    color:var(--red);
+    cursor:pointer;
+    border-radius:8px;
+    font-family:Orbitron;
+    font-size:12px;
+    transition:0.3s;
+}
+
+.logout:hover{
+    background:var(--red);
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>LUMY CORE SYSTEM</h1>
+
+    <div class="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
     </div>
 
-    <div id="members" class="card" style="display:none;">
-        <h3>Members</h3>
-        <div id="usersList"></div>
+    <div class="user" id="user">Chargement...</div>
+
+    <div class="alert">
+        MAINTENANCE EN COURS
     </div>
 
-    <div id="projects" class="card" style="display:none;">
-        <h3>Projects</h3>
-        <p>No active projects</p>
+    <div class="status">
+        Les services intranet sont temporairement indisponibles.<br>
+        Mise à jour système en cours.
     </div>
 
-    <div id="chat" class="card" style="display:none;">
-        <h3>Internal chat</h3>
-        <div class="chatbox" id="chatbox"></div>
-        <input id="msg" placeholder="message..." onkeydown="if(event.key==='Enter')send()">
+    <div class="status">
+        Merci de réessayer ultérieurement.
     </div>
+
+    <button class="logout" onclick="logout()">DÉCONNEXION</button>
 
 </div>
 
 <script>
-// FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "XXX",
-  authDomain: "XXX",
-  projectId: "XXX",
-};
+let user = JSON.parse(localStorage.getItem("lumy_user"));
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// AUTH GUARD
-auth.onAuthStateChanged(user=>{
-    if(!user){
-        location.href="index.html";
-    } else {
-        document.getElementById("name").innerText = user.displayName;
-        document.getElementById("pp").src = user.photoURL;
-
-        document.getElementById("d_name").innerText = user.displayName;
-        document.getElementById("d_email").innerText = user.email;
-
-        document.getElementById("welcome").innerText =
-        "Welcome " + user.displayName;
-    }
-});
-
-// NAV
-function show(id){
-    document.querySelectorAll(".main > div").forEach(e=>e.style.display="none");
-    document.getElementById(id).style.display="block";
+if(!user){
+    window.location.href="index.html";
 }
 
-// DROPDOWN
-function toggleDrop(){
-    let d=document.getElementById("drop");
-    d.style.display = d.style.display==="block"?"none":"block";
-}
+let split = (user.name || "").split(" ");
+let prenom = split[0] || "";
+let nom = split.slice(1).join(" ") || "";
 
-// LOGOUT
+document.getElementById("user").innerText =
+"Connecté : " + prenom + " " + nom;
+
 function logout(){
-    auth.signOut().then(()=>location.href="index.html");
+    localStorage.removeItem("lumy_user");
+    window.location.href="index.html";
 }
-
-// CHAT REALTIME
-function send(){
-    let msg=document.getElementById("msg").value;
-    db.collection("chat").add({
-        text:msg,
-        user:auth.currentUser.displayName,
-        time:Date.now()
-    });
-    document.getElementById("msg").value="";
-}
-
-db.collection("chat").orderBy("time")
-.onSnapshot(snap=>{
-    let box=document.getElementById("chatbox");
-    box.innerHTML="";
-    snap.forEach(doc=>{
-        let d=doc.data();
-        box.innerHTML+=`<div><b>${d.user}</b> : ${d.text}</div>`;
-    });
-});
 </script>
 
 </body>
