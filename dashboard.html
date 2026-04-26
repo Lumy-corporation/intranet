@@ -26,14 +26,12 @@ body{
     font-family:Inter;
 }
 
-/* CONTAINER */
 .box{
     text-align:center;
     max-width:500px;
     padding:40px;
 }
 
-/* LOGO / TITLE */
 h1{
     font-family:Orbitron;
     color:var(--cyan);
@@ -41,7 +39,6 @@ h1{
     font-size:26px;
 }
 
-/* ANIMATION DOTS */
 .loader{
     margin:20px auto;
     display:flex;
@@ -65,7 +62,6 @@ h1{
     50%{opacity:1;}
 }
 
-/* TEXT */
 .status{
     margin-top:20px;
     color:var(--gray);
@@ -80,11 +76,29 @@ h1{
     letter-spacing:1px;
 }
 
-/* USER GREETING */
 .user{
     margin-top:15px;
     color:white;
     font-size:16px;
+}
+
+/* BTN DECO */
+.logout{
+    margin-top:35px;
+    padding:10px 18px;
+    border:1px solid var(--red);
+    background:none;
+    color:var(--red);
+    cursor:pointer;
+    border-radius:8px;
+    font-family:Orbitron;
+    font-size:12px;
+    transition:0.3s;
+}
+
+.logout:hover{
+    background:var(--red);
+    color:white;
 }
 </style>
 </head>
@@ -109,12 +123,14 @@ h1{
 
     <div class="status">
         Les services intranet sont temporairement indisponibles.<br>
-        Nous procédons actuellement à des mises à jour système importantes.
+        Mise à jour système en cours.
     </div>
 
-    <div class="status" style="margin-top:20px;">
+    <div class="status">
         Merci de réessayer ultérieurement.
     </div>
+
+    <button class="logout" onclick="logout()">DÉCONNEXION</button>
 
 </div>
 
@@ -130,7 +146,12 @@ let prenom = split[0] || "";
 let nom = split.slice(1).join(" ") || "";
 
 document.getElementById("user").innerText =
-"Connecté en tant que : " + prenom + " " + nom;
+"Connecté : " + prenom + " " + nom;
+
+function logout(){
+    localStorage.removeItem("lumy_user");
+    window.location.href="index.html";
+}
 </script>
 
 </body>
