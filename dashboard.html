@@ -1,293 +1,288 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>LUMY CORE | Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --bg: #0b0b0f;
-    --card: #141420;
-    --text: #ffffff;
-    --muted: #9aa0a6;
-    --accent: #00f2ff;
-    --border: rgba(255,255,255,0.08);
+:root{
+  --bg:#0b0f14;
+  --panel:#111823;
+  --text:#e6e6e6;
+  --muted:#8aa0b6;
+  --accent:#00f2ff;
+  --border:#1f2a3a;
 }
 
-/* MODE CLAIR AUTO */
-@media (prefers-color-scheme: light) {
-    :root {
-        --bg: #f5f7fb;
-        --card: #ffffff;
-        --text: #0b0b0f;
-        --muted: #555;
-        --border: rgba(0,0,0,0.1);
-    }
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f5f7fb;
+    --panel:#ffffff;
+    --text:#111;
+    --muted:#4b5b6b;
+    --border:#e6e9ef;
+  }
 }
 
-body {
-    margin: 0;
-    font-family: Inter, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+*{box-sizing:border-box;font-family:Inter;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
 }
 
 /* TOP BAR */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 25px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+.topbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,15,20,0.85);
+  backdrop-filter:blur(10px);
 }
 
-.logo {
-    font-family: Orbitron;
-    color: var(--accent);
-    letter-spacing: 2px;
-    font-size: 14px;
+.logo{
+  font-family:Orbitron;
+  color:var(--accent);
+  letter-spacing:2px;
 }
 
-.nav {
-    display: flex;
-    gap: 20px;
+/* NAV */
+.nav{
+  display:flex;
+  gap:15px;
 }
 
-.nav a {
-    text-decoration: none;
-    color: var(--muted);
-    font-size: 13px;
+.nav button{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:6px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:.2s;
 }
 
-.nav a:hover {
-    color: var(--accent);
+.nav button:hover{
+  border-color:var(--accent);
+  color:var(--accent);
 }
 
 /* PROFILE */
-.profile {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
+.profile{
+  position:relative;
+  cursor:pointer;
 }
 
-.profile img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
+.profile img{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:2px solid var(--accent);
 }
 
-.dropdown {
-    position: absolute;
-    right: 0;
-    top: 45px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 15px;
-    border-radius: 12px;
-    width: 220px;
-    display: none;
+.dropdown{
+  position:absolute;
+  right:0;
+  top:50px;
+  width:220px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+  display:none;
 }
 
-.dropdown p {
-    margin: 5px 0;
-    font-size: 12px;
-    color: var(--muted);
+.dropdown p{
+  margin:5px 0;
+  font-size:12px;
+  color:var(--muted);
 }
 
-.logout {
-    margin-top: 10px;
-    width: 100%;
-    padding: 8px;
-    border: 1px solid red;
-    background: transparent;
-    color: red;
-    cursor: pointer;
-    border-radius: 8px;
+.dropdown button{
+  width:100%;
+  margin-top:10px;
+  padding:8px;
+  border:none;
+  border-radius:8px;
+  background:#ff3b3b;
+  color:white;
+  cursor:pointer;
 }
 
-/* MAIN */
-.container {
-    padding: 50px;
+/* CONTENT */
+.container{
+  padding:90px 20px 20px;
 }
 
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 30px;
-    border-radius: 20px;
-    max-width: 500px;
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:15px;
 }
 
-h1 {
-    font-size: 22px;
+h2{
+  font-family:Orbitron;
+  font-size:14px;
+  color:var(--accent);
+  letter-spacing:2px;
 }
 
-.accent {
-    color: var(--accent);
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+td,th{
+  padding:10px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+  text-align:left;
+}
+
+.badge{
+  font-size:11px;
+  padding:3px 8px;
+  border:1px solid var(--accent);
+  border-radius:20px;
+  color:var(--accent);
 }
 </style>
 </head>
 
 <body>
 
-<!-- TOP MENU -->
+<!-- TOP BAR -->
 <div class="topbar">
-    <div class="logo">LUMY CORE</div>
+  <div class="logo">LUMY CORE</div>
 
-    <div class="nav">
-        <a href="#">Dashboard</a>
-        <a href="#">Membres</a>
-        <a href="#">Apps</a>
-        <a href="#">Projets</a>
-    </div>
+  <div class="nav">
+    <button onclick="show('members')">Membres</button>
+    <button onclick="show('projects')">Projets</button>
+    <button onclick="show('apps')">Apps</button>
+  </div>
 
-    <!-- PROFILE -->
-    <div class="profile" onclick="toggleDropdown()">
-        <img id="pp" src="">
-        <div class="dropdown" id="dropdown">
-            <p id="name"></p>
-            <p id="email"></p>
-            <button class="logout" onclick="logout()">Déconnexion</button>
-        </div>
+  <div class="profile" onclick="toggleMenu()">
+    <img id="pp" src="">
+    <div class="dropdown" id="menu">
+      <p id="name">-</p>
+      <p id="email">-</p>
+      <button onclick="logout()">Déconnexion</button>
     </div>
+  </div>
 </div>
 
 <!-- CONTENT -->
 <div class="container">
-    <div class="card">
-        <h1>Salut <span class="accent" id="fullname"></span> 👋</h1>
-        <p style="color: var(--muted); font-size: 13px;">
-            Bienvenue sur le système Lumy Core
-        </p>
-    </div>
-</div>
 
-<script>
-let user = JSON.parse(localStorage.getItem("lumy_user"));
+  <div class="card">
+    <h2>TABLEAU DE BORD</h2>
+    <p id="welcome">Chargement...</p>
+  </div>
 
-if (!user) {
-    window.location.href = "index.html";
-}
+  <!-- MEMBERS -->
+  <div class="card" id="members">
+    <h2>Membres (Firestore)</h2>
+    <table id="usersTable"></table>
+  </div>
 
-document.getElementById("pp").src = user.photo || "";
-document.getElementById("fullname").innerText = (user.given_name || user.name || "");
-document.getElementById("name").innerText = user.name || "";
-document.getElementById("email").innerText = user.email || "";
+  <!-- PROJECTS -->
+  <div class="card" id="projects" style="display:none;">
+    <h2>Projets</h2>
+    <p>Aucun projet validé pour le moment.</p>
+  </div>
 
-function toggleDropdown() {
-    const d = document.getElementById("dropdown");
-    d.style.display = d.style.display === "block" ? "none" : "block";
-}
-
-function logout() {
-    localStorage.removeItem("lumy_user");
-    window.location.href = "index.html";
-}
-</script>
-
-</body>
-</html>}
-
-.status{
-    margin-top:20px;
-    color:var(--gray);
-    font-size:14px;
-    line-height:1.6;
-}
-
-.alert{
-    margin-top:25px;
-    color:var(--red);
-    font-weight:700;
-    letter-spacing:1px;
-}
-
-.user{
-    margin-top:15px;
-    color:white;
-    font-size:16px;
-}
-
-/* BTN DECO */
-.logout{
-    margin-top:35px;
-    padding:10px 18px;
-    border:1px solid var(--red);
-    background:none;
-    color:var(--red);
-    cursor:pointer;
-    border-radius:8px;
-    font-family:Orbitron;
-    font-size:12px;
-    transition:0.3s;
-}
-
-.logout:hover{
-    background:var(--red);
-    color:white;
-}
-</style>
-</head>
-
-<body>
-
-<div class="box">
-
-    <h1>LUMY CORE SYSTEM</h1>
-
-    <div class="loader">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-    </div>
-
-    <div class="user" id="user">Chargement...</div>
-
-    <div class="alert">
-        MAINTENANCE EN COURS
-    </div>
-
-    <div class="status">
-        Les services intranet sont temporairement indisponibles.<br>
-        Mise à jour système en cours.
-    </div>
-
-    <div class="status">
-        Merci de réessayer ultérieurement.
-    </div>
-
-    <button class="logout" onclick="logout()">DÉCONNEXION</button>
+  <!-- APPS -->
+  <div class="card" id="apps" style="display:none;">
+    <h2>Applications</h2>
+    <p>Aucune application publiée.</p>
+  </div>
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
-let user = JSON.parse(localStorage.getItem("lumy_user"));
+// FIREBASE
+const firebaseConfig = {
+  apiKey: "TON_API_KEY",
+  authDomain: "lumy-corporation-1db3f.firebaseapp.com",
+  projectId: "lumy-corporation-1db3f"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// USER LOCAL
+const user = JSON.parse(localStorage.getItem("lumy_user"));
 
 if(!user){
-    window.location.href="index.html";
+  window.location.href="index.html";
 }
 
-let split = (user.name || "").split(" ");
-let prenom = split[0] || "";
-let nom = split.slice(1).join(" ") || "";
+// UI USER
+document.getElementById("pp").src = user.photo || "";
+document.getElementById("name").innerText = user.name;
+document.getElementById("email").innerText = user.email;
 
-document.getElementById("user").innerText =
-"Connecté : " + prenom + " " + nom;
+document.getElementById("welcome").innerText =
+`Salut ${user.name}`;
+
+// ROLE SIMPLE
+const HR = ["theo.rabillard@lumycorp.com","leo.pujolas@lumycorp.com"];
+const isHR = HR.includes(user.email);
+
+// MENU
+function toggleMenu(){
+  const m = document.getElementById("menu");
+  m.style.display = m.style.display === "block" ? "none" : "block";
+}
 
 function logout(){
-    localStorage.removeItem("lumy_user");
-    window.location.href="index.html";
+  localStorage.removeItem("lumy_user");
+  window.location.href="index.html";
 }
+
+function show(id){
+  document.getElementById("members").style.display="none";
+  document.getElementById("projects").style.display="none";
+  document.getElementById("apps").style.display="none";
+  document.getElementById(id).style.display="block";
+}
+
+// FIRESTORE USERS (RÉEL)
+async function loadUsers(){
+  const table = document.getElementById("usersTable");
+  table.innerHTML = "<tr><th>Nom</th><th>Email</th></tr>";
+
+  const snap = await db.collection("users").get();
+
+  snap.forEach(doc=>{
+    const d = doc.data();
+    table.innerHTML += `
+      <tr>
+        <td>${d.Nom || ""} ${d.Prenom || ""}</td>
+        <td>${d["mail pro"] || d.email || ""}</td>
+      </tr>
+    `;
+  });
+}
+
+loadUsers();
+
 </script>
 
 </body>
