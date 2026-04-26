@@ -2,18 +2,18 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>LUMY CORE | AUTH</title>
+<title>LUMY CORE | SECURE ACCESS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
 :root{
-    --bg:#05070c;
-    --panel:rgba(15,20,35,0.65);
+    --bg:#03060c;
+    --panel:rgba(10,15,25,0.75);
     --accent:#00f2ff;
     --text:#e8f0ff;
-    --muted:#7c8aa3;
+    --muted:#6c7a92;
     --border:rgba(255,255,255,0.08);
 }
 
@@ -24,90 +24,117 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    background:
-        radial-gradient(circle at 20% 20%, rgba(0,242,255,0.08), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0,242,255,0.05), transparent 40%),
-        var(--bg);
     font-family:Inter;
     color:var(--text);
+    background:radial-gradient(circle at 50% 50%, #060b18, #02040a);
     overflow:hidden;
 }
 
-/* GRID OVERLAY (subtil) */
+/* ANIMATED GRID */
 body::before{
     content:"";
     position:absolute;
-    width:100%;
-    height:100%;
-    background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                     linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size:40px 40px;
-    pointer-events:none;
+    width:200%;
+    height:200%;
+    background:
+        linear-gradient(rgba(0,242,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,242,255,0.05) 1px, transparent 1px);
+    background-size:50px 50px;
+    transform:rotate(0deg);
+    animation:moveGrid 20s linear infinite;
+}
+
+@keyframes moveGrid{
+    from{transform:translateY(0);}
+    to{transform:translateY(-50px);}
 }
 
 /* CARD */
 .auth-card{
     position:relative;
     background:var(--panel);
-    backdrop-filter:blur(20px);
+    backdrop-filter:blur(18px);
     border:1px solid var(--border);
     padding:50px;
-    border-radius:18px;
+    border-radius:16px;
+    width:380px;
     text-align:center;
-    width:360px;
-
-    box-shadow:
-        0 0 40px rgba(0,0,0,0.6),
-        0 0 80px rgba(0,242,255,0.08);
+    box-shadow:0 0 80px rgba(0,242,255,0.08);
 }
 
-/* TOP GLOW LINE */
-.auth-card::before{
+/* SCAN LINE */
+.auth-card::after{
     content:"";
     position:absolute;
-    top:0;
     left:0;
-    right:0;
-    height:1px;
-    background:linear-gradient(90deg, transparent, var(--accent), transparent);
+    width:100%;
+    height:2px;
+    background:var(--accent);
+    top:0;
+    animation:scan 4s linear infinite;
+    opacity:0.4;
+}
+
+@keyframes scan{
+    0%{top:0}
+    100%{top:100%}
 }
 
 /* TITLE */
 h1{
     font-family:Orbitron;
-    color:var(--accent);
     letter-spacing:6px;
     font-size:18px;
+    color:var(--accent);
     margin-bottom:10px;
 }
 
-/* SUBTEXT */
+/* SUB */
 .subtitle{
     font-size:11px;
-    color:var(--muted);
     letter-spacing:2px;
-    margin-bottom:30px;
+    color:var(--muted);
+    margin-bottom:25px;
+}
+
+/* TERMINAL LOG */
+.log-box{
+    text-align:left;
+    font-size:10px;
+    color:#8aa0c2;
+    height:80px;
+    overflow:hidden;
+    margin-bottom:20px;
+    border-left:1px solid var(--border);
+    padding-left:10px;
+}
+
+.log-line{
+    opacity:0.7;
+    animation:fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(5px)}
+    to{opacity:0.7}
 }
 
 /* STATUS */
 #status{
-    margin-top:25px;
+    margin-top:20px;
     font-size:11px;
     color:var(--muted);
-    letter-spacing:1px;
 }
 
-/* GOOGLE BUTTON WRAP */
+/* BUTTON WRAP */
 .g_id_signin{
     display:flex;
     justify-content:center;
 }
 
-/* HOVER GLOW */
+/* HOVER */
 .auth-card:hover{
-    box-shadow:
-        0 0 50px rgba(0,0,0,0.7),
-        0 0 120px rgba(0,242,255,0.12);
+    box-shadow:0 0 120px rgba(0,242,255,0.12);
     transition:0.4s;
 }
 </style>
@@ -116,31 +143,59 @@ h1{
 <body>
 
 <div class="auth-card">
+
     <h1>LUMY CORE</h1>
-    <div class="subtitle">ACCÈS SYSTÈME INTERNE</div>
+    <div class="subtitle">SECURE INTERNAL ACCESS</div>
+
+    <div class="log-box" id="logs"></div>
 
     <div id="g_id_onload"
-         data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
-         data-context="signin"
-         data-ux_mode="popup"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
+        data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
     </div>
 
     <div class="g_id_signin"
-         data-type="standard"
-         data-theme="outline"
-         data-size="large">
+        data-type="standard"
+        data-theme="outline"
+        data-size="large">
     </div>
 
-    <div id="status">En attente d'identification...</div>
+    <div id="status">INITIALISATION...</div>
+
 </div>
 
 <script>
+
+/* FAKE SYSTEM LOGS */
+const logs = [
+"Boot sequence initialized...",
+"Connecting to secure node...",
+"Verifying certificates...",
+"Checking access policies...",
+"Syncing authentication module...",
+"Awaiting user credentials..."
+];
+
+let i = 0;
+setInterval(()=>{
+    if(i < logs.length){
+        let line = document.createElement("div");
+        line.className = "log-line";
+        line.innerText = logs[i];
+        document.getElementById("logs").appendChild(line);
+        i++;
+    }
+}, 500);
+
+/* AUTH */
 function handleCredentialResponse(response) {
 
     const base64Url = response.credential.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
     const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
         '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
     ).join(''));
@@ -149,12 +204,12 @@ function handleCredentialResponse(response) {
 
     localStorage.setItem('lumy_user', JSON.stringify(user));
 
-    document.getElementById('status').innerText =
-        "AUTHENTIFICATION VALIDÉE — " + user.given_name;
+    document.getElementById("status").innerText =
+        "ACCESS GRANTED — " + user.email;
 
-    setTimeout(() => {
+    setTimeout(()=>{
         window.location.href = "dashboard.html";
-    }, 1000);
+    }, 1200);
 }
 </script>
 
