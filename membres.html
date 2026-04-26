@@ -3,172 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUMY CORE | GESTION DES BÉNÉVOLES</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>LUMY CORE | GESTION UNITÉ</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --cyan: #00f2ff;
+            --purple: #b400ff;
+            --bg: #0a0a0c;
+            --card-bg: #141417;
+            --text: #ffffff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding: 40px 5%;
+        }
+
+        h1 { font-family: 'Orbitron'; letter-spacing: 4px; color: var(--cyan); text-align: center; margin-bottom: 40px; }
+        
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .admin-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .admin-card h3 {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--purple);
+        }
+
+        /* Tables Look */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #666; padding: 15px; border-bottom: 1px solid #222; }
+        td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid #1a1a1a; }
+        
+        .badge-pole {
+            background: rgba(180, 0, 255, 0.1);
+            color: var(--purple);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* Boutons */
+        .btn-paff {
+            background: var(--cyan);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 900;
+            cursor: pointer;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+        .btn-paff:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--cyan); }
+
+        .status-active { color: #00ff88; font-weight: bold; font-size: 0.7rem; }
+        
+        small { color: #555; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>UNITÉ DE GESTION DES BÉNÉVOLES</h1>
 
+    <h1>LUMY CORE <span style="color:white; opacity:0.2;">//</span> INTRANET</h1>
+
+    <div class="grid-layout">
+        
         <div class="admin-card">
-            <h3><i class="fas fa-user-plus"></i> Enrôlement d'une nouvelle recrue</h3>
-            
-            <div class="form-grid">
-                <div class="input-group">
-                    <label>Prénom</label>
-                    <input type="text" id="prenom" placeholder="Jean-luc" oninput="formatIdentity()">
-                </div>
-                
-                <div class="input-group">
-                    <label>Nom</label>
-                    <input type="text" id="nom" placeholder="DUPONT" oninput="formatIdentity()">
-                </div>
-
-                <div class="input-group">
-                    <label>Date de naissance</label>
-                    <input type="date" id="date_naissance">
-                </div>
-                
-                <div class="input-group">
-                    <label>Email Personnel</label>
-                    <input type="email" id="email_prive" placeholder="ex: jeanluc@gmail.com">
-                </div>
-
-                <div class="input-group">
-                    <label>Téléphone</label>
-                    <input type="tel" id="tel_prive" placeholder="06 00 00 00 00">
-                </div>
-
-                <div class="input-group">
-                    <label>Date d'entrée</label>
-                    <input type="date" id="date_entree" value="2026-04-26">
-                </div>
-
-                <div class="input-group full-width">
-                    <label>Email Professionnel (Généré)</label>
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <input type="text" id="alias" readonly placeholder="j.dupont" style="background: #2a2a35; border-color: #444;">
-                        <span style="font-weight: bold; color: #00d4ff;">@lumycorp.com</span>
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <label>Poste</label>
-                    <select id="poste">
-                        <option value="">-- Choisir un poste --</option>
-                        <option value="Dev">Développeur</option>
-                        <option value="Cyber">Cyber-Sécurité</option>
-                        <option value="RH">Ressources Humaines</option>
-                        <option value="Comm">Communication</option>
-                        <option value="Logistique">Logistique</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label>Niveau d'accès</label>
-                    <select id="role_acces">
-                        <option value="benevole">Bénévole (Standard)</option>
-                        <option value="responsable">Responsable (Manager)</option>
-                        <option value="directeur">Directeur (Admin)</option>
-                    </select>
-                </div>
-
-                <button onclick="recruterMembres()" class="btn-main">CRÉER COMPTE GOOGLE & BDD</button>
-            </div>
-        </div>
-
-        <div class="list-section">
-            <h3>Liste des Membres</h3>
+            <h3><i class="fas fa-id-badge"></i> RECRUES POTENTIELLES (INBOX)</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Nom Complet</th>
-                        <th>Email Pro</th>
+                        <th>Candidat</th>
+                        <th>Localisation</th>
+                        <th>Pôle Visé</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="candidats-body">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="admin-card" style="border-top: 2px solid var(--cyan);">
+            <h3><i class="fas fa-user-shield"></i> MEMBRES DE L'UNITÉ ACTIFS</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom & Prénom</th>
+                        <th>Email Lumy Pro</th>
                         <th>Poste</th>
                         <th>Statut</th>
                     </tr>
                 </thead>
-                <tbody id="membres-body"></tbody>
+                <tbody id="membres-body">
+                    </tbody>
             </table>
         </div>
+
     </div>
 
-    <script src="js/config.js"></script>
     <script>
-        // --- LOGIQUE DE FORMATAGE AUTO ---
-        function formatIdentity() {
-            let p = document.getElementById('prenom');
-            let n = document.getElementById('nom');
-            let a = document.getElementById('alias');
+        // CONFIGURATION FIREBASE (À lier avec ton config.js)
+        // Utilise les mêmes identifiants que ton formulaire d'enrôlement
+        const firebaseConfig = {
+            apiKey: "AIzaSyCjIUOQogsQUhRgYJgN1OlErEt3FsihZuo",
+            authDomain: "lumy-corporation-1db3f.firebaseapp.com",
+            projectId: "lumy-corporation-1db3f",
+            storageBucket: "lumy-corporation-1db3f.firebasestorage.app",
+            messagingSenderId: "1023452628363",
+            appId: "1:1023452628363:web:0806d0bc81436c0446db8e"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-            // Prénom : Majuscule au début
-            if (p.value) {
-                p.value = p.value.charAt(0).toUpperCase() + p.value.slice(1).toLowerCase();
-            }
-            // Nom : Tout en MAJUSCULES
-            if (n.value) {
-                n.value = n.value.toUpperCase();
-            }
-
-            // Génération de l'alias : p.nom (sans accents, sans caractères spé)
-            if (p.value && n.value) {
-                let cleanP = p.value.charAt(0).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                let cleanN = n.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '').toLowerCase();
-                a.value = cleanP + "." + cleanN;
-            }
-        }
-
-        // --- AFFICHAGE TEMPS RÉEL ---
-        db.collection("users").onSnapshot((snapshot) => {
-            const tbody = document.getElementById('membres-body');
+        // --- 1. ÉCOUTE DES NOUVELLES INSCRIPTIONS ---
+        db.collection("inscriptions").onSnapshot((snapshot) => {
+            const tbody = document.getElementById('candidats-body');
             tbody.innerHTML = "";
+            
             snapshot.forEach((doc) => {
-                const user = doc.data();
+                const data = doc.data();
                 tbody.innerHTML += `
                     <tr>
-                        <td>${user.prenom} ${user.nom}</td>
-                        <td>${doc.id}</td>
-                        <td>${user.poste}</td>
-                        <td><span class="status-badge">ACTIF</span></td>
+                        <td>
+                            <strong>${data.prenom} ${data.nom}</strong><br>
+                            <small>${data.email}</small>
+                        </td>
+                        <td>${data.ville || 'NC'} <br><small>${data.pays || 'Europe'}</small></td>
+                        <td><span class="badge-pole">${data.secteur_lumy}</span></td>
+                        <td>
+                            <button class="btn-paff" onclick="paffEnrolement('${doc.id}')">PAFF !</button>
+                        </td>
                     </tr>
                 `;
             });
         });
 
-        // --- ACTION DE CRÉATION ---
-        async function recruterMembres() {
-            const emailPro = document.getElementById('alias').value + "@lumycorp.com";
+        // --- 2. ÉCOUTE DE L'UNITÉ OFFICIELLE ---
+        db.collection("users").onSnapshot((snapshot) => {
+            const tbody = document.getElementById('membres-body');
+            tbody.innerHTML = "";
             
-            const data = {
-                nom: document.getElementById('nom').value,
-                prenom: document.getElementById('prenom').value,
-                date_naissance: document.getElementById('date_naissance').value,
-                email_prive: document.getElementById('email_prive').value,
-                tel_prive: document.getElementById('tel_prive').value,
-                date_entree: document.getElementById('date_entree').value,
-                poste: document.getElementById('poste').value,
-                niveau_acces: document.getElementById('role_acces').value,
-                email_pro: emailPro
-            };
+            snapshot.forEach((doc) => {
+                const user = doc.data();
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.prenom} ${user.nom}</td>
+                        <td><code style="color:var(--cyan)">${user.email_pro}</code></td>
+                        <td>${user.poste}</td>
+                        <td><span class="status-active"><i class="fas fa-check-circle"></i> ACTIF</span></td>
+                    </tr>
+                `;
+            });
+        });
 
-            // Vérification simple
-            if(!data.nom || !data.prenom || !data.email_prive) {
-                alert("Remplis au moins le Nom, Prénom et Mail privé !");
-                return;
-            }
-
-            console.log("Données prêtes :", data);
-            alert("Lancement de la procédure pour " + emailPro);
-
+        // --- 3. FONCTION MAGIQUE "PAFF" ---
+        async function paffEnrolement(idDoc) {
             try {
-                // Ici l'appel à la fonction Cloud de ton équipe web
-                // await createGoogleAndFirestoreAccount(data); 
-                alert("Succès ! Compte Google créé et bénévole ajouté à la base.");
-            } catch(e) {
-                alert("Erreur technique : " + e.message);
+                // Récupération des données du candidat
+                const docRef = db.collection("inscriptions").doc(idDoc);
+                const snap = await docRef.get();
+                const data = snap.data();
+
+                // Formatage propre
+                const prenomPropre = data.prenom.charAt(0).toUpperCase() + data.prenom.slice(1).toLowerCase();
+                const nomPropre = data.nom.toUpperCase();
+                
+                // Nettoyage de l'alias pour l'email
+                const alias = (data.prenom.charAt(0) + "." + data.nom)
+                              .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlève accents
+                              .replace(/\s+/g, '') // Enlève espaces
+                              .toLowerCase();
+                
+                const emailPro = alias + "@lumycorp.com";
+
+                // Création dans l'Unité Officielle
+                await db.collection("users").doc(emailPro).set({
+                    nom: nomPropre,
+                    prenom: prenomPropre,
+                    email_pro: emailPro,
+                    email_perso: data.email,
+                    tel: data.telephone || 'NC',
+                    poste: data.secteur_lumy,
+                    ville: data.ville || 'NC',
+                    date_entree: new Date().toLocaleDateString('fr-FR'),
+                    statut: "ACTIF"
+                });
+
+                // Suppression de la boîte de réception
+                await docRef.delete();
+
+                alert("SYSTÈME : " + prenomPropre + " enrôlé avec succès sous " + emailPro);
+
+            } catch (error) {
+                console.error(error);
+                alert("ERREUR CRITIQUE DANS LE PROTOCOLE.");
             }
         }
     </script>
