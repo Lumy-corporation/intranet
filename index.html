@@ -3,125 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL D'ACCÈS | LUMY CORE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>LUMY CORE | AUTHENTICATION</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --neon-blue: #00d4ff; --bg-dark: #0a0a14; }
-        body.flex-center { 
-            background: var(--bg-dark); color: white; font-family: 'Inter', sans-serif;
-            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+        :root {
+            --cyan: #00f2ff;
+            --purple: #b400ff;
+            --bg: #050505;
         }
-        .login-card {
-            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px;
-            border: 1px solid rgba(0,212,255,0.2); text-align: center; width: 350px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
         }
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; letter-spacing: 4px; color: var(--neon-blue); margin-bottom: 30px; }
-        .error-msg { color: #ff4b4b; background: rgba(255,75,75,0.1); padding: 10px; border-radius: 5px; display: none; margin-top: 20px; font-size: 0.8rem; }
+
+        /* Animation de fond */
+        .bg-glow {
+            position: absolute; width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.15) 0%, transparent 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: -1; filter: blur(50px);
+        }
+
+        .auth-container {
+            text-align: center;
+            background: rgba(20, 20, 23, 0.8);
+            padding: 60px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 400px; width: 90%;
+        }
+
+        .logo-area {
+            font-family: 'Orbitron';
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-msg {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #555;
+            margin-bottom: 40px;
+        }
+
+        .btn-google {
+            background: white;
+            color: #1d1d1f;
+            border: none;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-google:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 242, 255, 0.2);
+        }
+
+        .btn-google img { width: 20px; }
+
+        .footer-text {
+            margin-top: 30px;
+            font-size: 0.65rem;
+            color: #444;
+            letter-spacing: 1px;
+        }
+
+        /* Loader simple */
+        #loader { display: none; margin-top: 20px; }
+        .spinner {
+            width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: var(--cyan); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex-center">
+<body>
 
-<div class="login-card">
-    <img src="https://lumycorp.com/logo.png" alt="Lumy" style="width:80px; margin-bottom:20px;">
-    <h1>LUMY CORE</h1>
+    <div class="bg-glow"></div>
 
-    <div id="g_id_onload"
-         data-client_id="788062568965-vmpp8uu5pumpncqk5q2co3r35s96fg5k.apps.googleusercontent.com"
-         data-callback="handleSignIn">
+    <div class="auth-container">
+        <div class="logo-area">LUMY CORE</div>
+        <div class="status-msg">Système de Liaison Unifié</div>
+
+        <button class="btn-google" id="loginBtn" onclick="loginWithGoogle()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+            Continuer avec Google
+        </button>
+
+        <div id="loader">
+            <div class="spinner"></div>
+            <p style="font-size: 0.7rem; color: var(--cyan); margin-top: 10px;">Vérification du protocole...</p>
+        </div>
+
+        <div class="footer-text">ACCÈS RÉSERVÉ AU PERSONNEL LUMY CORP.</div>
     </div>
 
-    <div class="g_id_signin"
-         data-type="standard"
-         data-shape="rectangular"
-         data-theme="filled_black"
-         data-size="large"
-         data-logo_alignment="left">
-    </div>
+    <script>
+        // TA CONFIGURATION FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCjIUOQogsQUhRgYJgN1OlErEt3FsihZuo",
+            authDomain: "lumy-corporation-1db3f.firebaseapp.com",
+            databaseURL: "https://lumy-corporation-1db3f-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "lumy-corporation-1db3f",
+            appId: "1:1023452628363:web:0806d0bc81436c0446db8e"
+        };
 
-    <div id="error-msg" class="error-msg"></div>
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-    <p style="font-size: 9px; color: #444; margin-top: 30px; letter-spacing: 1px;">
-        SÉCURITÉ NIVEAU 4 - INTRANET PROPRIÉTAIRE
-    </p>
-</div>
+        // 1. GESTION DE LA CONNEXION
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            // Masquer le bouton, montrer le loader
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<script>
-/* ================= FIREBASE CONFIG (CORRIGÉE) ================= */
-const firebaseConfig = {
-    apiKey: "AIzaSyCjIUOQogsQUhRgYJgN1OlErEt3FsihZuo",
-    authDomain: "lumy-corporation-1db3f.firebaseapp.com",
-    projectId: "lumy-corporation-1db3f",
-    storageBucket: "lumy-corporation-1db3f.appspot.com",
-    messagingSenderId: "1023452628363",
-    appId: "1:1023452628363:web:0806d0bc81436c0446db8e",
-    measurementId: "G-JTZLLB2LGM"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-/* ================= JWT GOOGLE ================= */
-function parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(window.atob(base64));
-}
-
-/* ================= LOGIN ================= */
-async function handleSignIn(response) {
-    const payload = parseJwt(response.credential);
-    const errorDiv = document.getElementById('error-msg');
-
-    if (!payload.email) {
-        return showError("TOKEN GOOGLE INVALIDE.");
-    }
-
-    // Vérifie domaine
-    if (!payload.email.endsWith("@lumycorp.com")) {
-        return showError("ACCÈS REFUSÉ : DOMAINE @LUMYCORP.COM REQUIS.");
-    }
-
-    try {
-        // Firestore check user
-        const userDoc = await db.collection("users").doc(payload.email).get();
-
-        if (!userDoc.exists) {
-            return showError("ACCÈS RÉVOQUÉ : COMPTE NON RÉPERTORIÉ DANS LA BDD.");
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // Succès ! La redirection se fera via onAuthStateChanged
+                    console.log("Connecté en tant que :", result.user.displayName);
+                })
+                .catch((error) => {
+                    console.error("Erreur d'authentification :", error);
+                    alert("Échec de la connexion. Vérifiez vos droits d'accès.");
+                    document.getElementById('loginBtn').style.display = 'flex';
+                    document.getElementById('loader').style.display = 'none';
+                });
         }
 
-        const userData = userDoc.data();
-
-        // session locale
-        localStorage.setItem('lumy_user', JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            role: userData.role || "user",
-            photo: payload.picture
-        }));
-
-        window.location.href = "dashboard.html";
-
-    } catch (err) {
-        console.error(err);
-        showError("ERREUR DE LIAISON FIREBASE.");
-    }
-}
-
-/* ================= ERREUR ================= */
-function showError(msg) {
-    const e = document.getElementById('error-msg');
-    e.innerText = msg;
-    e.style.display = 'block';
-}
-</script>
-
+        // 2. SURVEILLANCE DE L'ÉTAT (SSO)
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Si l'utilisateur est déjà connecté, on l'envoie direct sur membres.html
+                // On peut aussi restreindre ici par domaine :
+                if (user.email.endsWith("@lumycorp.com") || user.email === "ton-email-admin@gmail.com") {
+                    window.location.href = "membres.html";
+                } else {
+                    alert("Accès refusé : Ce portail est réservé aux membres @lumycorp.com");
+                    auth.signOut();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
