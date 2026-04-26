@@ -10,89 +10,111 @@
 <style>
 :root{
     --bg:#050505;
-    --card:#111;
     --cyan:#00f2ff;
-    --red:#ff4444;
+    --red:#ff3b3b;
+    --gray:#888;
 }
 
 body{
     margin:0;
-    background:var(--bg);
-    color:white;
-    font-family:Inter;
+    height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
+    background:var(--bg);
+    color:white;
+    font-family:Inter;
 }
 
-.card{
+/* CONTAINER */
+.box{
     text-align:center;
-    background:var(--card);
+    max-width:500px;
     padding:40px;
-    border-radius:20px;
-    border:1px solid #222;
-    width:420px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.5);
 }
 
+/* LOGO / TITLE */
 h1{
     font-family:Orbitron;
     color:var(--cyan);
-    letter-spacing:2px;
+    letter-spacing:3px;
+    font-size:26px;
 }
 
+/* ANIMATION DOTS */
+.loader{
+    margin:20px auto;
+    display:flex;
+    justify-content:center;
+    gap:6px;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    background:var(--cyan);
+    border-radius:50%;
+    animation:blink 1.2s infinite ease-in-out;
+}
+
+.dot:nth-child(2){animation-delay:0.2s;}
+.dot:nth-child(3){animation-delay:0.4s;}
+
+@keyframes blink{
+    0%,100%{opacity:0.2;}
+    50%{opacity:1;}
+}
+
+/* TEXT */
 .status{
-    margin-top:15px;
-    color:#aaa;
+    margin-top:20px;
+    color:var(--gray);
     font-size:14px;
+    line-height:1.6;
 }
 
-.warn{
-    margin-top:20px;
+.alert{
+    margin-top:25px;
     color:var(--red);
     font-weight:700;
+    letter-spacing:1px;
 }
 
-.btn{
-    margin-top:30px;
-    padding:10px 20px;
-    border:1px solid var(--red);
-    background:none;
-    color:var(--red);
-    cursor:pointer;
-    border-radius:8px;
-    font-family:Orbitron;
-    transition:0.3s;
-}
-
-.btn:hover{
-    background:var(--red);
+/* USER GREETING */
+.user{
+    margin-top:15px;
     color:white;
+    font-size:16px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="box">
 
-    <h1>LUMY CORE</h1>
+    <h1>LUMY CORE SYSTEM</h1>
 
-    <div class="status" id="hello">
-        Chargement...
+    <div class="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
     </div>
 
-    <div class="warn">
-        ⚠ MAINTENANCE EN COURS ⚠
+    <div class="user" id="user">Chargement...</div>
+
+    <div class="alert">
+        MAINTENANCE EN COURS
     </div>
 
     <div class="status">
-        Le système intranet est temporairement indisponible.<br>
-        Veuillez revenir ultérieurement.
+        Les services intranet sont temporairement indisponibles.<br>
+        Nous procédons actuellement à des mises à jour système importantes.
     </div>
 
-    <button class="btn" onclick="logout()">Déconnexion</button>
+    <div class="status" style="margin-top:20px;">
+        Merci de réessayer ultérieurement.
+    </div>
 
 </div>
 
@@ -103,133 +125,12 @@ if(!user){
     window.location.href="index.html";
 }
 
-/* prénom / nom safe */
 let split = (user.name || "").split(" ");
 let prenom = split[0] || "";
 let nom = split.slice(1).join(" ") || "";
 
-document.getElementById("hello").innerText =
-"Bonjour " + prenom + " " + nom + ", l'accès est temporairement restreint.";
-
-function logout(){
-    localStorage.removeItem("lumy_user");
-    window.location.href="index.html";
-}
-</script>
-
-</body>
-</html>    height:35px;
-    border-radius:50%;
-    border:2px solid var(--cyan);
-}
-
-/* DROPDOWN */
-.dropdown{
-    position:absolute;
-    right:0;
-    top:50px;
-    background:#111;
-    border:1px solid #222;
-    width:220px;
-    border-radius:10px;
-    display:none;
-    padding:10px;
-}
-
-.dropdown p{
-    margin:5px 0;
-    font-size:12px;
-    color:#ccc;
-}
-
-.logout{
-    margin-top:10px;
-    padding:8px;
-    text-align:center;
-    border:1px solid red;
-    color:red;
-    cursor:pointer;
-    border-radius:6px;
-}
-
-/* DASHBOARD */
-.container{
-    padding-top:100px;
-    text-align:center;
-}
-
-h1{
-    font-family:Orbitron;
-    color:var(--cyan);
-}
-</style>
-</head>
-
-<body>
-
-<!-- TOP BAR -->
-<div class="topbar">
-
-    <div class="menu">
-        <a href="#">Dashboard</a>
-        <a href="#">Membres</a>
-        <a href="#">Apps</a>
-    </div>
-
-    <div class="profile" onclick="toggleMenu()">
-        <img id="pp" src="">
-        
-        <div class="dropdown" id="dropdown">
-
-            <p id="name">Nom</p>
-            <p id="email">Email</p>
-
-            <div class="logout" onclick="logout()">Déconnexion</div>
-
-        </div>
-    </div>
-
-</div>
-
-<!-- DASHBOARD -->
-<div class="container">
-    <h1 id="hello">Chargement...</h1>
-</div>
-
-<script>
-let user = JSON.parse(localStorage.getItem("lumy_user"));
-
-if(!user){
-    window.location.href="index.html";
-}
-
-/* ===== AFFICHAGE ===== */
-
-document.getElementById("pp").src = user.photo || "https://via.placeholder.com/100";
-
-document.getElementById("name").innerText = user.name || "Inconnu";
-document.getElementById("email").innerText = user.email || "-";
-
-/* prénom + nom (safe split) */
-let split = (user.name || "").split(" ");
-
-let prenom = split[0] || "";
-let nom = split.slice(1).join(" ") || "";
-
-document.getElementById("hello").innerText =
-"Salut " + prenom + " " + nom;
-
-/* MENU */
-function toggleMenu(){
-    let d = document.getElementById("dropdown");
-    d.style.display = (d.style.display === "block") ? "none" : "block";
-}
-
-/* logout */
-function logout(){
-    localStorage.removeItem("lumy_user");
-    window.location.href="index.html";
-}
+document.getElementById("user").innerText =
+"Connecté en tant que : " + prenom + " " + nom;
 </script>
 
 </body>
