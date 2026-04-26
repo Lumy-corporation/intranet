@@ -2,20 +2,18 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>LUMY CORE | SYSTEM ACCESS</title>
+<title>LUMY CORE | AUTH</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
 :root{
-    --bg:#03060c;
+    --bg:#04070d;
     --panel:#0b111b;
-    --panel2:#0f1624;
     --accent:#00f2ff;
     --text:#e8f0ff;
     --muted:#6c7a92;
-    --border:rgba(255,255,255,0.08);
 }
 
 /* GLOBAL */
@@ -24,116 +22,10 @@
 body{
     height:100vh;
     display:flex;
-    background:var(--bg);
-    color:var(--text);
-}
-
-/* LEFT PANEL (ADMIN SYSTEM) */
-.left{
-    width:50%;
-    padding:60px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    background:
-        radial-gradient(circle at 20% 20%, rgba(0,242,255,0.08), transparent 40%),
-        var(--bg);
-}
-
-/* TITLE */
-h1{
-    font-family:Orbitron;
-    letter-spacing:6px;
-    font-size:26px;
-    color:var(--accent);
-    margin-bottom:20px;
-}
-
-/* DESCRIPTION */
-.desc{
-    color:var(--muted);
-    font-size:13px;
-    line-height:1.6;
-    max-width:400px;
-}
-
-/* SYSTEM STATUS */
-.status-box{
-    margin-top:40px;
-    border:1px solid var(--border);
-    padding:20px;
-    border-radius:10px;
-    background:var(--panel);
-}
-
-.status-line{
-    display:flex;
-    justify-content:space-between;
-    font-size:12px;
-    margin-bottom:10px;
-}
-
-/* ANIM DOT */
-.dot{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:var(--accent);
-    animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-    0%{opacity:0.3}
-    50%{opacity:1}
-    100%{opacity:0.3}
-}
-
-/* RIGHT PANEL (LOGIN) */
-.right{
-    width:50%;
-    display:flex;
     justify-content:center;
     align-items:center;
-    background:var(--panel);
-    border-left:1px solid var(--border);
-}
-
-/* LOGIN BLOCK */
-.auth{
-    width:360px;
-}
-
-/* TITLE */
-.auth-title{
-    font-family:Orbitron;
-    letter-spacing:4px;
-    color:var(--accent);
-    margin-bottom:10px;
-}
-
-.sub{
-    font-size:12px;
-    color:var(--muted);
-    margin-bottom:30px;
-}
-
-/* BUTTON WRAP */
-.g_id_signin{
-    display:flex;
-    justify-content:center;
-}
-
-/* STATUS */
-#status{
-    margin-top:20px;
-    font-size:11px;
-    color:var(--muted);
-}
-
-/* HOVER INTERACTION */
-.auth:hover{
-    transform:translateY(-2px);
-    transition:0.3s;
+    background:var(--bg);
+    color:var(--text);
 }
 
 /* BACKGROUND GRID */
@@ -146,66 +38,174 @@ body::before{
         linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
     background-size:50px 50px;
-    pointer-events:none;
+}
+
+/* CARD */
+.auth{
+    position:relative;
+    width:420px;
+    padding:50px;
+    background:var(--panel);
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    text-align:center;
+}
+
+/* TITLE */
+h1{
+    font-family:Orbitron;
+    letter-spacing:5px;
+    color:var(--accent);
+    margin-bottom:10px;
+}
+
+.sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:30px;
+}
+
+/* STATUS */
+#status{
+    margin-top:20px;
+    font-size:11px;
+    color:var(--muted);
+}
+
+/* LEGAL BUTTON */
+.legal-trigger{
+    position:fixed;
+    bottom:15px;
+    right:20px;
+    font-size:10px;
+    color:#444;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.legal-trigger:hover{
+    color:var(--accent);
+}
+
+/* MODAL */
+.legal-modal{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+}
+
+.legal-content{
+    width:600px;
+    max-height:80vh;
+    background:#0b111b;
+    border:1px solid #222;
+    border-radius:15px;
+    padding:25px;
+    overflow-y:auto;
+    box-shadow:0 0 50px rgba(0,242,255,0.15);
+}
+
+.legal-header{
+    font-family:Orbitron;
+    font-size:12px;
+    color:var(--accent);
+    margin-bottom:15px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.close{
+    cursor:pointer;
+    font-size:18px;
+}
+
+.legal-body{
+    font-size:12px;
+    color:#aaa;
+    line-height:1.6;
+}
+
+.legal-body h3{
+    color:white;
+    font-size:11px;
+    margin-top:15px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LEFT PANEL -->
-<div class="left">
-
+<div class="auth">
     <h1>LUMY CORE</h1>
+    <div class="sub">ACCÈS AU SYSTÈME INTERNE</div>
 
-    <div class="desc">
-        Interface administrative interne sécurisée.<br><br>
-        Accès restreint aux membres autorisés de l’organisation.
+    <div id="g_id_onload"
+        data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
     </div>
 
-    <div class="status-box">
-        <div class="status-line">
-            <span>Authentication Service</span>
-            <div class="dot"></div>
-        </div>
-        <div class="status-line">
-            <span>Database Connection</span>
-            <div class="dot"></div>
-        </div>
-        <div class="status-line">
-            <span>Security Layer</span>
-            <div class="dot"></div>
-        </div>
+    <div class="g_id_signin"
+        data-type="standard"
+        data-theme="outline"
+        data-size="large">
     </div>
 
+    <div id="status">En attente d'identification...</div>
 </div>
 
-<!-- RIGHT PANEL -->
-<div class="right">
+<!-- BOUTON -->
+<div class="legal-trigger" onclick="openLegal()">Mentions légales</div>
 
-    <div class="auth">
+<!-- POPUP -->
+<div class="legal-modal" id="legalModal">
+    <div class="legal-content">
 
-        <div class="auth-title">AUTHENTIFICATION</div>
-        <div class="sub">Connexion au système interne</div>
-
-        <div id="g_id_onload"
-            data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
-            data-context="signin"
-            data-ux_mode="popup"
-            data-callback="handleCredentialResponse"
-            data-auto_prompt="false">
+        <div class="legal-header">
+            LUMY CORE — MENTIONS LÉGALES
+            <span class="close" onclick="closeLegal()">×</span>
         </div>
 
-        <div class="g_id_signin"
-            data-type="standard"
-            data-theme="outline"
-            data-size="large">
-        </div>
+        <div class="legal-body">
 
-        <div id="status">En attente...</div>
+            <h3>Éditeur du Système</h3>
+            Association LUMY CORPORATION<br>
+            Loi 1901<br>
+            Siège : Issoire (63500), France<br>
+            RNA : W633005785<br>
+            SIRET : 102 450 350 00016<br>
+            Directeur : Théo Rabillard<br>
+            Contact : contact@lumycorp.com
+
+            <h3>Hébergement & Infrastructure</h3>
+            GitHub Pages / Cloudflare<br>
+            Données en Union Européenne<br>
+            DNS : LDS
+
+            <h3>Propriété Intellectuelle</h3>
+            LumyOS, design et code protégés<br>
+            Reproduction interdite (Art. L122-4 CPI)
+
+            <h3>Données & RGPD</h3>
+            Données chiffrées AES-256<br>
+            Usage interne uniquement<br>
+            Droit d'accès : contact@lumycorp.com
+
+            <h3>Sécurité</h3>
+            Communications sécurisées SSL<br>
+            Chiffrement actif des échanges
+
+        </div>
 
     </div>
-
 </div>
 
 <script>
@@ -228,6 +228,15 @@ function handleCredentialResponse(response){
     setTimeout(()=>{
         window.location.href = "dashboard.html";
     },1000);
+}
+
+/* modal */
+function openLegal(){
+    document.getElementById("legalModal").style.display = "flex";
+}
+
+function closeLegal(){
+    document.getElementById("legalModal").style.display = "none";
 }
 </script>
 
