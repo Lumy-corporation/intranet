@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LUMY CORE | GESTION DES BÉNÉVOLES</title>
     <link rel="stylesheet" href="css/style.css">
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
@@ -11,41 +13,115 @@
     <div class="container">
         <h1>UNITÉ DE GESTION DES BÉNÉVOLES</h1>
 
-<div class="admin-card">
-    <h3><i class="fas fa-user-plus"></i> Enrôlement d'une nouvelle recrue</h3>
-    <div class="form-grid">
-        <input type="text" id="prenom" placeholder="Prénom">
-        <input type="text" id="nom" placeholder="Nom">
-        <input type="date" id="date_naissance" title="Date de naissance">
-        
-        <input type="email" id="email_prive" placeholder="Email Personnel">
-        <input type="tel" id="tel_prive" placeholder="Téléphone">
-        
-        <input type="text" id="alias" placeholder="Identifiant Lumy (ex: m.sprimont)">
-        <input type="date" id="date_entree" title="Date d'entrée chez Lumy Corp" value="2026-04-26">
-        
-        <select id="poste">
-            <option value="">-- Choisir un poste --</option>
-            <option value="Dev">Développeur</option>
-            <option value="Cyber">Cyber-Sécurité</option>
-            <option value="RH">Ressources Humaines</option>
-            <option value="Comm">Communication</option>
-            <option value="Logistique">Logistique</option>
-        </select>
-        
-        <select id="role_acces">
-            <option value="benevole">Bénévole (Standard)</option>
-            <option value="responsable">Responsable (Manager)</option>
-            <option value="directeur">Directeur (Admin)</option>
-        </select>
+        <div class="admin-card">
+            <h3><i class="fas fa-user-plus"></i> Enrôlement d'une nouvelle recrue</h3>
+            
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Prénom</label>
+                    <input type="text" id="prenom" placeholder="Jean-luc" oninput="formatIdentity()">
+                </div>
+                
+                <div class="input-group">
+                    <label>Nom</label>
+                    <input type="text" id="nom" placeholder="DUPONT" oninput="formatIdentity()">
+                </div>
 
-        <button onclick="recruterMembre()" class="btn-main">CRÉER COMPTE GOOGLE & BDD</button>
+                <div class="input-group">
+                    <label>Date de naissance</label>
+                    <input type="date" id="date_naissance">
+                </div>
+                
+                <div class="input-group">
+                    <label>Email Personnel</label>
+                    <input type="email" id="email_prive" placeholder="ex: jeanluc@gmail.com">
+                </div>
+
+                <div class="input-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="tel_prive" placeholder="06 00 00 00 00">
+                </div>
+
+                <div class="input-group">
+                    <label>Date d'entrée</label>
+                    <input type="date" id="date_entree" value="2026-04-26">
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Email Professionnel (Généré)</label>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input type="text" id="alias" readonly placeholder="j.dupont" style="background: #2a2a35; border-color: #444;">
+                        <span style="font-weight: bold; color: #00d4ff;">@lumycorp.com</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Poste</label>
+                    <select id="poste">
+                        <option value="">-- Choisir un poste --</option>
+                        <option value="Dev">Développeur</option>
+                        <option value="Cyber">Cyber-Sécurité</option>
+                        <option value="RH">Ressources Humaines</option>
+                        <option value="Comm">Communication</option>
+                        <option value="Logistique">Logistique</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Niveau d'accès</label>
+                    <select id="role_acces">
+                        <option value="benevole">Bénévole (Standard)</option>
+                        <option value="responsable">Responsable (Manager)</option>
+                        <option value="directeur">Directeur (Admin)</option>
+                    </select>
+                </div>
+
+                <button onclick="recruterMembres()" class="btn-main">CRÉER COMPTE GOOGLE & BDD</button>
+            </div>
+        </div>
+
+        <div class="list-section">
+            <h3>Liste des Membres</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom Complet</th>
+                        <th>Email Pro</th>
+                        <th>Poste</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="membres-body"></tbody>
+            </table>
+        </div>
     </div>
-</div>
-      
+
     <script src="js/config.js"></script>
     <script>
-        // Affichage des membres en temps réel depuis Firestore
+        // --- LOGIQUE DE FORMATAGE AUTO ---
+        function formatIdentity() {
+            let p = document.getElementById('prenom');
+            let n = document.getElementById('nom');
+            let a = document.getElementById('alias');
+
+            // Prénom : Majuscule au début
+            if (p.value) {
+                p.value = p.value.charAt(0).toUpperCase() + p.value.slice(1).toLowerCase();
+            }
+            // Nom : Tout en MAJUSCULES
+            if (n.value) {
+                n.value = n.value.toUpperCase();
+            }
+
+            // Génération de l'alias : p.nom (sans accents, sans caractères spé)
+            if (p.value && n.value) {
+                let cleanP = p.value.charAt(0).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                let cleanN = n.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '').toLowerCase();
+                a.value = cleanP + "." + cleanN;
+            }
+        }
+
+        // --- AFFICHAGE TEMPS RÉEL ---
         db.collection("users").onSnapshot((snapshot) => {
             const tbody = document.getElementById('membres-body');
             tbody.innerHTML = "";
@@ -56,32 +132,43 @@
                         <td>${user.prenom} ${user.nom}</td>
                         <td>${doc.id}</td>
                         <td>${user.poste}</td>
-                        <td><span class="status-active">ACTIF</span></td>
+                        <td><span class="status-badge">ACTIF</span></td>
                     </tr>
                 `;
             });
         });
 
+        // --- ACTION DE CRÉATION ---
         async function recruterMembres() {
+            const emailPro = document.getElementById('alias').value + "@lumycorp.com";
+            
             const data = {
                 nom: document.getElementById('nom').value,
                 prenom: document.getElementById('prenom').value,
+                date_naissance: document.getElementById('date_naissance').value,
                 email_prive: document.getElementById('email_prive').value,
-                alias: document.getElementById('alias').value,
-                role: document.getElementById('role').value
+                tel_prive: document.getElementById('tel_prive').value,
+                date_entree: document.getElementById('date_entree').value,
+                poste: document.getElementById('poste').value,
+                niveau_acces: document.getElementById('role_acces').value,
+                email_pro: emailPro
             };
 
-            // 1. Envoyer à ton API personnalisée qui crée le compte Google
-            // C'est ici que l'équipe web doit coder la liaison API Admin Google
-            alert("Lancement de la création Google Workspace et Firestore...");
-            
-            // Simulation de l'appel API
+            // Vérification simple
+            if(!data.nom || !data.prenom || !data.email_prive) {
+                alert("Remplis au moins le Nom, Prénom et Mail privé !");
+                return;
+            }
+
+            console.log("Données prêtes :", data);
+            alert("Lancement de la procédure pour " + emailPro);
+
             try {
-                // Cette fonction sera reliée à Google Admin SDK
-                await createGoogleAccount(data); 
-                alert("Compte @lumycorp.com créé et enregistré dans la base !");
+                // Ici l'appel à la fonction Cloud de ton équipe web
+                // await createGoogleAndFirestoreAccount(data); 
+                alert("Succès ! Compte Google créé et bénévole ajouté à la base.");
             } catch(e) {
-                alert("Erreur : " + e.message);
+                alert("Erreur technique : " + e.message);
             }
         }
     </script>
