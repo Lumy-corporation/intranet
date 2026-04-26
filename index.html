@@ -2,104 +2,56 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUMY CORE | AUTHENTICATION</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <title>LUMY CORE | AUTH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <style>
-        :root { --cyan: #00f2ff; --bg: #050505; }
-        body { 
-            background: var(--bg); color: white; font-family: 'Inter', sans-serif;
-            display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;
-        }
-        .login-card {
-            background: #111; padding: 50px; border-radius: 20px; border: 1px solid #222;
-            text-align: center; box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
-        }
-        h1 { font-family: 'Orbitron'; letter-spacing: 5px; color: var(--cyan); margin-bottom: 30px; }
-        
-        .btn-google {
-            background: white; color: black; border: none; padding: 15px 25px;
-            border-radius: 10px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; gap: 12px; margin: 0 auto;
-            transition: 0.3s; font-size: 1rem;
-        }
-        .btn-google:hover { transform: scale(1.05); background: #f0f0f0; }
-        
-        #status { margin-top: 20px; font-size: 0.8rem; color: #666; }
-        .user-ok { color: #00ff88; font-weight: bold; }
+        body { background: #050505; color: white; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .auth-card { background: #111; padding: 50px; border-radius: 20px; border: 1px solid #222; text-align: center; box-shadow: 0 0 40px rgba(0, 242, 255, 0.1); width: 350px; }
+        h1 { font-family: 'Orbitron'; color: #00f2ff; letter-spacing: 5px; margin-bottom: 30px; }
+        #g_id_onload { margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
+    <div class="auth-card">
         <h1>LUMY CORE</h1>
-        <p style="opacity: 0.5; margin-bottom: 40px;">ACCÈS UNITÉ DE CONTRÔLE</p>
+        <p style="opacity: 0.5; font-size: 0.8rem; margin-bottom: 30px;">ACCÈS UNITÉ DE CONTRÔLE</p>
 
-        <button class="btn-google" id="btn-login" onclick="login()">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-            SE CONNECTER AVEC GOOGLE
-        </button>
+        <div id="g_id_onload"
+             data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
 
-        <div id="status">En attente d'authentification...</div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+
+        <p id="status" style="margin-top:20px; font-size:0.7rem; color:#444;">En attente d'identification...</p>
     </div>
 
     <script>
-        // TA CONFIGURATION (Vérifie bien ton ID de projet)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCjIUOQogsQUhRgYJgN1OlErEt3FsihZuo",
-            authDomain: "lumy-corporation-1db3f.firebaseapp.com",
-            projectId: "lumy-corporation-1db3f",
-            appId: "1:1023452628363:web:0806d0bc81436c0446db8e"
-        };
+        function handleCredentialResponse(response) {
+            // Ici, Google nous a envoyé le jeton (le "badge" d'accès)
+            console.log("Jeton reçu de Google : " + response.credential);
+            
+            document.getElementById('status').innerText = "VÉRIFICATION RÉUSSIE... REDIRECTION...";
+            document.getElementById('status').style.color = "#00ff88";
 
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // Fonction de connexion
-        function login() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            // On force Google à demander quel compte utiliser
-            provider.setCustomParameters({ prompt: 'select_account' });
-
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    console.log("Connecté avec succès !");
-                })
-                .catch((error) => {
-                    console.error("Erreur :", error.code);
-                    document.getElementById('status').innerHTML = "Erreur : " + error.message;
-                });
+            // PAFF ! On envoie sur le dashboard
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
         }
-
-        // LE TRUC SUR TON NAVIGATEUR : Il écoute si tu es connecté
-        auth.onAuthStateChanged((user) => {
-            const status = document.getElementById('status');
-            const btn = document.getElementById('btn-login');
-
-            if (user) {
-                // OUI, TU ES OK !
-                status.innerHTML = `<span class="user-ok">ID CONFIRMÉ : ${user.displayName}</span><br>Session active sur ce navigateur.`;
-                btn.innerHTML = "DÉVERROUILLÉ ✅";
-                btn.style.background = "#00ff88";
-                btn.disabled = true;
-
-                console.log("Token de session récupéré pour :", user.email);
-                
-                // Ici, plus tard, on pourra ajouter une redirection automatique vers membres.html
-                // window.location.href = "membres.html"; 
-            } else {
-                status.innerText = "En attente d'authentification...";
-                btn.innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> SE CONNECTER AVEC GOOGLE`;
-                btn.style.background = "white";
-                btn.disabled = false;
-            }
-        });
     </script>
 </body>
 </html>
