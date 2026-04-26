@@ -1,153 +1,178 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUMY CORE | DASHBOARD</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --cyan: #00f2ff;
-            --bg: #050505;
-            --card: #111111;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMY CORE | DASHBOARD</title>
 
-        body {
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 
-        .dashboard-card {
-            background: var(--card);
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid #222;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            width: 400px;
-        }
+<style>
+:root{
+    --bg:#050505;
+    --card:#111;
+    --cyan:#00f2ff;
+}
 
-        .profile-pic {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--cyan);
-            margin-bottom: 20px;
-            object-fit: cover;
-        }
+body{
+    margin:0;
+    font-family:Inter;
+    background:var(--bg);
+    color:white;
+}
 
-        h1 {
-            font-family: 'Orbitron';
-            color: var(--cyan);
-            font-size: 1.2rem;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-        }
+/* ===== TOP BAR ===== */
+.topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:60px;
+    background:#0d0d0d;
+    border-bottom:1px solid #222;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    z-index:1000;
+}
 
-        .welcome-msg {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
+.menu{
+    display:flex;
+    gap:20px;
+}
 
-        .user-info {
-            background: #000;
-            padding: 15px;
-            border-radius: 15px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            border: 1px solid #1a1a1a;
-        }
+.menu a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:13px;
+}
 
-        .info-label {
-            color: #555;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 5px;
-        }
+.menu a:hover{
+    color:var(--cyan);
+}
 
-        .logout-btn {
-            margin-top: 30px;
-            background: none;
-            border: 1px solid #ff4444;
-            color: #ff4444;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            transition: 0.3s;
-        }
+/* PROFILE */
+.profile{
+    position:relative;
+    cursor:pointer;
+}
 
-        .logout-btn:hover {
-            background: #ff4444;
-            color: white;
-        }
-    </style>
+.profile img{
+    width:35px;
+    height:35px;
+    border-radius:50%;
+    border:2px solid var(--cyan);
+}
+
+/* DROPDOWN */
+.dropdown{
+    position:absolute;
+    right:0;
+    top:50px;
+    background:#111;
+    border:1px solid #222;
+    width:220px;
+    border-radius:10px;
+    display:none;
+    padding:10px;
+}
+
+.dropdown p{
+    margin:5px 0;
+    font-size:12px;
+    color:#ccc;
+}
+
+.logout{
+    margin-top:10px;
+    padding:8px;
+    text-align:center;
+    border:1px solid red;
+    color:red;
+    cursor:pointer;
+    border-radius:6px;
+}
+
+/* DASHBOARD */
+.container{
+    padding-top:100px;
+    text-align:center;
+}
+
+h1{
+    font-family:Orbitron;
+    color:var(--cyan);
+}
+</style>
 </head>
+
 <body>
 
-    <div class="dashboard-card" id="dashboard-content">
-        <h1>LUMY CORE SYSTEM</h1>
-        
-        <img id="user-img" class="profile-pic" src="" alt="Photo de profil">
-        
-        <div class="welcome-msg">
-            Salut 👋 <span id="user-fullname" style="color: var(--cyan);">Chargement...</span>
-        </div>
+<!-- TOP BAR -->
+<div class="topbar">
 
-        <div class="user-info">
-            <span class="info-label">Identité</span>
-            <div id="display-name" style="margin-bottom: 15px;">-</div>
-            
-            <span class="info-label">Adresse Email</span>
-            <div id="display-email" style="color: var(--cyan);">-</div>
-        </div>
-
-        <button class="logout-btn" onclick="logout()">DÉCONNEXION</button>
+    <div class="menu">
+        <a href="#">Dashboard</a>
+        <a href="#">Membres</a>
+        <a href="#">Apps</a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
-    <script>
-        // On récupère le jeton stocké par la page d'accueil (ou passé en paramètre)
-        // Note : Dans un vrai système, on utiliserait le localStorage ou une session.
+    <div class="profile" onclick="toggleMenu()">
+        <img id="pp" src="">
         
-        window.onload = function() {
-            // Pour l'exemple, on récupère les données dans l'URL si elles y sont, 
-            // ou on simule la lecture du jeton Google
-            const urlParams = new URLSearchParams(window.location.search);
-            const credential = urlParams.get('credential'); // On aurait pu le passer comme ça
+        <div class="dropdown" id="dropdown">
 
-            // On va essayer de décoder les infos si on a le jeton
-            // (Si tu as utilisé ma fonction de callback précédente, 
-            // on peut stocker le jeton dans le localStorage)
-            
-            const userData = JSON.parse(localStorage.getItem('lumy_user'));
+            <p id="name">Nom</p>
+            <p id="email">Email</p>
 
-            if (userData) {
-                document.getElementById('user-img').src = userData.picture;
-                document.getElementById('user-fullname').innerText = userData.given_name;
-                document.getElementById('display-name').innerText = userData.name;
-                document.getElementById('display-email').innerText = userData.email;
-            } else {
-                // Si pas de données, on renvoie à la connexion
-                window.location.href = "index.html";
-            }
-        };
+            <div class="logout" onclick="logout()">Déconnexion</div>
 
-        function logout() {
-            localStorage.removeItem('lumy_user');
-            window.location.href = "index.html";
-        }
-    </script>
+        </div>
+    </div>
+
+</div>
+
+<!-- DASHBOARD -->
+<div class="container">
+    <h1 id="hello">Chargement...</h1>
+</div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("lumy_user"));
+
+if(!user){
+    window.location.href="index.html";
+}
+
+/* ===== AFFICHAGE ===== */
+
+document.getElementById("pp").src = user.photo || "https://via.placeholder.com/100";
+
+document.getElementById("name").innerText = user.name || "Inconnu";
+document.getElementById("email").innerText = user.email || "-";
+
+/* prénom + nom (safe split) */
+let split = (user.name || "").split(" ");
+
+let prenom = split[0] || "";
+let nom = split.slice(1).join(" ") || "";
+
+document.getElementById("hello").innerText =
+"Salut " + prenom + " " + nom;
+
+/* MENU */
+function toggleMenu(){
+    let d = document.getElementById("dropdown");
+    d.style.display = (d.style.display === "block") ? "none" : "block";
+}
+
+/* logout */
+function logout(){
+    localStorage.removeItem("lumy_user");
+    window.location.href="index.html";
+}
+</script>
+
 </body>
 </html>
