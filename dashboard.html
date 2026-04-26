@@ -21,8 +21,8 @@ display:flex;
 justify-content:center;
 align-items:center;
 background:radial-gradient(circle at top, #0a0a0a, var(--bg));
-color:white;
 font-family:Inter;
+color:white;
 overflow:hidden;
 }
 
@@ -36,7 +36,7 @@ linear-gradient(#111 1px, transparent 1px),
 linear-gradient(90deg, #111 1px, transparent 1px);
 background-size:60px 60px;
 transform:rotate(25deg);
-opacity:0.2;
+opacity:0.15;
 animation:move 25s linear infinite;
 }
 
@@ -48,26 +48,40 @@ to{transform:translateY(-200px) rotate(25deg);}
 .container{
 z-index:2;
 text-align:center;
+width:520px;
+padding:50px;
 background:rgba(10,10,10,0.85);
 border:1px solid #1a1a1a;
-padding:45px;
-border-radius:18px;
-backdrop-filter: blur(10px);
-width:420px;
-box-shadow:0 0 50px rgba(0,242,255,0.04);
+border-radius:20px;
+backdrop-filter: blur(12px);
+box-shadow:0 0 80px rgba(0,242,255,0.05);
 }
 
+/* LOGO */
 .logo{
-font-family:Orbitron;
-color:var(--cyan);
-font-size:15px;
-letter-spacing:3px;
-margin-bottom:20px;
+width:140px;
+height:140px;
+margin:auto;
+margin-bottom:25px;
+border-radius:20px;
+border:2px solid rgba(0,242,255,0.3);
+box-shadow:0 0 40px rgba(0,242,255,0.15);
+background:white;
+object-fit:contain;
+animation:float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(0px);}
+50%{transform:translateY(-8px);}
+100%{transform:translateY(0px);}
 }
 
 .title{
-font-size:20px;
-font-weight:600;
+font-family:Orbitron;
+font-size:18px;
+letter-spacing:3px;
+color:var(--cyan);
 margin-bottom:10px;
 }
 
@@ -78,8 +92,8 @@ margin-bottom:25px;
 }
 
 .loader{
-width:55px;
-height:55px;
+width:50px;
+height:50px;
 border:3px solid #1a1a1a;
 border-top:3px solid var(--cyan);
 border-radius:50%;
@@ -122,14 +136,17 @@ min-height:20px;
 
 button{
 margin-top:25px;
-padding:10px;
+padding:12px;
 width:100%;
 background:transparent;
 border:1px solid var(--cyan);
 color:var(--cyan);
 cursor:pointer;
+border-radius:8px;
 transition:0.3s;
-border-radius:6px;
+font-family:Orbitron;
+font-size:11px;
+letter-spacing:1px;
 }
 
 button:hover{
@@ -152,13 +169,14 @@ opacity:0.4;
 
 <div class="container">
 
-<div class="logo">LUMY CORE SYSTEM</div>
+<!-- LOGO -->
+<img class="logo" src="https://postimg.cc/ZCfjHWMY" alt="Lumy Logo">
 
-<div class="title">MAINTENANCE EN COURS</div>
+<div class="title">MAINTENANCE SYSTEM</div>
 
 <div class="subtitle">
-L’intranet est temporairement indisponible<br>
-Mise à jour système en cours
+L’intranet Lumy Core est temporairement indisponible<br>
+Mise à jour sécurisée en cours
 </div>
 
 <div class="loader"></div>
@@ -167,15 +185,14 @@ Mise à jour système en cours
 <div class="bar"></div>
 </div>
 
-<div class="status" id="status">Initialisation système...</div>
+<div class="status" id="status">Initialisation des services...</div>
 
-<!-- IMPORTANT : aucun redirect, aucun login cassé -->
-<button onclick="checkStatus()">Vérifier statut système</button>
+<button onclick="checkStatus()">STATUT SYSTÈME</button>
 
 </div>
 
 <div class="footer">
-Lumy Corporation • Secure Intranet Layer
+Lumy Corporation • Secure Cloud Intranet
 </div>
 
 <script>
@@ -184,9 +201,8 @@ const messages = [
 "Initialisation des services...",
 "Synchronisation Firestore...",
 "Vérification des permissions...",
-"Optimisation des modules...",
-"Reconstruction du cache...",
-"Sécurisation des endpoints...",
+"Chargement des modules internes...",
+"Optimisation des performances...",
 "Système en cours de stabilisation..."
 ];
 
@@ -197,9 +213,9 @@ document.getElementById("status").innerText = messages[i];
 i = (i + 1) % messages.length;
 },2000);
 
-/* aucun crash, aucune redirection */
+/* safe button */
 function checkStatus(){
-alert("Système en maintenance. Aucun accès autorisé.");
+alert("Système en maintenance. Accès temporairement indisponible.");
 }
 
 </script>
