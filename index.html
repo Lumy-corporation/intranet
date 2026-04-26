@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>LUMY CORE | SECURE ACCESS</title>
+<title>LUMY CORE | SYSTEM ACCESS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -10,113 +10,117 @@
 <style>
 :root{
     --bg:#03060c;
-    --panel:rgba(10,15,25,0.75);
+    --panel:#0b111b;
+    --panel2:#0f1624;
     --accent:#00f2ff;
     --text:#e8f0ff;
     --muted:#6c7a92;
     --border:rgba(255,255,255,0.08);
 }
 
-/* BACKGROUND */
+/* GLOBAL */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter;}
+
 body{
-    margin:0;
     height:100vh;
     display:flex;
-    justify-content:center;
-    align-items:center;
-    font-family:Inter;
+    background:var(--bg);
     color:var(--text);
-    background:radial-gradient(circle at 50% 50%, #060b18, #02040a);
-    overflow:hidden;
 }
 
-/* ANIMATED GRID */
-body::before{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
+/* LEFT PANEL (ADMIN SYSTEM) */
+.left{
+    width:50%;
+    padding:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
     background:
-        linear-gradient(rgba(0,242,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,242,255,0.05) 1px, transparent 1px);
-    background-size:50px 50px;
-    transform:rotate(0deg);
-    animation:moveGrid 20s linear infinite;
-}
-
-@keyframes moveGrid{
-    from{transform:translateY(0);}
-    to{transform:translateY(-50px);}
-}
-
-/* CARD */
-.auth-card{
-    position:relative;
-    background:var(--panel);
-    backdrop-filter:blur(18px);
-    border:1px solid var(--border);
-    padding:50px;
-    border-radius:16px;
-    width:380px;
-    text-align:center;
-    box-shadow:0 0 80px rgba(0,242,255,0.08);
-}
-
-/* SCAN LINE */
-.auth-card::after{
-    content:"";
-    position:absolute;
-    left:0;
-    width:100%;
-    height:2px;
-    background:var(--accent);
-    top:0;
-    animation:scan 4s linear infinite;
-    opacity:0.4;
-}
-
-@keyframes scan{
-    0%{top:0}
-    100%{top:100%}
+        radial-gradient(circle at 20% 20%, rgba(0,242,255,0.08), transparent 40%),
+        var(--bg);
 }
 
 /* TITLE */
 h1{
     font-family:Orbitron;
     letter-spacing:6px;
-    font-size:18px;
+    font-size:26px;
+    color:var(--accent);
+    margin-bottom:20px;
+}
+
+/* DESCRIPTION */
+.desc{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.6;
+    max-width:400px;
+}
+
+/* SYSTEM STATUS */
+.status-box{
+    margin-top:40px;
+    border:1px solid var(--border);
+    padding:20px;
+    border-radius:10px;
+    background:var(--panel);
+}
+
+.status-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+/* ANIM DOT */
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--accent);
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    0%{opacity:0.3}
+    50%{opacity:1}
+    100%{opacity:0.3}
+}
+
+/* RIGHT PANEL (LOGIN) */
+.right{
+    width:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:var(--panel);
+    border-left:1px solid var(--border);
+}
+
+/* LOGIN BLOCK */
+.auth{
+    width:360px;
+}
+
+/* TITLE */
+.auth-title{
+    font-family:Orbitron;
+    letter-spacing:4px;
     color:var(--accent);
     margin-bottom:10px;
 }
 
-/* SUB */
-.subtitle{
-    font-size:11px;
-    letter-spacing:2px;
+.sub{
+    font-size:12px;
     color:var(--muted);
-    margin-bottom:25px;
+    margin-bottom:30px;
 }
 
-/* TERMINAL LOG */
-.log-box{
-    text-align:left;
-    font-size:10px;
-    color:#8aa0c2;
-    height:80px;
-    overflow:hidden;
-    margin-bottom:20px;
-    border-left:1px solid var(--border);
-    padding-left:10px;
-}
-
-.log-line{
-    opacity:0.7;
-    animation:fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn{
-    from{opacity:0;transform:translateY(5px)}
-    to{opacity:0.7}
+/* BUTTON WRAP */
+.g_id_signin{
+    display:flex;
+    justify-content:center;
 }
 
 /* STATUS */
@@ -126,72 +130,86 @@ h1{
     color:var(--muted);
 }
 
-/* BUTTON WRAP */
-.g_id_signin{
-    display:flex;
-    justify-content:center;
+/* HOVER INTERACTION */
+.auth:hover{
+    transform:translateY(-2px);
+    transition:0.3s;
 }
 
-/* HOVER */
-.auth-card:hover{
-    box-shadow:0 0 120px rgba(0,242,255,0.12);
-    transition:0.4s;
+/* BACKGROUND GRID */
+body::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size:50px 50px;
+    pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="auth-card">
+<!-- LEFT PANEL -->
+<div class="left">
 
     <h1>LUMY CORE</h1>
-    <div class="subtitle">SECURE INTERNAL ACCESS</div>
 
-    <div class="log-box" id="logs"></div>
-
-    <div id="g_id_onload"
-        data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false">
+    <div class="desc">
+        Interface administrative interne sécurisée.<br><br>
+        Accès restreint aux membres autorisés de l’organisation.
     </div>
 
-    <div class="g_id_signin"
-        data-type="standard"
-        data-theme="outline"
-        data-size="large">
+    <div class="status-box">
+        <div class="status-line">
+            <span>Authentication Service</span>
+            <div class="dot"></div>
+        </div>
+        <div class="status-line">
+            <span>Database Connection</span>
+            <div class="dot"></div>
+        </div>
+        <div class="status-line">
+            <span>Security Layer</span>
+            <div class="dot"></div>
+        </div>
     </div>
 
-    <div id="status">INITIALISATION...</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right">
+
+    <div class="auth">
+
+        <div class="auth-title">AUTHENTIFICATION</div>
+        <div class="sub">Connexion au système interne</div>
+
+        <div id="g_id_onload"
+            data-client_id="280639681515-s3mthshvuqqc19s138j87o37br67qf9b.apps.googleusercontent.com"
+            data-context="signin"
+            data-ux_mode="popup"
+            data-callback="handleCredentialResponse"
+            data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+            data-type="standard"
+            data-theme="outline"
+            data-size="large">
+        </div>
+
+        <div id="status">En attente...</div>
+
+    </div>
 
 </div>
 
 <script>
-
-/* FAKE SYSTEM LOGS */
-const logs = [
-"Boot sequence initialized...",
-"Connecting to secure node...",
-"Verifying certificates...",
-"Checking access policies...",
-"Syncing authentication module...",
-"Awaiting user credentials..."
-];
-
-let i = 0;
-setInterval(()=>{
-    if(i < logs.length){
-        let line = document.createElement("div");
-        line.className = "log-line";
-        line.innerText = logs[i];
-        document.getElementById("logs").appendChild(line);
-        i++;
-    }
-}, 500);
-
-/* AUTH */
-function handleCredentialResponse(response) {
+function handleCredentialResponse(response){
 
     const base64Url = response.credential.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -205,11 +223,11 @@ function handleCredentialResponse(response) {
     localStorage.setItem('lumy_user', JSON.stringify(user));
 
     document.getElementById("status").innerText =
-        "ACCESS GRANTED — " + user.email;
+        "Accès autorisé : " + user.email;
 
     setTimeout(()=>{
         window.location.href = "dashboard.html";
-    }, 1200);
+    },1000);
 }
 </script>
 
