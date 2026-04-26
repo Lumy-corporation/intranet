@@ -2,166 +2,95 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>LUMY CORE | INTRANET</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMY CORE | Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --bg:#070b14;
-    --panel:#0f172a;
-    --panel2:#111c33;
-    --border:#1f2a44;
-    --text:#e5e7eb;
-    --muted:#6b7280;
-    --accent:#00f2ff;
-}
-
-/* RESET */
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter;}
-body{
-    background:var(--bg);
-    color:var(--text);
+body {
+    margin:0;
+    font-family:Inter;
+    background:#050505;
+    color:white;
     display:flex;
-    height:100vh;
 }
 
 /* SIDEBAR */
-.sidebar{
+.sidebar {
     width:260px;
-    background:linear-gradient(180deg,#0b1220,#0a0f1a);
-    border-right:1px solid var(--border);
-    display:flex;
-    flex-direction:column;
+    background:#0b0b0b;
+    border-right:1px solid #1a1a1a;
+    height:100vh;
     padding:20px;
 }
 
-.logo{
-    font-weight:600;
-    letter-spacing:2px;
-    color:var(--accent);
+.logo {
+    font-family:Orbitron;
+    color:#00f2ff;
     margin-bottom:30px;
+    letter-spacing:2px;
 }
 
-/* ROLE SECTIONS */
-.section-title{
-    font-size:10px;
-    color:var(--muted);
-    margin:15px 0 8px;
-    text-transform:uppercase;
-}
-
-.menu-item{
-    padding:10px;
-    border-radius:6px;
-    font-size:13px;
+.menu button {
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    background:#111;
+    border:1px solid #1f1f1f;
+    color:white;
     cursor:pointer;
-    color:var(--text);
-    transition:0.2s;
+    border-radius:8px;
+    text-align:left;
 }
 
-.menu-item:hover{
-    background:rgba(0,242,255,0.08);
-    color:var(--accent);
+.menu button:hover {
+    border-color:#00f2ff;
 }
 
 /* MAIN */
-.main{
+.main {
     flex:1;
-    display:flex;
-    flex-direction:column;
+    padding:30px;
 }
 
-/* TOP BAR */
-.topbar{
-    height:60px;
-    border-bottom:1px solid var(--border);
+.topbar {
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:0 20px;
+    margin-bottom:30px;
 }
 
-.user{
+.userbox {
     display:flex;
     align-items:center;
     gap:10px;
     cursor:pointer;
 }
 
-.avatar{
-    width:30px;
-    height:30px;
+.userbox img {
+    width:35px;
+    height:35px;
     border-radius:50%;
-    background:#222;
+    border:1px solid #00f2ff;
 }
 
-/* CONTENT */
-.content{
+.card {
+    background:#0b0b0b;
+    border:1px solid #1a1a1a;
     padding:20px;
-    overflow:auto;
+    border-radius:12px;
 }
 
-.card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:20px;
-    margin-bottom:15px;
+.title {
+    font-family:Orbitron;
+    color:#00f2ff;
+    margin-bottom:20px;
 }
 
-/* MODULE GRID */
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
-}
-
-.title{
-    font-size:14px;
-    margin-bottom:10px;
-    color:var(--accent);
-}
-
-/* CHAT (mod + admin only) */
-.chat{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    width:280px;
-    height:320px;
-    background:var(--panel2);
-    border:1px solid var(--border);
-    border-radius:10px;
-    display:none;
-    flex-direction:column;
-}
-
-.chat-header{
+.user-item {
     padding:10px;
-    border-bottom:1px solid var(--border);
-    font-size:12px;
-}
-
-.chat-body{
-    flex:1;
-    padding:10px;
-    font-size:12px;
-    overflow:auto;
-}
-
-.chat-input{
-    border-top:1px solid var(--border);
-    padding:10px;
-}
-
-.chat-input input{
-    width:100%;
-    background:#0b1220;
-    border:1px solid var(--border);
-    color:white;
-    padding:8px;
-    border-radius:6px;
+    border-bottom:1px solid #1a1a1a;
 }
 </style>
 </head>
@@ -170,104 +99,117 @@ body{
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-
     <div class="logo">LUMY CORE</div>
 
-    <div class="section-title">Administration</div>
-    <div class="menu-item" onclick="openModule('members')">Membres</div>
-    <div class="menu-item" onclick="openModule('recruit')">Recrutement</div>
-
-    <div class="section-title">Opérations</div>
-    <div class="menu-item" onclick="openModule('projects')">Projets</div>
-    <div class="menu-item" onclick="openModule('logs')">Logs système</div>
-
-    <div class="section-title">Communication</div>
-    <div class="menu-item" onclick="openChat()">Chat interne</div>
-
-    <div class="section-title">Système</div>
-    <div class="menu-item" onclick="logout()">Déconnexion</div>
-
+    <div class="menu">
+        <button onclick="loadMembers()">Membres</button>
+        <button onclick="loadProjects()">Projets</button>
+        <button onclick="loadChat()">Chat</button>
+    </div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
 
-    <!-- TOP BAR -->
     <div class="topbar">
+        <div id="welcome">Chargement...</div>
 
-        <div>Dashboard Intranet</div>
-
-        <div class="user" onclick="toggleProfile()">
-            <div class="avatar"></div>
-            <div style="font-size:12px;">Profil</div>
+        <div class="userbox" onclick="toggleProfile()">
+            <img id="pp" src="">
         </div>
-
     </div>
 
-    <!-- CONTENT -->
-    <div class="content">
-
-        <div class="card">
-            <div class="title">Bienvenue</div>
-            <div id="welcome">Chargement...</div>
-        </div>
-
-        <div class="grid">
-
-            <div class="card">
-                <div class="title">Statut système</div>
-                <div>ONLINE — Firebase connecté</div>
-            </div>
-
-            <div class="card">
-                <div class="title">Activité récente</div>
-                <div>Aucun log critique</div>
-            </div>
-
-        </div>
-
+    <div class="card" id="content">
+        Bienvenue sur l’intranet Lumy Core
     </div>
+
+    <button onclick="logout()" style="margin-top:20px;background:#111;border:1px solid #ff4444;color:#ff4444;padding:10px;border-radius:8px;cursor:pointer;">
+        Déconnexion
+    </button>
 
 </div>
 
-<!-- CHAT -->
-<div class="chat" id="chat">
-    <div class="chat-header">Chat interne</div>
-    <div class="chat-body" id="chatBody"></div>
-    <div class="chat-input">
-        <input placeholder="Message...">
-    </div>
-</div>
+<!-- FIREBASE -->
+<script type="module">
 
-<script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// LOAD USER
+/* CONFIG */
+const firebaseConfig = {
+  apiKey: "XXX",
+  authDomain: "XXX",
+  projectId: "XXX",
+  storageBucket: "XXX",
+  messagingSenderId: "XXX",
+  appId: "XXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* USER LOCAL */
 const user = JSON.parse(localStorage.getItem("lumy_user"));
 
-if(user){
-    document.getElementById("welcome").innerText =
-        "Bonjour " + user.given_name + " " + user.family_name;
+if(!user){
+    window.location.href="login.html";
 }
 
-// MODULE SWITCH
-function openModule(name){
-    alert("Module : " + name + " (à connecter Firebase ensuite)");
+/* UI INIT */
+document.getElementById("welcome").innerText =
+"Salut " + user.given_name + " " + user.family_name;
+
+document.getElementById("pp").src = user.picture;
+
+/* MEMBERS */
+window.loadMembers = async function(){
+
+    const snap = await getDocs(collection(db,"users"));
+
+    let html = "<div class='title'>MEMBRES</div>";
+
+    snap.forEach(doc=>{
+        const u = doc.data();
+
+        html += `
+            <div class="user-item">
+                <b>${u.firstName || ""} ${u.lastName || ""}</b><br>
+                <small>${u.email || ""}</small><br>
+                <small>${u.role || "Member"}</small>
+            </div>
+        `;
+    });
+
+    document.getElementById("content").innerHTML = html;
 }
 
-// CHAT
-function openChat(){
-    document.getElementById("chat").style.display = "flex";
+/* PROJECTS (placeholder) */
+window.loadProjects = function(){
+    document.getElementById("content").innerHTML =
+    "<div class='title'>PROJETS</div>Aucun projet disponible.";
 }
 
-// PROFILE
-function toggleProfile(){
-    alert("Profil utilisateur (à faire menu dropdown Firebase)");
+/* CHAT (placeholder futur Firebase Realtime) */
+window.loadChat = function(){
+    document.getElementById("content").innerHTML =
+    "<div class='title'>CHAT INTERNE</div>Module en cours de développement.";
 }
 
-// LOGOUT
-function logout(){
+/* PROFILE */
+window.toggleProfile = function(){
+    alert(
+        "Nom: " + user.name +
+        "\nEmail: " + user.email
+    );
+}
+
+/* LOGOUT */
+window.logout = function(){
     localStorage.removeItem("lumy_user");
-    window.location.href = "index.html";
+    signOut(auth);
+    window.location.href="login.html";
 }
 
 </script>
