@@ -2,376 +2,292 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>LUMY CORE | SaaS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMY CORE | Dashboard</title>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --bg:#07090f;
-    --panel:#0e111a;
-    --panel2:#141826;
-    --text:#e6f1ff;
-    --muted:#7d8590;
-    --accent:#00f2ff;
-    --glow:0 0 15px rgba(0,242,255,0.4);
+:root {
+    --bg: #0b0b0f;
+    --card: #141420;
+    --text: #ffffff;
+    --muted: #9aa0a6;
+    --accent: #00f2ff;
+    --border: rgba(255,255,255,0.08);
 }
 
-body{
-    margin:0;
-    font-family:Inter;
-    background:var(--bg);
-    color:var(--text);
+/* MODE CLAIR AUTO */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #0b0b0f;
+        --muted: #555;
+        --border: rgba(0,0,0,0.1);
+    }
 }
 
-/* SIDEBAR */
-.sidebar{
-    width:260px;
-    height:100vh;
-    background:var(--panel);
-    border-right:1px solid rgba(255,255,255,0.05);
-    padding:20px;
-    position:fixed;
+body {
+    margin: 0;
+    font-family: Inter, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
-.logo{
-    font-family:Orbitron;
-    color:var(--accent);
-    text-shadow:var(--glow);
-    margin-bottom:30px;
-    letter-spacing:2px;
+/* TOP BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 25px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-/* BUTTON NAV */
-.nav-btn{
-    width:100%;
-    padding:12px;
-    margin:6px 0;
-    border-radius:10px;
-    background:transparent;
-    border:1px solid transparent;
-    color:var(--muted);
-    text-align:left;
-    cursor:pointer;
-    transition:0.2s;
-    font-weight:500;
+.logo {
+    font-family: Orbitron;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-size: 14px;
 }
 
-.nav-btn:hover{
-    border:1px solid var(--accent);
-    color:var(--accent);
-    box-shadow:var(--glow);
-    transform:translateX(3px);
+.nav {
+    display: flex;
+    gap: 20px;
 }
 
-/* MAIN */
-.main{
-    margin-left:260px;
+.nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
 }
 
-/* TOPBAR */
-.topbar{
-    height:60px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 20px;
-    border-bottom:1px solid rgba(255,255,255,0.05);
-}
-
-.search{
-    background:var(--panel2);
-    border:1px solid rgba(255,255,255,0.08);
-    padding:8px 12px;
-    border-radius:8px;
-    color:var(--text);
+.nav a:hover {
+    color: var(--accent);
 }
 
 /* PROFILE */
-.profile{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    cursor:pointer;
-    position:relative;
+.profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
 }
 
-.profile img{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:2px solid var(--accent);
-    box-shadow:var(--glow);
+.profile img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
 }
 
-.dropdown{
-    position:absolute;
-    right:0;
-    top:45px;
-    background:var(--panel);
-    border:1px solid rgba(255,255,255,0.1);
-    width:220px;
-    padding:12px;
-    border-radius:10px;
-    display:none;
-    backdrop-filter:blur(10px);
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 12px;
+    width: 220px;
+    display: none;
 }
 
-.drop-btn{
-    width:100%;
-    margin-top:8px;
-    padding:8px;
-    background:transparent;
-    border:1px solid red;
-    color:red;
-    border-radius:8px;
-    cursor:pointer;
-    transition:0.2s;
+.dropdown p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: var(--muted);
 }
 
-.drop-btn:hover{
-    background:red;
-    color:white;
+.logout {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid red;
+    background: transparent;
+    color: red;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
-/* CONTENT */
-.content{
-    padding:20px;
+/* MAIN */
+.container {
+    padding: 50px;
 }
 
-/* CARD */
-.card{
-    background:var(--panel);
-    border:1px solid rgba(255,255,255,0.05);
-    padding:15px;
-    border-radius:14px;
-    box-shadow:0 0 20px rgba(0,0,0,0.3);
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
 }
 
-/* PROJECT ITEM */
-.project{
-    display:flex;
-    justify-content:space-between;
-    padding:10px;
-    border-bottom:1px solid rgba(255,255,255,0.05);
+h1 {
+    font-size: 22px;
 }
 
-/* BUTTON ACTION */
-.btn{
-    padding:6px 10px;
-    border-radius:8px;
-    border:1px solid var(--accent);
-    background:transparent;
-    color:var(--accent);
-    cursor:pointer;
-    transition:0.2s;
-    font-size:12px;
+.accent {
+    color: var(--accent);
 }
-
-.btn:hover{
-    background:var(--accent);
-    color:black;
-    box-shadow:var(--glow);
-    transform:scale(1.05);
-}
-
-/* INPUT */
-.input{
-    padding:10px;
-    width:250px;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,0.1);
-    background:var(--panel2);
-    color:white;
-}
-
-/* STATUS */
-.badge{
-    padding:3px 8px;
-    font-size:11px;
-    border-radius:6px;
-}
-
-.pending{background:orange;color:black;}
-.approved{background:limegreen;color:black;}
-
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<!-- TOP MENU -->
+<div class="topbar">
     <div class="logo">LUMY CORE</div>
 
-    <button class="nav-btn" onclick="nav('dashboard')">📊 Dashboard</button>
-    <button class="nav-btn" onclick="nav('members')">👥 Membres</button>
-    <button class="nav-btn" onclick="nav('projects')">📁 Projets</button>
-    <button class="nav-btn" onclick="nav('apps')">⚙ Apps</button>
-</div>
+    <div class="nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Membres</a>
+        <a href="#">Apps</a>
+        <a href="#">Projets</a>
+    </div>
 
-<!-- MAIN -->
-<div class="main">
-
-<!-- TOP -->
-<div class="topbar">
-    <input class="search" placeholder="Search system...">
-
-    <div class="profile" onclick="toggle()">
-        <img id="pp">
-        <div class="dropdown" id="drop">
-            <div id="name"></div>
-            <div id="email"></div>
-            <button class="drop-btn" onclick="logout()">DECONNECT</button>
+    <!-- PROFILE -->
+    <div class="profile" onclick="toggleDropdown()">
+        <img id="pp" src="">
+        <div class="dropdown" id="dropdown">
+            <p id="name"></p>
+            <p id="email"></p>
+            <button class="logout" onclick="logout()">Déconnexion</button>
         </div>
     </div>
 </div>
 
 <!-- CONTENT -->
-<div class="content">
-
-<!-- DASHBOARD -->
-<div id="dashboard">
-    <h2>Salut <span style="color:var(--accent)" id="fullname"></span></h2>
-</div>
-
-<!-- MEMBERS -->
-<div id="members" style="display:none">
+<div class="container">
     <div class="card">
-        <h3>Membres système</h3>
-        <div id="membersList"></div>
+        <h1>Salut <span class="accent" id="fullname"></span> 👋</h1>
+        <p style="color: var(--muted); font-size: 13px;">
+            Bienvenue sur le système Lumy Core
+        </p>
     </div>
-</div>
-
-<!-- PROJECTS -->
-<div id="projects" style="display:none">
-
-    <div class="card">
-        <h3>Créer un projet</h3>
-
-        <input id="proj" class="input" placeholder="Nom du projet">
-        <button class="btn" onclick="create()">CREATE</button>
-    </div>
-
-    <div class="card">
-        <h3>Projets</h3>
-        <div id="projectList"></div>
-    </div>
-
-</div>
-
-<!-- APPS -->
-<div id="apps" style="display:none">
-    <div class="card">
-        <h3>Apps</h3>
-        <p>Aucune application déployée</p>
-    </div>
-</div>
-
-</div>
 </div>
 
 <script>
+let user = JSON.parse(localStorage.getItem("lumy_user"));
 
+if (!user) {
+    window.location.href = "index.html";
+}
+
+document.getElementById("pp").src = user.photo || "";
+document.getElementById("fullname").innerText = (user.given_name || user.name || "");
+document.getElementById("name").innerText = user.name || "";
+document.getElementById("email").innerText = user.email || "";
+
+function toggleDropdown() {
+    const d = document.getElementById("dropdown");
+    d.style.display = d.style.display === "block" ? "none" : "block";
+}
+
+function logout() {
+    localStorage.removeItem("lumy_user");
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>}
+
+.status{
+    margin-top:20px;
+    color:var(--gray);
+    font-size:14px;
+    line-height:1.6;
+}
+
+.alert{
+    margin-top:25px;
+    color:var(--red);
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.user{
+    margin-top:15px;
+    color:white;
+    font-size:16px;
+}
+
+/* BTN DECO */
+.logout{
+    margin-top:35px;
+    padding:10px 18px;
+    border:1px solid var(--red);
+    background:none;
+    color:var(--red);
+    cursor:pointer;
+    border-radius:8px;
+    font-family:Orbitron;
+    font-size:12px;
+    transition:0.3s;
+}
+
+.logout:hover{
+    background:var(--red);
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>LUMY CORE SYSTEM</h1>
+
+    <div class="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <div class="user" id="user">Chargement...</div>
+
+    <div class="alert">
+        MAINTENANCE EN COURS
+    </div>
+
+    <div class="status">
+        Les services intranet sont temporairement indisponibles.<br>
+        Mise à jour système en cours.
+    </div>
+
+    <div class="status">
+        Merci de réessayer ultérieurement.
+    </div>
+
+    <button class="logout" onclick="logout()">DÉCONNEXION</button>
+
+</div>
+
+<script>
 let user = JSON.parse(localStorage.getItem("lumy_user"));
 
 if(!user){
-    location.href="index.html";
+    window.location.href="index.html";
 }
 
-document.getElementById("pp").src=user.photo;
-document.getElementById("fullname").innerText=user.name;
-document.getElementById("name").innerText=user.name;
-document.getElementById("email").innerText=user.email;
+let split = (user.name || "").split(" ");
+let prenom = split[0] || "";
+let nom = split.slice(1).join(" ") || "";
 
-function toggle(){
-    let d=document.getElementById("drop");
-    d.style.display = d.style.display==="block"?"none":"block";
-}
+document.getElementById("user").innerText =
+"Connecté : " + prenom + " " + nom;
 
 function logout(){
     localStorage.removeItem("lumy_user");
-    location.href="index.html";
+    window.location.href="index.html";
 }
-
-function nav(page){
-    ["dashboard","members","projects","apps"].forEach(p=>{
-        document.getElementById(p).style.display="none";
-    });
-    document.getElementById(page).style.display="block";
-}
-
-// FIRESTORE
-const db=firebase.firestore();
-
-// CREATE PROJECT
-async function create(){
-    let name=document.getElementById("proj").value;
-
-    await db.collection("projects").add({
-        title:name,
-        owner:user.email,
-        status:"pending",
-        createdAt:Date.now()
-    });
-
-    load();
-}
-
-// LOAD
-async function load(){
-
-    let m="";
-    let ms=await db.collection("users").get();
-
-    ms.forEach(u=>{
-        m+=`<div>${u.data().name}</div>`;
-    });
-
-    document.getElementById("membersList").innerHTML=m;
-
-    let p="";
-    let ps=await db.collection("projects").get();
-
-    ps.forEach(pr=>{
-        let d=pr.data();
-
-        p+=`
-        <div class="project">
-            <div>
-                ${d.title}
-                <span class="badge ${d.status}">${d.status}</span>
-            </div>
-
-            <div>
-                ${canValidate() && d.status==="pending"
-                ? `<button class="btn" onclick="validate('${pr.id}')">VALIDATE</button>`
-                : ""}
-            </div>
-        </div>`;
-    });
-
-    document.getElementById("projectList").innerHTML=p;
-}
-
-function canValidate(){
-    return user.email==="theo.rabillard@lumycorp.com"
-    || user.email==="leo.pujolas@lumycorp.com";
-}
-
-async function validate(id){
-    await db.collection("projects").doc(id).update({
-        status:"approved"
-    });
-
-    load();
-}
-
-load();
-
 </script>
 
 </body>
