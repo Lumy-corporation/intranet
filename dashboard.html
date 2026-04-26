@@ -2,68 +2,150 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DASHBOARD | LUMY CORE</title>
-    <link rel="stylesheet" href="css/style.css"> <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMY CORE | DASHBOARD</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cyan: #00f2ff;
+            --bg: #050505;
+            --card: #111111;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .dashboard-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid #222;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 400px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--cyan);
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-family: 'Orbitron';
+            color: var(--cyan);
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-msg {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            background: #000;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #1a1a1a;
+        }
+
+        .info-label {
+            color: #555;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .logout-btn {
+            margin-top: 30px;
+            background: none;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff4444;
+            color: white;
+        }
+    </style>
 </head>
-<body style="background: #0a0a14; color: white; font-family: sans-serif;">
+<body>
 
-    <nav style="padding: 20px; border-bottom: 1px solid #00d4ff; display: flex; justify-content: space-between;">
-        <span id="user-welcome" style="font-weight: bold; color: #00d4ff;">ACCÈS CORE...</span>
-        <button onclick="logout()" style="background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">DÉCONNEXION</button>
-    </nav>
-
-    <div style="padding: 30px;">
-        <h2>CANDIDATURES EN ATTENTE</h2>
+    <div class="dashboard-card" id="dashboard-content">
+        <h1>LUMY CORE SYSTEM</h1>
         
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <thead>
-                <tr style="text-align: left; border-bottom: 2px solid #333;">
-                    <th>Nom / Prénom</th>
-                    <th>Pôle</th>
-                    <th>Email</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="candidates-list">
-                </tbody>
-        </table>
+        <img id="user-img" class="profile-pic" src="" alt="Photo de profil">
+        
+        <div class="welcome-msg">
+            Salut 👋 <span id="user-fullname" style="color: var(--cyan);">Chargement...</span>
+        </div>
+
+        <div class="user-info">
+            <span class="info-label">Identité</span>
+            <div id="display-name" style="margin-bottom: 15px;">-</div>
+            
+            <span class="info-label">Adresse Email</span>
+            <div id="display-email" style="color: var(--cyan);">-</div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">DÉCONNEXION</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <script>
-        // Initialise Firebase (même config que la page login)
-        // ... (Config Firebase ici) ...
-        const db = firebase.firestore();
+        // On récupère le jeton stocké par la page d'accueil (ou passé en paramètre)
+        // Note : Dans un vrai système, on utiliserait le localStorage ou une session.
+        
+        window.onload = function() {
+            // Pour l'exemple, on récupère les données dans l'URL si elles y sont, 
+            // ou on simule la lecture du jeton Google
+            const urlParams = new URLSearchParams(window.location.search);
+            const credential = urlParams.get('credential'); // On aurait pu le passer comme ça
 
-        // Sécurité : Vérifier si l'utilisateur est connecté
-        const user = JSON.parse(localStorage.getItem('lumy_user'));
-        if(!user) window.location.href = "index.html";
-        document.getElementById('user-welcome').innerText = "OPÉRATEUR : " + user.name.toUpperCase();
-
-        // Charger les candidats en temps réel
-        db.collection("candidates").onSnapshot((snapshot) => {
-            const list = document.getElementById('candidates-list');
-            list.innerHTML = ""; // Vide la liste avant de recharger
+            // On va essayer de décoder les infos si on a le jeton
+            // (Si tu as utilisé ma fonction de callback précédente, 
+            // on peut stocker le jeton dans le localStorage)
             
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                list.innerHTML += `
-                    <tr style="border-bottom: 1px solid #222; height: 50px;">
-                        <td>${data.nom} ${data.prenom}</td>
-                        <td><span style="color: #00d4ff;">${data.pole}</span></td>
-                        <td>${data.email_prive}</td>
-                        <td>${data.statut}</td>
-                        <td>
-                            <button onclick="valider('${doc.id}')" style="background: green; color: white; border: none; padding: 5px;">VALIDER</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        });
+            const userData = JSON.parse(localStorage.getItem('lumy_user'));
+
+            if (userData) {
+                document.getElementById('user-img').src = userData.picture;
+                document.getElementById('user-fullname').innerText = userData.given_name;
+                document.getElementById('display-name').innerText = userData.name;
+                document.getElementById('display-email').innerText = userData.email;
+            } else {
+                // Si pas de données, on renvoie à la connexion
+                window.location.href = "index.html";
+            }
+        };
 
         function logout() {
-            localStorage.clear();
+            localStorage.removeItem('lumy_user');
             window.location.href = "index.html";
         }
     </script>
