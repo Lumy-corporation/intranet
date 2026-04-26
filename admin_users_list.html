@@ -11,6 +11,7 @@
 :root{
 --bg:#050505;
 --cyan:#00f2ff;
+--card:#0b0b0b;
 }
 
 body{
@@ -25,7 +26,7 @@ color:white;
 overflow:hidden;
 }
 
-/* GRID BACKGROUND */
+/* BACKGROUND GRID */
 .grid{
 position:absolute;
 width:200%;
@@ -35,7 +36,7 @@ linear-gradient(#111 1px, transparent 1px),
 linear-gradient(90deg, #111 1px, transparent 1px);
 background-size:60px 60px;
 transform:rotate(25deg);
-opacity:0.15;
+opacity:0.12;
 animation:move 25s linear infinite;
 }
 
@@ -44,7 +45,7 @@ from{transform:translateY(0) rotate(25deg);}
 to{transform:translateY(-200px) rotate(25deg);}
 }
 
-/* CARD */
+/* MAIN CARD */
 .container{
 z-index:2;
 text-align:center;
@@ -54,18 +55,16 @@ background:rgba(10,10,10,0.85);
 border:1px solid #1a1a1a;
 border-radius:20px;
 backdrop-filter: blur(12px);
-box-shadow:0 0 80px rgba(0,242,255,0.05);
+box-shadow:0 0 90px rgba(0,242,255,0.05);
 }
 
 /* LOGO */
 .logo{
-width:150px;
-height:150px;
+width:160px;
+height:auto;
 object-fit:contain;
-margin-bottom:25px;
-border-radius:18px;
-border:2px solid rgba(0,242,255,0.25);
-box-shadow:0 0 45px rgba(0,242,255,0.12);
+margin-bottom:20px;
+filter: drop-shadow(0 0 18px rgba(0,242,255,0.35));
 animation:float 4s ease-in-out infinite;
 }
 
@@ -75,7 +74,7 @@ animation:float 4s ease-in-out infinite;
 100%{transform:translateY(0);}
 }
 
-/* TEXT */
+/* TITLE */
 .title{
 font-family:Orbitron;
 font-size:18px;
@@ -84,6 +83,7 @@ color:var(--cyan);
 margin-bottom:10px;
 }
 
+/* SUBTITLE */
 .subtitle{
 opacity:0.6;
 font-size:13px;
@@ -105,7 +105,7 @@ animation:spin 1s linear infinite;
 to{transform:rotate(360deg);}
 }
 
-/* PROGRESS */
+/* PROGRESS BAR */
 .progress{
 width:100%;
 height:4px;
@@ -128,7 +128,7 @@ animation:load 6s ease-in-out infinite;
 100%{width:100%}
 }
 
-/* STATUS */
+/* STATUS TEXT */
 .status{
 font-size:12px;
 opacity:0.7;
@@ -164,6 +164,16 @@ bottom:10px;
 font-size:10px;
 opacity:0.4;
 }
+
+/* FADE IN */
+.fade{
+animation:fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:scale(0.95);}
+to{opacity:1;transform:scale(1);}
+}
 </style>
 </head>
 
@@ -171,12 +181,12 @@ opacity:0.4;
 
 <div class="grid"></div>
 
-<div class="container">
+<div class="container fade">
 
-<!-- LOGO OFFICIEL -->
-<img class="logo" src="https://i.postimg.cc/0yv38mGS/Lumylogo.png" alt="Lumy Logo">
+<!-- LOGO -->
+<img class="logo" src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png" alt="Lumy Logo">
 
-<div class="title">MAINTENANCE SYSTEM</div>
+<div class="title">MAINTENANCE SYSTÈME</div>
 
 <div class="subtitle">
 L’intranet Lumy Core est temporairement indisponible<br>
@@ -196,13 +206,19 @@ Mise à jour sécurisée en cours
 </div>
 
 <div class="footer">
-Lumy Corporation • Secure Intranet Layer
+Lumy Corporation • Secure Cloud Intranet
 </div>
 
 <script>
 
 const messages = [
-"Accès Refusé"
+"Initialisation des services...",
+"Synchronisation Firestore...",
+"Vérification des permissions...",
+"Chargement des modules internes...",
+"Optimisation du système...",
+"Sécurisation des endpoints...",
+"Système en cours de stabilisation..."
 ];
 
 let i = 0;
@@ -212,7 +228,7 @@ document.getElementById("status").innerText = messages[i];
 i = (i + 1) % messages.length;
 },2000);
 
-/* SAFE BUTTON */
+/* SAFE SYSTEM BUTTON */
 function checkStatus(){
 alert("Système en maintenance. Aucun accès disponible pour le moment.");
 }
