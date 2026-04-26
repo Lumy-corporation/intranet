@@ -3,118 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORE | INTRANET V2</title>
+<title>LUMY CORP | INTRANET</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin:0;
-    font-family:Inter;
-    background:#050505;
-    color:white;
-    display:flex;
+body{
+margin:0;
+font-family:Inter;
+background:#050505;
+color:white;
+display:flex;
 }
 
 /* SIDEBAR */
-.sidebar {
-    width:270px;
-    background:#0b0b0b;
-    border-right:1px solid #1a1a1a;
-    height:100vh;
-    padding:20px;
+.sidebar{
+width:280px;
+height:100vh;
+background:#0a0a0a;
+border-right:1px solid #1a1a1a;
+padding:20px;
+display:flex;
+flex-direction:column;
 }
 
-.logo {
-    font-family:Orbitron;
-    color:#00f2ff;
-    margin-bottom:30px;
-    letter-spacing:2px;
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:30px;
 }
 
-.menu button {
-    width:100%;
-    padding:12px;
-    margin-bottom:10px;
-    background:#111;
-    border:1px solid #1f1f1f;
-    color:white;
-    cursor:pointer;
-    border-radius:8px;
-    text-align:left;
+.logo img{
+width:40px;
+height:40px;
+border-radius:8px;
 }
 
-.menu button:hover {
-    border-color:#00f2ff;
+.logo span{
+font-family:Orbitron;
+color:#00f2ff;
+letter-spacing:2px;
+}
+
+.menu button{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+background:#111;
+border:1px solid #1f1f1f;
+color:white;
+text-align:left;
+border-radius:8px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.menu button:hover{
+border-color:#00f2ff;
+transform:translateX(3px);
 }
 
 /* MAIN */
-.main {
-    flex:1;
-    padding:25px;
+.main{
+flex:1;
+padding:25px;
 }
 
-.topbar {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:25px;
+/* TOPBAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
 }
 
-.userbox {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    cursor:pointer;
+.profile{
+display:flex;
+align-items:center;
+gap:10px;
+cursor:pointer;
 }
 
-.userbox img {
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    border:1px solid #00f2ff;
+.profile img{
+width:38px;
+height:38px;
+border-radius:50%;
+border:1px solid #00f2ff;
 }
 
-.card {
-    background:#0b0b0b;
-    border:1px solid #1a1a1a;
-    padding:20px;
-    border-radius:12px;
+/* CARD */
+.card{
+background:#0b0b0b;
+border:1px solid #1a1a1a;
+padding:20px;
+border-radius:12px;
 }
 
-.title {
-    font-family:Orbitron;
-    color:#00f2ff;
-    margin-bottom:15px;
+/* TITLES */
+.title{
+font-family:Orbitron;
+color:#00f2ff;
+margin-bottom:15px;
+}
+
+/* LIST */
+.item{
+padding:10px;
+border-bottom:1px solid #1a1a1a;
 }
 
 /* CHAT */
-.chat-box {
-    height:400px;
-    overflow:auto;
-    border:1px solid #1a1a1a;
-    padding:10px;
-    margin-bottom:10px;
+.chatBox{
+height:400px;
+overflow:auto;
+border:1px solid #1a1a1a;
+padding:10px;
+margin-bottom:10px;
 }
 
-.msg {
-    padding:6px;
-    border-bottom:1px solid #1a1a1a;
+input{
+width:80%;
+padding:10px;
+background:#111;
+border:1px solid #1f1f1f;
+color:white;
 }
 
-input {
-    width:80%;
-    padding:10px;
-    background:#111;
-    border:1px solid #1f1f1f;
-    color:white;
-}
-
-button.send {
-    padding:10px;
-    background:#00f2ff;
-    border:none;
-    cursor:pointer;
+.sendBtn{
+padding:10px;
+background:#00f2ff;
+border:none;
+cursor:pointer;
 }
 </style>
 </head>
@@ -123,38 +143,40 @@ button.send {
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <div class="logo">LUMY CORE</div>
 
-    <div class="menu">
-        <button onclick="loadDashboard()">Dashboard</button>
-        <button onclick="loadMembers()">Membres</button>
-        <button onclick="loadProjects()">Projets</button>
-        <button onclick="loadChat()">Chat</button>
-    </div>
+<div class="logo">
+<img src="https://i.postimg.cc/ZCfjHWMY/logo.png" alt="logo">
+<span>LUMY CORE</span>
+</div>
+
+<div class="menu">
+<button onclick="dashboard()">Dashboard</button>
+<button onclick="members()">Membres</button>
+<button onclick="projects()">Projets</button>
+<button onclick="chat()">Chat</button>
+</div>
+
 </div>
 
 <!-- MAIN -->
 <div class="main">
 
 <div class="topbar">
-    <div id="welcome">Chargement...</div>
 
-    <div class="userbox" onclick="showProfile()">
-        <img id="pp">
-    </div>
+<div id="welcome">Chargement...</div>
+
+<div class="profile" onclick="profile()">
+<img id="pp">
+</div>
+
 </div>
 
 <div class="card" id="content">
-    Chargement intranet...
+Chargement...
 </div>
-
-<button onclick="logout()" style="margin-top:20px;background:#111;border:1px solid #ff4444;color:#ff4444;padding:10px;border-radius:8px;">
-Déconnexion
-</button>
 
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -170,14 +192,14 @@ onSnapshot
 
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* CONFIG */
+/* FIREBASE */
 const firebaseConfig = {
- apiKey:"XXX",
- authDomain:"XXX",
- projectId:"XXX",
- storageBucket:"XXX",
- messagingSenderId:"XXX",
- appId:"XXX"
+apiKey:"XXX",
+authDomain:"XXX",
+projectId:"XXX",
+storageBucket:"XXX",
+messagingSenderId:"XXX",
+appId:"XXX"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -188,121 +210,116 @@ const auth = getAuth(app);
 const user = JSON.parse(localStorage.getItem("lumy_user"));
 
 if(!user){
- window.location.href="login.html";
+window.location.href="login.html";
 }
 
 document.getElementById("welcome").innerText =
-"Salut " + user.given_name + " " + user.family_name;
+"Bienvenue " + user.given_name + " " + user.family_name;
 
 document.getElementById("pp").src = user.picture;
 
 /* DASHBOARD */
-window.loadDashboard = function(){
- document.getElementById("content").innerHTML = `
- <div class="title">DASHBOARD</div>
- <p>Bienvenue dans l’intranet Lumy Core V2</p>
- `;
+window.dashboard = function(){
+document.getElementById("content").innerHTML =
+"<div class='title'>DASHBOARD</div>Intranet Lumy Core V3 opérationnel.";
 }
 
 /* MEMBERS */
-window.loadMembers = async function(){
+window.members = async function(){
 
- const snap = await getDocs(collection(db,"users"));
+const snap = await getDocs(collection(db,"users"));
 
- let html = `<div class="title">MEMBRES</div>`;
+let html = "<div class='title'>MEMBRES</div>";
 
- snap.forEach(d=>{
-  const u = d.data();
+snap.forEach(d=>{
+const u = d.data();
 
-  html += `
-   <div class="msg">
-    <b>${u.firstName || ""} ${u.lastName || ""}</b><br>
-    ${u.email || ""}<br>
-    <small>${u.role || "user"}</small>
-   </div>
-  `;
- });
+html += `
+<div class="item">
+<b>${u.firstName||""} ${u.lastName||""}</b><br>
+${u.email||""}<br>
+<small>${u.role||"user"}</small>
+</div>
+`;
+});
 
- document.getElementById("content").innerHTML = html;
+document.getElementById("content").innerHTML = html;
 }
 
 /* PROJECTS */
-window.loadProjects = async function(){
+window.projects = async function(){
 
- const snap = await getDocs(collection(db,"projects"));
+const snap = await getDocs(collection(db,"projects"));
 
- let html = `<div class="title">PROJETS</div>`;
+let html = "<div class='title'>PROJETS</div>";
 
- snap.forEach(d=>{
-  const p = d.data();
+snap.forEach(d=>{
+const p = d.data();
 
-  html += `
-   <div class="msg">
-    <b>${p.name}</b><br>
-    ${p.status || "pending"}
-   </div>
-  `;
- });
+html += `
+<div class="item">
+<b>${p.name}</b><br>
+${p.status||"pending"}
+</div>
+`;
+});
 
- document.getElementById("content").innerHTML = html;
+document.getElementById("content").innerHTML = html;
 }
 
 /* CHAT REALTIME */
-window.loadChat = function(){
+window.chat = function(){
 
- document.getElementById("content").innerHTML = `
- <div class="title">CHAT INTERNE</div>
+document.getElementById("content").innerHTML = `
+<div class="title">CHAT INTERNE</div>
 
- <div class="chat-box" id="chatBox"></div>
+<div class="chatBox" id="chat"></div>
 
- <input id="msgInput" placeholder="Message...">
- <button class="send" onclick="sendMsg()">Envoyer</button>
- `;
+<input id="msg">
+<button class="sendBtn" onclick="send()">Envoyer</button>
+`;
 
- const q = query(collection(db,"messages"),orderBy("time"));
+const q = query(collection(db,"messages"),orderBy("time"));
 
- onSnapshot(q,(snap)=>{
-  let box = document.getElementById("chatBox");
-  box.innerHTML="";
+onSnapshot(q,(snap)=>{
+let box = document.getElementById("chat");
+box.innerHTML="";
 
-  snap.forEach(d=>{
-   const m = d.data();
-   box.innerHTML += `<div class="msg"><b>${m.user}</b> : ${m.text}</div>`;
-  });
+snap.forEach(d=>{
+const m=d.data();
+box.innerHTML += `<div class="item"><b>${m.user}</b> : ${m.text}</div>`;
+});
 
-  box.scrollTop = box.scrollHeight;
- });
+box.scrollTop = box.scrollHeight;
+});
 }
 
-/* SEND MESSAGE */
-window.sendMsg = async function(){
+/* SEND */
+window.send = async function(){
 
- const input = document.getElementById("msgInput");
+let input = document.getElementById("msg");
 
- if(!input.value) return;
+if(!input.value) return;
 
- await addDoc(collection(db,"messages"),{
-  text:input.value,
-  user:user.given_name,
-  time:Date.now()
- });
+await addDoc(collection(db,"messages"),{
+text:input.value,
+user:user.given_name,
+time:Date.now()
+});
 
- input.value="";
+input.value="";
 }
 
 /* PROFILE */
-window.showProfile = function(){
- alert(
-  user.name + "\n" +
-  user.email
- );
+window.profile = function(){
+alert(user.name + "\n" + user.email);
 }
 
 /* LOGOUT */
 window.logout = function(){
- localStorage.removeItem("lumy_user");
- signOut(auth);
- window.location.href="login.html";
+localStorage.removeItem("lumy_user");
+signOut(auth);
+window.location.href="login.html";
 }
 
 </script>
