@@ -13,7 +13,6 @@
 --cyan:#00f2ff;
 }
 
-/* GLOBAL */
 body{
 margin:0;
 height:100vh;
@@ -26,7 +25,7 @@ font-family:Inter;
 overflow:hidden;
 }
 
-/* BACKGROUND GLOW */
+/* BACKGROUND */
 .bg{
 position:absolute;
 width:100%;
@@ -37,7 +36,6 @@ radial-gradient(circle at 70% 80%, rgba(0,242,255,0.06), transparent 40%);
 z-index:0;
 }
 
-/* GRID */
 .grid{
 position:absolute;
 width:200%;
@@ -78,16 +76,14 @@ animation:float 4s ease-in-out infinite;
 100%{transform:translateY(0);}
 }
 
-/* TITLE */
+/* TEXT */
 .title{
 font-family:Orbitron;
 font-size:26px;
 letter-spacing:4px;
-color:white;
 margin-bottom:10px;
 }
 
-/* SUB */
 .subtitle{
 font-size:14px;
 opacity:0.6;
@@ -169,7 +165,7 @@ Nos équipes déploient une nouvelle version du système.
 Initialisation...
 </div>
 
-<button class="btn" onclick="logout()">SE DÉCONNECTER</button>
+<button class="btn" id="logoutBtn" onclick="logout()">SE DÉCONNECTER</button>
 
 </div>
 
@@ -178,7 +174,6 @@ Lumy Corporation • Infrastructure Sécurisée
 </div>
 
 <script>
-
 const messages = [
 "Initialisation des services...",
 "Connexion aux serveurs...",
@@ -195,19 +190,26 @@ document.getElementById("status").innerText = messages[i];
 i = (i + 1) % messages.length;
 },2000);
 
-/* LOGOUT SAFE */
+/* LOGOUT COMPLET */
 function logout(){
-localStorage.removeItem("lumy_user");
+    // Supprime session locale
+    localStorage.removeItem("lumy_user");
 
-/* si Firebase est utilisé */
-if (window.firebase && firebase.auth){
-firebase.auth().signOut();
+    // Déconnexion Firebase si utilisé
+    if (window.firebase && firebase.auth){
+        firebase.auth().signOut();
+    }
+
+    // Feedback visuel
+    const btn = document.getElementById("logoutBtn");
+    btn.innerText = "DÉCONNEXION...";
+    btn.style.opacity = "0.6";
+
+    // Redirection propre
+    setTimeout(()=>{
+        window.location.href = "https://intranet.lumycorp.com/";
+    }, 800);
 }
-
-/* pas de redirection automatique */
-alert("Vous êtes déconnecté.");
-}
-
 </script>
 
 </body>
