@@ -11,22 +11,33 @@
 :root{
 --bg:#050505;
 --cyan:#00f2ff;
---card:#0b0b0b;
 }
 
+/* GLOBAL */
 body{
 margin:0;
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:radial-gradient(circle at top, #0a0a0a, var(--bg));
-font-family:Inter;
+background:#050505;
 color:white;
+font-family:Inter;
 overflow:hidden;
 }
 
-/* BACKGROUND GRID */
+/* BACKGROUND GLOW */
+.bg{
+position:absolute;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 30% 20%, rgba(0,242,255,0.08), transparent 40%),
+radial-gradient(circle at 70% 80%, rgba(0,242,255,0.06), transparent 40%);
+z-index:0;
+}
+
+/* GRID */
 .grid{
 position:absolute;
 width:200%;
@@ -35,9 +46,9 @@ background-image:
 linear-gradient(#111 1px, transparent 1px),
 linear-gradient(90deg, #111 1px, transparent 1px);
 background-size:60px 60px;
+opacity:0.08;
 transform:rotate(25deg);
-opacity:0.12;
-animation:move 25s linear infinite;
+animation:move 30s linear infinite;
 }
 
 @keyframes move{
@@ -45,59 +56,52 @@ from{transform:translateY(0) rotate(25deg);}
 to{transform:translateY(-200px) rotate(25deg);}
 }
 
-/* MAIN CARD */
+/* HERO */
 .container{
 z-index:2;
 text-align:center;
-width:520px;
-padding:50px;
-background:rgba(10,10,10,0.85);
-border:1px solid #1a1a1a;
-border-radius:20px;
-backdrop-filter: blur(12px);
-box-shadow:0 0 90px rgba(0,242,255,0.05);
+max-width:700px;
+padding:40px;
 }
 
 /* LOGO */
 .logo{
-width:160px;
-height:auto;
-object-fit:contain;
-margin-bottom:20px;
-filter: drop-shadow(0 0 18px rgba(0,242,255,0.35));
+width:170px;
+margin-bottom:25px;
+filter: drop-shadow(0 0 25px rgba(0,242,255,0.35));
 animation:float 4s ease-in-out infinite;
 }
 
 @keyframes float{
 0%{transform:translateY(0);}
-50%{transform:translateY(-8px);}
+50%{transform:translateY(-10px);}
 100%{transform:translateY(0);}
 }
 
 /* TITLE */
 .title{
 font-family:Orbitron;
-font-size:18px;
-letter-spacing:3px;
-color:var(--cyan);
+font-size:26px;
+letter-spacing:4px;
+color:white;
 margin-bottom:10px;
 }
 
-/* SUBTITLE */
+/* SUB */
 .subtitle{
+font-size:14px;
 opacity:0.6;
-font-size:13px;
-margin-bottom:25px;
+margin-bottom:30px;
 }
 
 /* LOADER */
 .loader{
-width:52px;
-height:52px;
-border:3px solid #1a1a1a;
+width:60px;
+height:60px;
+border:3px solid #111;
 border-top:3px solid var(--cyan);
 border-radius:50%;
-margin:20px auto;
+margin:30px auto;
 animation:spin 1s linear infinite;
 }
 
@@ -105,119 +109,82 @@ animation:spin 1s linear infinite;
 to{transform:rotate(360deg);}
 }
 
-/* PROGRESS BAR */
-.progress{
-width:100%;
-height:4px;
-background:#111;
-border-radius:10px;
-overflow:hidden;
-margin-top:20px;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:var(--cyan);
-animation:load 6s ease-in-out infinite;
-}
-
-@keyframes load{
-0%{width:0%}
-50%{width:85%}
-100%{width:100%}
-}
-
-/* STATUS TEXT */
+/* STATUS */
 .status{
 font-size:12px;
 opacity:0.7;
-margin-top:15px;
 min-height:20px;
 }
 
 /* BUTTON */
-button{
-margin-top:25px;
-padding:12px;
-width:100%;
+.btn{
+margin-top:35px;
+padding:12px 20px;
 background:transparent;
 border:1px solid var(--cyan);
 color:var(--cyan);
 cursor:pointer;
 border-radius:8px;
-transition:0.3s;
 font-family:Orbitron;
 font-size:11px;
-letter-spacing:1px;
+letter-spacing:2px;
+transition:0.3s;
 }
 
-button:hover{
+.btn:hover{
 background:var(--cyan);
 color:black;
+box-shadow:0 0 20px rgba(0,242,255,0.3);
 }
 
 /* FOOTER */
 .footer{
 position:absolute;
-bottom:10px;
+bottom:15px;
 font-size:10px;
-opacity:0.4;
-}
-
-/* FADE IN */
-.fade{
-animation:fadeIn 1s ease-out;
-}
-
-@keyframes fadeIn{
-from{opacity:0;transform:scale(0.95);}
-to{opacity:1;transform:scale(1);}
+opacity:0.3;
 }
 </style>
 </head>
 
 <body>
 
+<div class="bg"></div>
 <div class="grid"></div>
 
-<div class="container fade">
+<div class="container">
 
-<!-- LOGO -->
-<img class="logo" src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png" alt="Lumy Logo">
+<img src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png" class="logo">
 
-<div class="title">MAINTENANCE SYSTÈME</div>
+<div class="title">SYSTEM MAINTENANCE</div>
 
 <div class="subtitle">
-L’intranet Lumy Core est temporairement indisponible<br>
-Mise à jour sécurisée en cours
+Lumy Core est actuellement en mise à jour.<br>
+Nos équipes déploient une nouvelle version du système.
 </div>
 
 <div class="loader"></div>
 
-<div class="progress">
-<div class="bar"></div>
+<div class="status" id="status">
+Initialisation...
 </div>
 
-<div class="status" id="status">Initialisation des services...</div>
-
-<button onclick="checkStatus()">STATUT SYSTÈME</button>
+<button class="btn" onclick="logout()">SE DÉCONNECTER</button>
 
 </div>
 
 <div class="footer">
-Lumy Corporation • Secure Cloud Intranet
+Lumy Corporation • Infrastructure Sécurisée
 </div>
 
 <script>
 
 const messages = [
 "Initialisation des services...",
-"Synchronisation Firestore...",
-"Vérification des permissions...",
-"Chargement des modules internes...",
-"Optimisation du système...",
-"Sécurisation des endpoints...",
+"Connexion aux serveurs...",
+"Synchronisation des données...",
+"Vérification des accès...",
+"Déploiement des modules...",
 "Système en cours de stabilisation..."
 ];
 
@@ -228,9 +195,17 @@ document.getElementById("status").innerText = messages[i];
 i = (i + 1) % messages.length;
 },2000);
 
-/* SAFE SYSTEM BUTTON */
-function checkStatus(){
-alert("Système en maintenance. Aucun accès disponible pour le moment.");
+/* LOGOUT SAFE */
+function logout(){
+localStorage.removeItem("lumy_user");
+
+/* si Firebase est utilisé */
+if (window.firebase && firebase.auth){
+firebase.auth().signOut();
+}
+
+/* pas de redirection automatique */
+alert("Vous êtes déconnecté.");
 }
 
 </script>
