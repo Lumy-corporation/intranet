@@ -2,212 +2,327 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORP | MAINTENANCE</title>
+<title>LUMY CORP - Agent Control Center</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 :root{
 --bg:#050505;
+--card:#0d0d0d;
+--border:#1a1a1a;
 --cyan:#00f2ff;
+--danger:#ff3b3b;
 }
 
 /* GLOBAL */
 body{
 margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#050505;
+background:radial-gradient(circle at top, #0a0a0a, var(--bg));
 color:white;
 font-family:Inter;
-overflow:hidden;
+padding:30px;
 }
 
-/* BACKGROUND GLOW */
-.bg{
-position:absolute;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 30% 20%, rgba(0,242,255,0.08), transparent 40%),
-radial-gradient(circle at 70% 80%, rgba(0,242,255,0.06), transparent 40%);
-z-index:0;
-}
-
-/* GRID */
-.grid{
-position:absolute;
-width:200%;
-height:200%;
-background-image:
-linear-gradient(#111 1px, transparent 1px),
-linear-gradient(90deg, #111 1px, transparent 1px);
-background-size:60px 60px;
-opacity:0.08;
-transform:rotate(25deg);
-animation:move 30s linear infinite;
-}
-
-@keyframes move{
-from{transform:translateY(0) rotate(25deg);}
-to{transform:translateY(-200px) rotate(25deg);}
-}
-
-/* HERO */
-.container{
-z-index:2;
-text-align:center;
-max-width:700px;
-padding:40px;
-}
-
-/* LOGO */
-.logo{
-width:170px;
-margin-bottom:25px;
-filter: drop-shadow(0 0 25px rgba(0,242,255,0.35));
-animation:float 4s ease-in-out infinite;
-}
-
-@keyframes float{
-0%{transform:translateY(0);}
-50%{transform:translateY(-10px);}
-100%{transform:translateY(0);}
-}
-
-/* TITLE */
-.title{
-font-family:Orbitron;
-font-size:26px;
-letter-spacing:4px;
-color:white;
-margin-bottom:10px;
-}
-
-/* SUB */
-.subtitle{
-font-size:14px;
-opacity:0.6;
+/* HEADER */
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
 margin-bottom:30px;
 }
 
-/* LOADER */
-.loader{
-width:60px;
-height:60px;
-border:3px solid #111;
-border-top:3px solid var(--cyan);
-border-radius:50%;
-margin:30px auto;
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-to{transform:rotate(360deg);}
-}
-
-/* STATUS */
-.status{
-font-size:12px;
-opacity:0.7;
-min-height:20px;
-}
-
-/* BUTTON */
-.btn{
-margin-top:35px;
-padding:12px 20px;
-background:transparent;
-border:1px solid var(--cyan);
+.title{
+font-family:Orbitron;
+letter-spacing:3px;
 color:var(--cyan);
+}
+
+/* GRID */
+.grid-layout{
+display:grid;
+grid-template-columns: 380px 1fr;
+gap:30px;
+}
+
+/* CARDS */
+.card{
+background:rgba(10,10,10,0.8);
+border:1px solid var(--border);
+border-radius:15px;
+padding:25px;
+backdrop-filter: blur(10px);
+box-shadow:0 0 40px rgba(0,242,255,0.05);
+}
+
+/* SIDEBAR */
+.sidebar h3{
+font-family:Orbitron;
+font-size:14px;
+letter-spacing:2px;
+margin-bottom:20px;
+color:var(--cyan);
+}
+
+/* INPUTS */
+input, select{
+width:100%;
+padding:12px;
+margin-bottom:12px;
+background:#111;
+border:1px solid #222;
+color:white;
+border-radius:8px;
+transition:0.2s;
+}
+
+input:focus, select:focus{
+border-color:var(--cyan);
+outline:none;
+}
+
+/* BUTTONS */
+button{
 cursor:pointer;
 border-radius:8px;
+border:none;
 font-family:Orbitron;
-font-size:11px;
-letter-spacing:2px;
+letter-spacing:1px;
+}
+
+.btn-add{
+background:linear-gradient(135deg, #00f2ff, #007bff);
+color:black;
+padding:12px;
+width:100%;
 transition:0.3s;
 }
 
-.btn:hover{
-background:var(--cyan);
-color:black;
-box-shadow:0 0 20px rgba(0,242,255,0.3);
+.btn-add:hover{
+transform:translateY(-2px);
+box-shadow:0 0 20px rgba(0,242,255,0.4);
 }
 
-/* FOOTER */
-.footer{
-position:absolute;
-bottom:15px;
-font-size:10px;
-opacity:0.3;
+.btn-del{
+background:transparent;
+color:var(--danger);
+border:1px solid var(--danger);
+padding:6px 12px;
+font-size:11px;
+transition:0.2s;
+}
+
+.btn-del:hover{
+background:var(--danger);
+color:white;
+}
+
+/* USERS */
+.user-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+border-bottom:1px solid #1a1a1a;
+transition:0.2s;
+}
+
+.user-row:hover{
+background:#111;
+}
+
+.user-info{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.profile-img{
+width:45px;
+height:45px;
+border-radius:50%;
+border:1px solid var(--cyan);
+}
+
+.user-name{
+font-weight:600;
+}
+
+.user-email{
+font-size:12px;
+opacity:0.6;
+}
+
+/* HEADER RIGHT */
+.refresh{
+background:#111;
+color:white;
+padding:8px 15px;
+border:1px solid #222;
+transition:0.2s;
+}
+
+.refresh:hover{
+border-color:var(--cyan);
+}
+
+/* STATUS */
+.status-msg{
+margin-top:10px;
+font-size:12px;
+opacity:0.7;
+}
+
+/* EMPTY */
+.empty{
+opacity:0.5;
+text-align:center;
+padding:30px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="bg"></div>
-<div class="grid"></div>
-
-<div class="container">
-
-<img src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png" class="logo">
-
-<div class="title">SYSTEM MAINTENANCE</div>
-
-<div class="subtitle">
-Lumy Core est actuellement en mise à jour.<br>
-Nos équipes déploient une nouvelle version du système.
+<div class="header">
+<div class="title">LUMY CONTROL CENTER</div>
+<button class="refresh" onclick="listUsers()">ACTUALISER</button>
 </div>
 
-<div class="loader"></div>
+<div class="grid-layout">
 
-<div class="status" id="status">
-Initialisation...
+<!-- SIDEBAR -->
+<div class="card sidebar">
+<h3>DÉPLOYER UN AGENT</h3>
+
+<input type="text" id="new_firstname" placeholder="Prénom">
+<input type="text" id="new_lastname" placeholder="Nom">
+<input type="email" id="new_recovery" placeholder="Email personnel">
+<select id="new_ou">
+<option value="/">Racine</option>
+<option value="/Vietnam">Vietnam</option>
+<option value="/Agents">Agents</option>
+</select>
+
+<button class="btn-add" onclick="createNewUser()">DÉPLOYER</button>
+
+<div id="create_status" class="status-msg"></div>
 </div>
 
-<button class="btn" onclick="logout()">SE DÉCONNECTER</button>
+<!-- MAIN -->
+<div class="card">
+<h3 style="font-family:Orbitron;letter-spacing:2px;color:var(--cyan);margin-bottom:15px;">
+BASE AGENTS
+</h3>
+
+<div id="user_list_container" class="empty">
+Connexion requise...
+</div>
+</div>
 
 </div>
 
-<div class="footer">
-Lumy Corporation • Infrastructure Sécurisée
-</div>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
 <script>
+const CLIENT_ID = 'TON_CLIENT_ID.apps.googleusercontent.com';
+const API_KEY = 'TON_API_KEY';
+const SCOPES = 'https://www.googleapis.com/auth/admin.directory.user';
 
-const messages = [
-"Initialisation des services...",
-"Connexion aux serveurs...",
-"Synchronisation des données...",
-"Vérification des accès...",
-"Déploiement des modules...",
-"Système en cours de stabilisation..."
-];
+let tokenClient;
 
-let i = 0;
-
-setInterval(()=>{
-document.getElementById("status").innerText = messages[i];
-i = (i + 1) % messages.length;
-},2000);
-
-/* LOGOUT SAFE */
-function logout(){
-localStorage.removeItem("lumy_user");
-
-/* si Firebase est utilisé */
-if (window.firebase && firebase.auth){
-firebase.auth().signOut();
+function gapiLoaded(){
+gapi.load('client',()=>gapi.client.init({
+apiKey: API_KEY,
+discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/admin/directory_1/rest']
+}));
 }
 
-/* pas de redirection automatique */
-alert("Vous êtes déconnecté.");
+function gisLoaded(){
+tokenClient = google.accounts.oauth2.initTokenClient({
+client_id: CLIENT_ID,
+scope: SCOPES,
+callback:(resp)=>{ if(resp.access_token) listUsers(); }
+});
 }
 
+async function listUsers(){
+if(!gapi.client.getToken()) return tokenClient.requestAccessToken();
+
+const response = await gapi.client.directory.users.list({
+customer:'my_customer',
+orderBy:'email'
+});
+
+const users = response.result.users || [];
+
+if(users.length === 0){
+document.getElementById('user_list_container').innerHTML =
+"<div class='empty'>Aucun agent trouvé</div>";
+return;
+}
+
+let html = '';
+
+users.forEach(user=>{
+const img = user.thumbnailPhotoUrl || 'https://www.w3schools.com/howto/img_avatar.png';
+
+html += `
+<div class="user-row">
+<div class="user-info">
+<img src="${img}" class="profile-img">
+<div>
+<div class="user-name">${user.name.fullName}</div>
+<div class="user-email">${user.primaryEmail}</div>
+</div>
+</div>
+<button class="btn-del" onclick="deleteUser('${user.primaryEmail}')">
+SUPPRIMER
+</button>
+</div>
+`;
+});
+
+document.getElementById('user_list_container').innerHTML = html;
+}
+
+async function createNewUser(){
+if(!gapi.client.getToken()) return tokenClient.requestAccessToken();
+
+const fname = document.getElementById('new_firstname').value;
+const lname = document.getElementById('new_lastname').value;
+const recovery = document.getElementById('new_recovery').value;
+const ou = document.getElementById('new_ou').value;
+
+const userBody = {
+primaryEmail: `${fname.toLowerCase().charAt(0)}.${lname.toLowerCase()}@lumycorp.com`,
+name:{givenName:fname,familyName:lname},
+password: Math.random().toString(36).slice(-10),
+changePasswordAtNextLogin:true,
+recoveryEmail: recovery,
+orgUnitPath: ou
+};
+
+try{
+await gapi.client.directory.users.insert({resource:userBody});
+document.getElementById('create_status').innerHTML="Agent déployé";
+listUsers();
+}catch(err){
+document.getElementById('create_status').innerHTML="Erreur : "+err.result.error.message;
+}
+}
+
+async function deleteUser(email){
+if(confirm("Confirmer suppression de "+email+" ?")){
+try{
+await gapi.client.directory.users.delete({userKey:email});
+listUsers();
+}catch(err){
+alert("Erreur : "+err.result.error.message);
+}
+}
+}
 </script>
 
 </body>
