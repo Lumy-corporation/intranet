@@ -4,96 +4,110 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>LUMY CORP Dashboard</title>
+<title>LUMY CORE V2</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCjIUQOQS...",
   authDomain: "lumy-corporation-1db3f.firebaseapp.com",
-  databaseURL: "https://lumy-corporation-1db3f-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "lumy-corporation-1db3f"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
-/* LOAD DASHBOARD */
+/* NAVIGATION */
+window.navigate = (page) => {
+  document.querySelectorAll(".page").forEach(p => p.style.display="none");
+  document.getElementById(page).style.display="block";
+};
+
+/* DASHBOARD */
 async function loadDashboard() {
+  const users = await getDocs(collection(db,"users"));
+  const projects = await getDocs(collection(db,"projects"));
+  const messages = await getDocs(collection(db,"messages"));
+  const billing = await getDocs(collection(db,"billing"));
 
-  // MEMBERS
-  const usersSnap = await getDocs(collection(db, "users"));
-  document.getElementById("membersCount").innerText = usersSnap.size;
+  document.getElementById("membersCount").innerText = users.size;
+  document.getElementById("projectsCount").innerText = projects.size;
+  document.getElementById("messagesCount").innerText = messages.size;
 
-  // PROJECTS
-  const projectsSnap = await getDocs(collection(db, "projects"));
-  document.getElementById("projectsCount").innerText = projectsSnap.size;
-
-  // MESSAGES
-  const messagesSnap = await getDocs(collection(db, "messages"));
-  document.getElementById("messagesCount").innerText = messagesSnap.size;
-
-  // BILLING
-  const billingSnap = await getDocs(collection(db, "billing"));
   let pending = 0;
-  billingSnap.forEach(doc => {
-    if (doc.data().status === "pending") pending++;
+  billing.forEach(d=>{
+    if(d.data().status==="pending") pending++;
   });
   document.getElementById("pendingInvoices").innerText = pending;
+}
 
-  // LOGS (latest 10)
-  const logsQuery = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(10));
-  const logsSnap = await getDocs(logsQuery);
+/* CHAT */
+window.sendMessage = async () => {
+  const input = document.getElementById("chatInput");
+  if(!input.value) return;
 
-  const logsContainer = document.getElementById("logsContainer");
-  logsContainer.innerHTML = "";
-
-  logsSnap.forEach(doc => {
-    const log = doc.data();
-    logsContainer.innerHTML += `
-      <div>📌 ${log.action || "activité"}<br>
-      <small>${formatDate(log.timestamp)}</small></div>
-    `;
+  await addDoc(collection(db,"messages"), {
+    sender:"User",
+    message:input.value,
+    timestamp:new Date()
   });
 
-  // RECENT MESSAGES (latest 10)
-  const msgQuery = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(10));
-  const msgSnap = await getDocs(msgQuery);
+  input.value="";
+  loadMessages();
+};
 
-  const recentMessages = document.getElementById("recentMessages");
-  recentMessages.innerHTML = "";
+async function loadMessages(){
+  const q = query(collection(db,"messages"), orderBy("timestamp","desc"), limit(20));
+  const snap = await getDocs(q);
 
-  msgSnap.forEach(doc => {
+  const box = document.getElementById("chatBox");
+  box.innerHTML="";
+
+  snap.forEach(doc=>{
     const m = doc.data();
-    recentMessages.innerHTML += `
-      <div>💬 <b>${m.sender || "User"}</b><br>${m.message}</div>
-    `;
+    box.innerHTML += `<div class="msg"><b>${m.sender}</b><br>${m.message}</div>`;
   });
 }
 
-function formatDate(ts) {
-  if (!ts) return "";
-  return new Date(ts.seconds * 1000).toLocaleString();
+/* USERS */
+async function loadUsers(){
+  const snap = await getDocs(collection(db,"users"));
+  const list = document.getElementById("usersList");
+  list.innerHTML="";
+
+  snap.forEach(doc=>{
+    const u = doc.data();
+    list.innerHTML += `
+      <div class="item">
+        ${u.firstName} ${u.lastName} — ${u.role}
+      </div>`;
+  });
 }
 
-window.onload = loadDashboard;
+/* INIT */
+window.onload = () => {
+  navigate("dashboard");
+  loadDashboard();
+  loadMessages();
+  loadUsers();
+};
 
 </script>
 
 <style>
-body {
+body{
   margin:0;
-  font-family:'Inter';
   background:#050505;
   color:white;
+  font-family:'Inter';
 }
 
 /* SIDEBAR */
-.sidebar {
+.sidebar{
   position:fixed;
   width:260px;
   height:100vh;
@@ -101,88 +115,96 @@ body {
   padding:20px;
 }
 
-.logo {
+.logo{
   display:flex;
   align-items:center;
   gap:10px;
-  font-family:'Orbitron';
   color:#00f2ff;
+  font-family:'Orbitron';
   margin-bottom:30px;
 }
 
-.logo img {
+.logo img{
   width:40px;
   filter:drop-shadow(0 0 10px #00f2ff);
 }
 
-.menu div {
-  margin:15px 0;
+.menu div{
+  margin:12px 0;
   cursor:pointer;
   opacity:0.7;
-  transition:0.3s;
 }
 
-.menu div:hover {
-  opacity:1;
+.menu div:hover{
   color:#00f2ff;
+  opacity:1;
 }
 
 /* MAIN */
-.main {
+.main{
   margin-left:260px;
   padding:30px;
 }
 
-h1 {
-  margin-bottom:20px;
-}
-
 /* GRID */
-.grid {
+.grid{
   display:grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap:20px;
-  margin-bottom:20px;
-}
-
-.grid-2 {
-  display:grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns:repeat(4,1fr);
   gap:20px;
 }
 
-/* CARD */
-.card {
+.card{
   background:rgba(255,255,255,0.05);
   padding:20px;
   border-radius:15px;
-  backdrop-filter:blur(12px);
-  transition:0.3s;
+  backdrop-filter:blur(10px);
 }
 
-.card:hover {
-  transform:translateY(-4px);
-  box-shadow:0 0 25px #00f2ff22;
-}
-
-/* STATS */
-.stat {
+.stat{
   text-align:center;
 }
 
-.stat p {
-  font-size:30px;
+.stat p{
+  font-size:28px;
   color:#00f2ff;
 }
 
 /* LIST */
-#logsContainer div,
-#recentMessages div {
+.item{
+  padding:10px;
+  background:rgba(255,255,255,0.03);
+  border-radius:10px;
+  margin:10px 0;
+}
+
+/* CHAT */
+.msg{
   margin:10px 0;
   padding:10px;
   background:rgba(255,255,255,0.03);
   border-radius:10px;
-  font-size:14px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  background:#111;
+  border:none;
+  color:white;
+}
+
+button{
+  margin-top:10px;
+  padding:10px;
+  background:#00f2ff;
+  border:none;
+  cursor:pointer;
+}
+
+/* PAGES */
+.page{
+  display:none;
 }
 
 </style>
@@ -191,7 +213,6 @@ h1 {
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <div class="logo">
     <img src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png">
@@ -199,60 +220,38 @@ h1 {
   </div>
 
   <div class="menu">
-    <div>Dashboard</div>
-    <div>Membres</div>
-    <div>Recrutement</div>
-    <div>Projets</div>
-    <div>Chat</div>
-    <div>Facturation</div>
-    <div>Logs</div>
-    <div>Paramètres</div>
+    <div onclick="navigate('dashboard')">Dashboard</div>
+    <div onclick="navigate('users')">Membres</div>
+    <div onclick="navigate('chat')">Chat</div>
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
-  <h1>Dashboard</h1>
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="page">
+    <h1>Dashboard</h1>
 
-  <!-- STATS -->
-  <div class="grid">
-
-    <div class="card stat">
-      <h3>Membres</h3>
-      <p id="membersCount">0</p>
+    <div class="grid">
+      <div class="card stat"><h3>Membres</h3><p id="membersCount">0</p></div>
+      <div class="card stat"><h3>Projets</h3><p id="projectsCount">0</p></div>
+      <div class="card stat"><h3>Messages</h3><p id="messagesCount">0</p></div>
+      <div class="card stat"><h3>Factures</h3><p id="pendingInvoices">0</p></div>
     </div>
-
-    <div class="card stat">
-      <h3>Projets</h3>
-      <p id="projectsCount">0</p>
-    </div>
-
-    <div class="card stat">
-      <h3>Messages</h3>
-      <p id="messagesCount">0</p>
-    </div>
-
-    <div class="card stat">
-      <h3>Factures en attente</h3>
-      <p id="pendingInvoices">0</p>
-    </div>
-
   </div>
 
-  <!-- CONTENT -->
-  <div class="grid-2">
+  <!-- USERS -->
+  <div id="users" class="page">
+    <h1>Membres</h1>
+    <div id="usersList"></div>
+  </div>
 
-    <div class="card">
-      <h3>Activité système</h3>
-      <div id="logsContainer"></div>
-    </div>
-
-    <div class="card">
-      <h3>Messages récents</h3>
-      <div id="recentMessages"></div>
-    </div>
-
+  <!-- CHAT -->
+  <div id="chat" class="page">
+    <h1>Chat interne</h1>
+    <div id="chatBox"></div>
+    <input id="chatInput" placeholder="Message...">
+    <button onclick="sendMessage()">Envoyer</button>
   </div>
 
 </div>
