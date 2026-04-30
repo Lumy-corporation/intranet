@@ -1,260 +1,184 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+import React from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { motion } from 'framer-motion';
+import { Users, MessageSquare, Receipt, Activity, TrendingUp, Clock, CheckCircle2, AlertCircle, Zap, FolderKanban } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { ROLE_COLOR, ROLE_LABELS } from '@/lib/roles';
 
-<title>LUMY CORE V2</title>
+function StatCard({ icon: IconComp, label, value, sub, color = 'cyan', delay = 0 }) {
+  const Icon = IconComp;
+  const colors = {
+    cyan: { text: 'text-cyan-400', bg: 'bg-cyan-400/10', border: 'border-cyan-400/20' },
+    violet: { text: 'text-violet-400', bg: 'bg-violet-400/10', border: 'border-violet-400/20' },
+    emerald: { text: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
+    amber: { text: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20' },
+  };
+  const c = colors[color] || colors.cyan;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.45 }}
+      className="glass rounded-xl p-5 hover:border-white/10 transition-all duration-300 group cursor-default"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">{label}</p>
+          <p className="text-3xl font-bold text-foreground font-inter">{value}</p>
+          {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+        </div>
+        <div className={`w-10 h-10 rounded-xl ${c.bg} border ${c.border} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+          <Icon className={`w-5 h-5 ${c.text}`} />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCjIUQOQS...",
-  authDomain: "lumy-corporation-1db3f.firebaseapp.com",
-  projectId: "lumy-corporation-1db3f"
+const SEV_STYLE = {
+  info: { text: 'text-cyan-400', bg: 'bg-cyan-400/8' },
+  warning: { text: 'text-amber-400', bg: 'bg-amber-400/8' },
+  error: { text: 'text-red-400', bg: 'bg-red-400/8' },
+  critical: { text: 'text-red-500', bg: 'bg-red-500/10' },
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore();
+export default function Dashboard() {
+  const { user } = useOutletContext();
 
-/* NAVIGATION */
-window.navigate = (page) => {
-  document.querySelectorAll(".page").forEach(p => p.style.display="none");
-  document.getElementById(page).style.display="block";
-};
+  const { data: members = [] } = useQuery({ queryKey: ['users'], queryFn: () => base44.entities.User.list() });
+  const { data: messages = [] } = useQuery({ queryKey: ['messages'], queryFn: () => base44.entities.Message.list('-created_date', 8) });
+  const { data: invoices = [] } = useQuery({ queryKey: ['invoices'], queryFn: () => base44.entities.Invoice.list() });
+  const { data: logs = [] } = useQuery({ queryKey: ['logs'], queryFn: () => base44.entities.SystemLog.list('-created_date', 10) });
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
 
-/* DASHBOARD */
-async function loadDashboard() {
-  const users = await getDocs(collection(db,"users"));
-  const projects = await getDocs(collection(db,"projects"));
-  const messages = await getDocs(collection(db,"messages"));
-  const billing = await getDocs(collection(db,"billing"));
+  const pending = invoices.filter(i => i.status === 'pending').length;
+  const paid = invoices.filter(i => i.status === 'paid').reduce((a, b) => a + (b.amount || 0), 0);
+  const firstName = user?.full_name?.split(' ')[0] || 'Utilisateur';
+  const role = user?.role || 'NO_ROLE';
+  const rc = ROLE_COLOR[role] || ROLE_COLOR.EMPLOYEE;
 
-  document.getElementById("membersCount").innerText = users.size;
-  document.getElementById("projectsCount").innerText = projects.size;
-  document.getElementById("messagesCount").innerText = messages.size;
+  return (
+    <div className="space-y-7 max-w-[1400px]">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Zap className="w-4 h-4 text-primary" />
+            <span className="font-orbitron text-xs text-primary tracking-widest font-semibold">LUMY CORE — DASHBOARD</span>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">
+            Bienvenue, <span className="gradient-text text-glow">{firstName}</span> 👋
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {format(new Date(), "EEEE d MMMM yyyy", { locale: fr })} · Vue d'ensemble de votre espace de travail
+          </p>
+        </div>
+        <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full ${rc.bg} border ${rc.border}`}>
+          <span className={`text-xs font-semibold ${rc.text}`}>{ROLE_LABELS[role]}</span>
+        </div>
+      </motion.div>
 
-  let pending = 0;
-  billing.forEach(d=>{
-    if(d.data().status==="pending") pending++;
-  });
-  document.getElementById("pendingInvoices").innerText = pending;
-}
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={Users} label="Membres" value={members.length} sub="utilisateurs actifs" color="cyan" delay={0} />
+        <StatCard icon={FolderKanban} label="Projets actifs" value={projects.filter(p => p.status === 'active').length} sub={`${projects.length} au total`} color="violet" delay={0.08} />
+        <StatCard icon={Receipt} label="En attente" value={pending} sub="factures à traiter" color="amber" delay={0.16} />
+        <StatCard icon={TrendingUp} label="Encaissé" value={`${paid.toFixed(0)}€`} sub="total payé" color="emerald" delay={0.24} />
+      </div>
 
-/* CHAT */
-window.sendMessage = async () => {
-  const input = document.getElementById("chatInput");
-  if(!input.value) return;
+      {/* Content grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Activity feed */}
+        <div className="xl:col-span-2 glass rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-border flex items-center gap-3">
+            <Activity className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground">Activité système récente</h2>
+            <span className="ml-auto text-xs text-muted-foreground">{logs.length} événements</span>
+          </div>
+          <div className="p-2">
+            {logs.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground text-sm">Aucune activité enregistrée</div>
+            ) : (
+              logs.map((log, i) => {
+                const s = SEV_STYLE[log.severity] || SEV_STYLE.info;
+                return (
+                  <motion.div
+                    key={log.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors"
+                  >
+                    <div className={`mt-0.5 w-2 h-2 rounded-full ${s.text.replace('text', 'bg')} flex-shrink-0 mt-2`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm text-foreground font-medium">{log.action}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${s.text} ${s.bg}`}>{log.category}</span>
+                      </div>
+                      {log.details && <p className="text-xs text-muted-foreground mt-0.5 truncate">{log.details}</p>}
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {log.performedBy || 'Système'} · {log.created_date ? format(new Date(log.created_date), 'dd MMM HH:mm', { locale: fr }) : '—'}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
+        </div>
 
-  await addDoc(collection(db,"messages"), {
-    sender:"User",
-    message:input.value,
-    timestamp:new Date()
-  });
+        {/* Right col */}
+        <div className="space-y-5">
+          {/* Recent messages */}
+          <div className="glass rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-border flex items-center gap-3">
+              <MessageSquare className="w-4 h-4 text-violet-400" />
+              <h2 className="text-sm font-semibold text-foreground">Messages récents</h2>
+            </div>
+            <div className="p-3 space-y-2">
+              {messages.length === 0 ? (
+                <p className="text-center text-muted-foreground text-sm py-6">Aucun message</p>
+              ) : messages.slice(0, 4).map(msg => (
+                <div key={msg.id} className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-white/[0.03]">
+                  <div className="w-7 h-7 rounded-full bg-violet-400/15 border border-violet-400/20 flex items-center justify-center text-violet-400 text-xs font-bold flex-shrink-0">
+                    {msg.senderName?.charAt(0)?.toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground">{msg.senderName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-  input.value="";
-  loadMessages();
-};
-
-async function loadMessages(){
-  const q = query(collection(db,"messages"), orderBy("timestamp","desc"), limit(20));
-  const snap = await getDocs(q);
-
-  const box = document.getElementById("chatBox");
-  box.innerHTML="";
-
-  snap.forEach(doc=>{
-    const m = doc.data();
-    box.innerHTML += `<div class="msg"><b>${m.sender}</b><br>${m.message}</div>`;
-  });
-}
-
-/* USERS */
-async function loadUsers(){
-  const snap = await getDocs(collection(db,"users"));
-  const list = document.getElementById("usersList");
-  list.innerHTML="";
-
-  snap.forEach(doc=>{
-    const u = doc.data();
-    list.innerHTML += `
-      <div class="item">
-        ${u.firstName} ${u.lastName} — ${u.role}
-      </div>`;
-  });
-}
-
-/* INIT */
-window.onload = () => {
-  navigate("dashboard");
-  loadDashboard();
-  loadMessages();
-  loadUsers();
-};
-
-</script>
-
-<style>
-body{
-  margin:0;
-  background:#050505;
-  color:white;
-  font-family:'Inter';
-}
-
-/* SIDEBAR */
-.sidebar{
-  position:fixed;
-  width:260px;
-  height:100vh;
-  background:#0b0b0b;
-  padding:20px;
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  color:#00f2ff;
-  font-family:'Orbitron';
-  margin-bottom:30px;
-}
-
-.logo img{
-  width:40px;
-  filter:drop-shadow(0 0 10px #00f2ff);
-}
-
-.menu div{
-  margin:12px 0;
-  cursor:pointer;
-  opacity:0.7;
-}
-
-.menu div:hover{
-  color:#00f2ff;
-  opacity:1;
-}
-
-/* MAIN */
-.main{
-  margin-left:260px;
-  padding:30px;
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:20px;
-}
-
-.card{
-  background:rgba(255,255,255,0.05);
-  padding:20px;
-  border-radius:15px;
-  backdrop-filter:blur(10px);
-}
-
-.stat{
-  text-align:center;
-}
-
-.stat p{
-  font-size:28px;
-  color:#00f2ff;
-}
-
-/* LIST */
-.item{
-  padding:10px;
-  background:rgba(255,255,255,0.03);
-  border-radius:10px;
-  margin:10px 0;
-}
-
-/* CHAT */
-.msg{
-  margin:10px 0;
-  padding:10px;
-  background:rgba(255,255,255,0.03);
-  border-radius:10px;
-}
-
-input{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  background:#111;
-  border:none;
-  color:white;
-}
-
-button{
-  margin-top:10px;
-  padding:10px;
-  background:#00f2ff;
-  border:none;
-  cursor:pointer;
-}
-
-/* PAGES */
-.page{
-  display:none;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="sidebar">
-  <div class="logo">
-    <img src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png">
-    LUMY CORE
-  </div>
-
-  <div class="menu">
-    <div onclick="navigate('dashboard')">Dashboard</div>
-    <div onclick="navigate('users')">Membres</div>
-    <div onclick="navigate('chat')">Chat</div>
-  </div>
-</div>
-
-<div class="main">
-
-  <!-- DASHBOARD -->
-  <div id="dashboard" class="page">
-    <h1>Dashboard</h1>
-
-    <div class="grid">
-      <div class="card stat"><h3>Membres</h3><p id="membersCount">0</p></div>
-      <div class="card stat"><h3>Projets</h3><p id="projectsCount">0</p></div>
-      <div class="card stat"><h3>Messages</h3><p id="messagesCount">0</p></div>
-      <div class="card stat"><h3>Factures</h3><p id="pendingInvoices">0</p></div>
+          {/* Invoice status */}
+          <div className="glass rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-border flex items-center gap-3">
+              <Receipt className="w-4 h-4 text-amber-400" />
+              <h2 className="text-sm font-semibold text-foreground">Statut facturation</h2>
+            </div>
+            <div className="p-5 space-y-3">
+              {[
+                { label: 'Payées', count: invoices.filter(i => i.status === 'paid').length, icon: CheckCircle2, color: 'text-emerald-400' },
+                { label: 'En attente', count: pending, icon: Clock, color: 'text-amber-400' },
+                { label: 'Échouées', count: invoices.filter(i => i.status === 'failed').length, icon: AlertCircle, color: 'text-red-400' },
+              ].map(item => (
+                <div key={item.label} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <item.icon className={`w-4 h-4 ${item.color}`} />
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                  </div>
+                  <span className={`text-sm font-semibold ${item.color}`}>{item.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <!-- USERS -->
-  <div id="users" class="page">
-    <h1>Membres</h1>
-    <div id="usersList"></div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="chat" class="page">
-    <h1>Chat interne</h1>
-    <div id="chatBox"></div>
-    <input id="chatInput" placeholder="Message...">
-    <button onclick="sendMessage()">Envoyer</button>
-  </div>
-
-</div>
-
-</body>
-</html>
+  );
+}
