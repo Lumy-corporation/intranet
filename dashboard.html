@@ -3,214 +3,259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMY CORE | MAINTENANCE</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<title>LUMY CORE Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCjIUQOQS...",
+  authDomain: "lumy-corporation-1db3f.firebaseapp.com",
+  databaseURL: "https://lumy-corporation-1db3f-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lumy-corporation-1db3f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore();
+
+/* LOAD DASHBOARD */
+async function loadDashboard() {
+
+  // MEMBERS
+  const usersSnap = await getDocs(collection(db, "users"));
+  document.getElementById("membersCount").innerText = usersSnap.size;
+
+  // PROJECTS
+  const projectsSnap = await getDocs(collection(db, "projects"));
+  document.getElementById("projectsCount").innerText = projectsSnap.size;
+
+  // MESSAGES
+  const messagesSnap = await getDocs(collection(db, "messages"));
+  document.getElementById("messagesCount").innerText = messagesSnap.size;
+
+  // BILLING
+  const billingSnap = await getDocs(collection(db, "billing"));
+  let pending = 0;
+  billingSnap.forEach(doc => {
+    if (doc.data().status === "pending") pending++;
+  });
+  document.getElementById("pendingInvoices").innerText = pending;
+
+  // LOGS (latest 10)
+  const logsQuery = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(10));
+  const logsSnap = await getDocs(logsQuery);
+
+  const logsContainer = document.getElementById("logsContainer");
+  logsContainer.innerHTML = "";
+
+  logsSnap.forEach(doc => {
+    const log = doc.data();
+    logsContainer.innerHTML += `
+      <div>📌 ${log.action || "activité"}<br>
+      <small>${formatDate(log.timestamp)}</small></div>
+    `;
+  });
+
+  // RECENT MESSAGES (latest 10)
+  const msgQuery = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(10));
+  const msgSnap = await getDocs(msgQuery);
+
+  const recentMessages = document.getElementById("recentMessages");
+  recentMessages.innerHTML = "";
+
+  msgSnap.forEach(doc => {
+    const m = doc.data();
+    recentMessages.innerHTML += `
+      <div>💬 <b>${m.sender || "User"}</b><br>${m.message}</div>
+    `;
+  });
+}
+
+function formatDate(ts) {
+  if (!ts) return "";
+  return new Date(ts.seconds * 1000).toLocaleString();
+}
+
+window.onload = loadDashboard;
+
+</script>
 
 <style>
-:root{
---bg:#050505;
---cyan:#00f2ff;
+body {
+  margin:0;
+  font-family:'Inter';
+  background:#050505;
+  color:white;
 }
 
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#050505;
-color:white;
-font-family:Inter;
-overflow:hidden;
+/* SIDEBAR */
+.sidebar {
+  position:fixed;
+  width:260px;
+  height:100vh;
+  background:#0b0b0b;
+  padding:20px;
 }
 
-/* BACKGROUND */
-.bg{
-position:absolute;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 30% 20%, rgba(0,242,255,0.08), transparent 40%),
-radial-gradient(circle at 70% 80%, rgba(0,242,255,0.06), transparent 40%);
-z-index:0;
+.logo {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'Orbitron';
+  color:#00f2ff;
+  margin-bottom:30px;
 }
 
-.grid{
-position:absolute;
-width:200%;
-height:200%;
-background-image:
-linear-gradient(#111 1px, transparent 1px),
-linear-gradient(90deg, #111 1px, transparent 1px);
-background-size:60px 60px;
-opacity:0.08;
-transform:rotate(25deg);
-animation:move 30s linear infinite;
+.logo img {
+  width:40px;
+  filter:drop-shadow(0 0 10px #00f2ff);
 }
 
-@keyframes move{
-from{transform:translateY(0) rotate(25deg);}
-to{transform:translateY(-200px) rotate(25deg);}
+.menu div {
+  margin:15px 0;
+  cursor:pointer;
+  opacity:0.7;
+  transition:0.3s;
 }
 
-/* HERO */
-.container{
-z-index:2;
-text-align:center;
-max-width:700px;
-padding:40px;
+.menu div:hover {
+  opacity:1;
+  color:#00f2ff;
 }
 
-/* LOGO */
-.logo{
-width:170px;
-margin-bottom:25px;
-filter: drop-shadow(0 0 25px rgba(0,242,255,0.35));
-animation:float 4s ease-in-out infinite;
+/* MAIN */
+.main {
+  margin-left:260px;
+  padding:30px;
 }
 
-@keyframes float{
-0%{transform:translateY(0);}
-50%{transform:translateY(-10px);}
-100%{transform:translateY(0);}
+h1 {
+  margin-bottom:20px;
 }
 
-/* TEXT */
-.title{
-font-family:Orbitron;
-font-size:26px;
-letter-spacing:4px;
-margin-bottom:10px;
+/* GRID */
+.grid {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:20px;
+  margin-bottom:20px;
 }
 
-.subtitle{
-font-size:14px;
-opacity:0.6;
-margin-bottom:30px;
+.grid-2 {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:20px;
 }
 
-/* LOADER */
-.loader{
-width:60px;
-height:60px;
-border:3px solid #111;
-border-top:3px solid var(--cyan);
-border-radius:50%;
-margin:30px auto;
-animation:spin 1s linear infinite;
+/* CARD */
+.card {
+  background:rgba(255,255,255,0.05);
+  padding:20px;
+  border-radius:15px;
+  backdrop-filter:blur(12px);
+  transition:0.3s;
 }
 
-@keyframes spin{
-to{transform:rotate(360deg);}
+.card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 0 25px #00f2ff22;
 }
 
-/* STATUS */
-.status{
-font-size:12px;
-opacity:0.7;
-min-height:20px;
+/* STATS */
+.stat {
+  text-align:center;
 }
 
-/* BUTTON */
-.btn{
-margin-top:35px;
-padding:12px 20px;
-background:transparent;
-border:1px solid var(--cyan);
-color:var(--cyan);
-cursor:pointer;
-border-radius:8px;
-font-family:Orbitron;
-font-size:11px;
-letter-spacing:2px;
-transition:0.3s;
+.stat p {
+  font-size:30px;
+  color:#00f2ff;
 }
 
-.btn:hover{
-background:var(--cyan);
-color:black;
-box-shadow:0 0 20px rgba(0,242,255,0.3);
+/* LIST */
+#logsContainer div,
+#recentMessages div {
+  margin:10px 0;
+  padding:10px;
+  background:rgba(255,255,255,0.03);
+  border-radius:10px;
+  font-size:14px;
 }
 
-/* FOOTER */
-.footer{
-position:absolute;
-bottom:15px;
-font-size:10px;
-opacity:0.3;
-}
 </style>
+
 </head>
 
 <body>
 
-<div class="bg"></div>
-<div class="grid"></div>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <img src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png">
+    LUMY CORE
+  </div>
 
-<div class="container">
-
-<img src="https://i.postimg.cc/BbnFcJFS/Lumylogo.png" class="logo">
-
-<div class="title">SYSTEM MAINTENANCE</div>
-
-<div class="subtitle">
-Lumy Core est actuellement en mise à jour.<br>
-Nos équipes déploient une nouvelle version du système.
+  <div class="menu">
+    <div>Dashboard</div>
+    <div>Membres</div>
+    <div>Recrutement</div>
+    <div>Projets</div>
+    <div>Chat</div>
+    <div>Facturation</div>
+    <div>Logs</div>
+    <div>Paramètres</div>
+  </div>
 </div>
 
-<div class="loader"></div>
+<!-- MAIN -->
+<div class="main">
 
-<div class="status" id="status">
-Initialisation...
+  <h1>Dashboard</h1>
+
+  <!-- STATS -->
+  <div class="grid">
+
+    <div class="card stat">
+      <h3>Membres</h3>
+      <p id="membersCount">0</p>
+    </div>
+
+    <div class="card stat">
+      <h3>Projets</h3>
+      <p id="projectsCount">0</p>
+    </div>
+
+    <div class="card stat">
+      <h3>Messages</h3>
+      <p id="messagesCount">0</p>
+    </div>
+
+    <div class="card stat">
+      <h3>Factures en attente</h3>
+      <p id="pendingInvoices">0</p>
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="grid-2">
+
+    <div class="card">
+      <h3>Activité système</h3>
+      <div id="logsContainer"></div>
+    </div>
+
+    <div class="card">
+      <h3>Messages récents</h3>
+      <div id="recentMessages"></div>
+    </div>
+
+  </div>
+
 </div>
-
-<button class="btn" id="logoutBtn" onclick="logout()">SE DÉCONNECTER</button>
-
-</div>
-
-<div class="footer">
-Lumy Corporation • Infrastructure Sécurisée
-</div>
-
-<script>
-const messages = [
-"Initialisation des services...",
-"Connexion aux serveurs...",
-"Synchronisation des données...",
-"Vérification des accès...",
-"Déploiement des modules...",
-"Système en cours de stabilisation..."
-];
-
-let i = 0;
-
-setInterval(()=>{
-document.getElementById("status").innerText = messages[i];
-i = (i + 1) % messages.length;
-},2000);
-
-/* LOGOUT COMPLET */
-function logout(){
-    // Supprime session locale
-    localStorage.removeItem("lumy_user");
-
-    // Déconnexion Firebase si utilisé
-    if (window.firebase && firebase.auth){
-        firebase.auth().signOut();
-    }
-
-    // Feedback visuel
-    const btn = document.getElementById("logoutBtn");
-    btn.innerText = "DÉCONNEXION...";
-    btn.style.opacity = "0.6";
-
-    // Redirection propre
-    setTimeout(()=>{
-        window.location.href = "https://intranet.lumycorp.com/";
-    }, 800);
-}
-</script>
 
 </body>
 </html>
