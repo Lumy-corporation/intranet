@@ -1,200 +1,206 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard</title>
+import React, { useMemo, useState } from "react";
+import {
+  ShieldOff,
+  FolderKanban,
+  UserPlus,
+  Settings,
+  LayoutDashboard,
+  LogOut,
+} from "lucide-react";
 
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="bg-gray-950 text-white p-6">
-
-<!-- HEADER -->
-<div class="flex justify-between items-start mb-6">
-  <div>
-    <h1 class="text-2xl font-bold">
-      Bienvenue, <span id="name" class="text-cyan-400"></span> 👋
-    </h1>
-    <p id="date" class="text-gray-400 text-sm"></p>
-  </div>
-
-  <div id="role" class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs"></div>
-</div>
-
-<!-- STATS -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-
-  <div class="bg-gray-900 p-4 rounded-xl">
-    <p class="text-gray-400 text-xs">Membres</p>
-    <p id="members" class="text-2xl font-bold"></p>
-  </div>
-
-  <div class="bg-gray-900 p-4 rounded-xl">
-    <p class="text-gray-400 text-xs">Projets actifs</p>
-    <p id="projects" class="text-2xl font-bold"></p>
-  </div>
-
-  <div class="bg-gray-900 p-4 rounded-xl">
-    <p class="text-gray-400 text-xs">Factures en attente</p>
-    <p id="pending" class="text-2xl font-bold text-amber-400"></p>
-  </div>
-
-  <div class="bg-gray-900 p-4 rounded-xl">
-    <p class="text-gray-400 text-xs">Encaissé</p>
-    <p id="paid" class="text-2xl font-bold text-emerald-400"></p>
-  </div>
-
-</div>
-
-<!-- GRID -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-  <!-- LOGS -->
-  <div class="lg:col-span-2 bg-gray-900 rounded-xl p-4">
-    <h2 class="font-semibold mb-3">Activité système</h2>
-    <div id="logs" class="space-y-2"></div>
-  </div>
-
-  <!-- RIGHT -->
-  <div class="space-y-4">
-
-    <!-- MESSAGES -->
-    <div class="bg-gray-900 rounded-xl p-4">
-      <h2 class="font-semibold mb-3">Messages récents</h2>
-      <div id="messages" class="space-y-2"></div>
-    </div>
-
-    <!-- INVOICES -->
-    <div class="bg-gray-900 rounded-xl p-4">
-      <h2 class="font-semibold mb-3">Facturation</h2>
-      <div id="invoiceStatus" class="space-y-2"></div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-/* ---------------- MOCK DATA ---------------- */
-
-const user = {
-  full_name: "Alex Martin",
-  role: "ADMIN"
+/**
+ * =========================
+ * AUTH MOCK (frontend only)
+ * =========================
+ */
+const ROLE_MAP = {
+  "leo.pujolas@lumycorp.com": "RH",
+  "theo.rabillard@lumycorp.com": "PRESIDENT",
 };
 
-const members = Array(12).fill({});
-const projects = [
-  { status: "active" },
-  { status: "active" },
-  { status: "done" }
-];
+function getRole(email) {
+  return ROLE_MAP[email] || "NO_ROLE";
+}
 
-const invoices = [
-  { status: "pending", amount: 120 },
-  { status: "paid", amount: 200 },
-  { status: "paid", amount: 350 },
-  { status: "failed", amount: 80 }
-];
+/**
+ * =========================
+ * APP ROOT
+ * =========================
+ */
+export default function App() {
+  const [email, setEmail] = useState("");
+  const [user, setUser] = useState(null);
 
-const messages = [
-  { senderName: "Lina", content: "Salut 👋" },
-  { senderName: "Tom", content: "Projet prêt" },
-  { senderName: "Sara", content: "Bug fixé" }
-];
+  const role = useMemo(() => (user ? getRole(user) : null), [user]);
 
-const logs = [
-  { action: "Login", category: "auth", severity: "info", created_date: new Date() },
-  { action: "Invoice created", category: "invoice", severity: "warning", created_date: new Date() }
-];
+  if (!user) {
+    return <Login email={email} setEmail={setEmail} onLogin={setUser} />;
+  }
 
-/* ---------------- HEADER ---------------- */
+  if (role === "NO_ROLE") {
+    return <NoRole user={user} />;
+  }
 
-document.getElementById("name").innerText = user.full_name.split(" ")[0];
-document.getElementById("role").innerText = user.role;
+  return <Dashboard user={user} role={role} onLogout={() => setUser(null)} />;
+}
 
-/* DATE */
-document.getElementById("date").innerText =
-  new Date().toLocaleDateString("fr-FR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-
-/* ---------------- STATS ---------------- */
-
-document.getElementById("members").innerText = members.length;
-
-document.getElementById("projects").innerText =
-  projects.filter(p => p.status === "active").length;
-
-document.getElementById("pending").innerText =
-  invoices.filter(i => i.status === "pending").length;
-
-document.getElementById("paid").innerText =
-  invoices
-    .filter(i => i.status === "paid")
-    .reduce((a, b) => a + b.amount, 0) + "€";
-
-/* ---------------- LOGS ---------------- */
-
-const logsBox = document.getElementById("logs");
-
-logs.forEach(l => {
-  const div = document.createElement("div");
-  div.className = "p-2 bg-gray-800 rounded text-sm";
-  div.innerHTML = `
-    <b>${l.action}</b>
-    <div class="text-gray-400 text-xs">${l.category}</div>
-  `;
-  logsBox.appendChild(div);
-});
-
-/* ---------------- MESSAGES ---------------- */
-
-const msgBox = document.getElementById("messages");
-
-messages.forEach(m => {
-  const div = document.createElement("div");
-  div.className = "flex gap-2 p-2 bg-gray-800 rounded";
-
-  div.innerHTML = `
-    <div class="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center text-xs">
-      ${m.senderName[0]}
+/**
+ * =========================
+ * LOGIN
+ * =========================
+ */
+function Login({ email, setEmail, onLogin }) {
+  return (
+    <div className="h-screen flex items-center justify-center bg-black text-white">
+      <div className="w-80 p-6 rounded-xl border border-white/10 bg-white/5">
+        <h1 className="text-lg font-bold mb-4">LUMY CORE</h1>
+        <input
+          className="w-full p-2 bg-black border border-white/10 rounded"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button
+          className="w-full mt-3 p-2 bg-white text-black rounded"
+          onClick={() => onLogin(email)}
+        >
+          Connexion
+        </button>
+      </div>
     </div>
+  );
+}
+
+/**
+ * =========================
+ * ACCESS DENIED
+ * =========================
+ */
+function NoRole({ user }) {
+  return (
+    <div className="h-screen flex items-center justify-center bg-black text-white">
+      <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center max-w-md">
+        <ShieldOff className="mx-auto mb-3" />
+        <h2 className="text-xl font-bold">Accès refusé</h2>
+        <p className="text-sm opacity-70 mt-2">Aucun rôle attribué</p>
+        <p className="text-xs mt-3">{user}</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * =========================
+ * DASHBOARD SHELL
+ * =========================
+ */
+function Dashboard({ user, role, onLogout }) {
+  const [page, setPage] = useState("home");
+
+  const nav = [
+    { id: "home", label: "Dashboard", icon: LayoutDashboard },
+    { id: "projects", label: "Projets", icon: FolderKanban },
+    { id: "recruitment", label: "Recrutement", icon: UserPlus },
+    { id: "settings", label: "Paramètres", icon: Settings },
+  ];
+
+  return (
+    <div className="flex h-screen bg-black text-white">
+      {/* Sidebar */}
+      <div className="w-64 border-r border-white/10 p-4">
+        <h2 className="font-bold mb-6">LUMY CORE</h2>
+
+        {nav.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setPage(item.id)}
+            className="flex items-center gap-2 w-full p-2 rounded hover:bg-white/10 text-left"
+          >
+            <item.icon size={16} /> {item.label}
+          </button>
+        ))}
+
+        <button
+          onClick={onLogout}
+          className="mt-6 flex items-center gap-2 text-red-400 hover:bg-red-500/10 w-full p-2 rounded"
+        >
+          <LogOut size={16} /> Déconnexion
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 p-6 overflow-auto">
+        {page === "home" && <Home user={user} role={role} />}
+        {page === "projects" && <Projects role={role} />}
+        {page === "recruitment" && <Recruitment role={role} />}
+        {page === "settings" && <Settings role={role} />}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * =========================
+ * PAGES
+ * =========================
+ */
+
+function Home({ user, role }) {
+  return (
     <div>
-      <div class="text-sm">${m.senderName}</div>
-      <div class="text-xs text-gray-400">${m.content}</div>
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <p className="opacity-70 mt-2">{user} — rôle: {role}</p>
     </div>
-  `;
+  );
+}
 
-  msgBox.appendChild(div);
-});
+function Projects({ role }) {
+  const allowed = role === "PRESIDENT" || role === "RH";
 
-/* ---------------- INVOICE STATUS ---------------- */
+  return (
+    <div>
+      <h1 className="text-xl font-bold">Projets</h1>
+      {allowed ? (
+        <div className="mt-4 p-4 bg-white/5 rounded-xl">
+          Module Projets activé
+        </div>
+      ) : (
+        <p className="text-red-400 mt-4">Accès refusé</p>
+      )}
+    </div>
+  );
+}
 
-const invBox = document.getElementById("invoiceStatus");
+function Recruitment({ role }) {
+  const allowed = role === "RH" || role === "PRESIDENT";
 
-const status = [
-  { label: "Payées", key: "paid", color: "text-emerald-400" },
-  { label: "En attente", key: "pending", color: "text-amber-400" },
-  { label: "Échouées", key: "failed", color: "text-red-400" }
-];
+  return (
+    <div>
+      <h1 className="text-xl font-bold">Recrutement</h1>
+      {allowed ? (
+        <div className="mt-4 p-4 bg-white/5 rounded-xl">
+          Module RH actif
+        </div>
+      ) : (
+        <p className="text-red-400 mt-4">Réservé RH / Président</p>
+      )}
+    </div>
+  );
+}
 
-status.forEach(s => {
-  const count = invoices.filter(i => i.status === s.key).length;
+function Settings({ role }) {
+  const allowed = role === "PRESIDENT";
 
-  const div = document.createElement("div");
-  div.className = "flex justify-between text-sm";
-
-  div.innerHTML = `
-    <span class="${s.color}">${s.label}</span>
-    <span class="${s.color} font-bold">${count}</span>
-  `;
-
-  invBox.appendChild(div);
-});
-</script>
-
-</body>
-</html>
+  return (
+    <div>
+      <h1 className="text-xl font-bold">Paramètres</h1>
+      {allowed ? (
+        <div className="mt-4 p-4 bg-white/5 rounded-xl">
+          Accès système complet
+        </div>
+      ) : (
+        <p className="text-red-400 mt-4">Accès Président uniquement</p>
+      )}
+    </div>
+  );
+}
