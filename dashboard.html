@@ -1,262 +1,200 @@
-import React, { useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Receipt,
-  Plus,
-  X,
-  Save,
-  Trash2,
-  Edit2,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
-  XCircle,
-} from "lucide-react";
-import { Button } from "../components/ui/button";
-import { toast } from "sonner";
-import { addLog } from "../lib/logger";
-import { canManageBilling } from "../lib/roles";
-import AccessDenied from "../components/AccessDenied";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { base44 } from "../api/base44Client";
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
 
-const STATUS = {
-  pending: {
-    label: "En attente",
-    text: "text-amber-400",
-    bg: "bg-amber-400/10",
-    border: "border-amber-400/20",
-    icon: Clock,
-  },
-  paid: {
-    label: "Payée",
-    text: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    border: "border-emerald-400/20",
-    icon: CheckCircle2,
-  },
-  failed: {
-    label: "Échouée",
-    text: "text-red-400",
-    bg: "bg-red-400/10",
-    border: "border-red-400/20",
-    icon: XCircle,
-  },
-  cancelled: {
-    label: "Annulée",
-    text: "text-slate-400",
-    bg: "bg-slate-400/10",
-    border: "border-slate-400/20",
-    icon: XCircle,
-  },
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-950 text-white p-6">
+
+<!-- HEADER -->
+<div class="flex justify-between items-start mb-6">
+  <div>
+    <h1 class="text-2xl font-bold">
+      Bienvenue, <span id="name" class="text-cyan-400"></span> 👋
+    </h1>
+    <p id="date" class="text-gray-400 text-sm"></p>
+  </div>
+
+  <div id="role" class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs"></div>
+</div>
+
+<!-- STATS -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+  <div class="bg-gray-900 p-4 rounded-xl">
+    <p class="text-gray-400 text-xs">Membres</p>
+    <p id="members" class="text-2xl font-bold"></p>
+  </div>
+
+  <div class="bg-gray-900 p-4 rounded-xl">
+    <p class="text-gray-400 text-xs">Projets actifs</p>
+    <p id="projects" class="text-2xl font-bold"></p>
+  </div>
+
+  <div class="bg-gray-900 p-4 rounded-xl">
+    <p class="text-gray-400 text-xs">Factures en attente</p>
+    <p id="pending" class="text-2xl font-bold text-amber-400"></p>
+  </div>
+
+  <div class="bg-gray-900 p-4 rounded-xl">
+    <p class="text-gray-400 text-xs">Encaissé</p>
+    <p id="paid" class="text-2xl font-bold text-emerald-400"></p>
+  </div>
+
+</div>
+
+<!-- GRID -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- LOGS -->
+  <div class="lg:col-span-2 bg-gray-900 rounded-xl p-4">
+    <h2 class="font-semibold mb-3">Activité système</h2>
+    <div id="logs" class="space-y-2"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="space-y-4">
+
+    <!-- MESSAGES -->
+    <div class="bg-gray-900 rounded-xl p-4">
+      <h2 class="font-semibold mb-3">Messages récents</h2>
+      <div id="messages" class="space-y-2"></div>
+    </div>
+
+    <!-- INVOICES -->
+    <div class="bg-gray-900 rounded-xl p-4">
+      <h2 class="font-semibold mb-3">Facturation</h2>
+      <div id="invoiceStatus" class="space-y-2"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ---------------- MOCK DATA ---------------- */
+
+const user = {
+  full_name: "Alex Martin",
+  role: "ADMIN"
 };
 
-function InvoiceModal({ invoice, onClose, onSave }) {
-  const [form, setForm] = useState({
-    targetName: invoice?.targetName || "",
-    targetEmail: invoice?.targetEmail || "",
-    amount: invoice?.amount || 0,
-    description: invoice?.description || "",
-    status: invoice?.status || "pending",
-    dueDate: invoice?.dueDate || "",
-    currency: invoice?.currency || "EUR",
+const members = Array(12).fill({});
+const projects = [
+  { status: "active" },
+  { status: "active" },
+  { status: "done" }
+];
+
+const invoices = [
+  { status: "pending", amount: 120 },
+  { status: "paid", amount: 200 },
+  { status: "paid", amount: 350 },
+  { status: "failed", amount: 80 }
+];
+
+const messages = [
+  { senderName: "Lina", content: "Salut 👋" },
+  { senderName: "Tom", content: "Projet prêt" },
+  { senderName: "Sara", content: "Bug fixé" }
+];
+
+const logs = [
+  { action: "Login", category: "auth", severity: "info", created_date: new Date() },
+  { action: "Invoice created", category: "invoice", severity: "warning", created_date: new Date() }
+];
+
+/* ---------------- HEADER ---------------- */
+
+document.getElementById("name").innerText = user.full_name.split(" ")[0];
+document.getElementById("role").innerText = user.role;
+
+/* DATE */
+document.getElementById("date").innerText =
+  new Date().toLocaleDateString("fr-FR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
   });
 
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+/* ---------------- STATS ---------------- */
 
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-background rounded-2xl w-full max-w-lg"
-      >
-        <div className="px-6 py-4 border-b flex justify-between">
-          <h2 className="font-semibold">
-            {invoice ? "Modifier la facture" : "Nouvelle facture"}
-          </h2>
-          <button onClick={onClose}>
-            <X />
-          </button>
-        </div>
+document.getElementById("members").innerText = members.length;
 
-        <div className="p-6 space-y-4">
-          <input
-            placeholder="Nom client"
-            value={form.targetName}
-            onChange={(e) => set("targetName", e.target.value)}
-            className="input"
-          />
+document.getElementById("projects").innerText =
+  projects.filter(p => p.status === "active").length;
 
-          <input
-            placeholder="Email"
-            value={form.targetEmail}
-            onChange={(e) => set("targetEmail", e.target.value)}
-            className="input"
-          />
+document.getElementById("pending").innerText =
+  invoices.filter(i => i.status === "pending").length;
 
-          <input
-            type="number"
-            placeholder="Montant"
-            value={form.amount}
-            onChange={(e) => set("amount", Number(e.target.value))}
-            className="input"
-          />
+document.getElementById("paid").innerText =
+  invoices
+    .filter(i => i.status === "paid")
+    .reduce((a, b) => a + b.amount, 0) + "€";
 
-          <textarea
-            placeholder="Description"
-            value={form.description}
-            onChange={(e) => set("description", e.target.value)}
-            className="input"
-          />
+/* ---------------- LOGS ---------------- */
 
-          <input
-            type="date"
-            value={form.dueDate}
-            onChange={(e) => set("dueDate", e.target.value)}
-            className="input"
-          />
-        </div>
+const logsBox = document.getElementById("logs");
 
-        <div className="px-6 py-4 border-t flex justify-end gap-2">
-          <Button variant="ghost" onClick={onClose}>
-            Annuler
-          </Button>
-          <Button onClick={() => onSave(invoice?.id, form)}>
-            <Save className="w-4 h-4 mr-2" />
-            Enregistrer
-          </Button>
-        </div>
-      </motion.div>
+logs.forEach(l => {
+  const div = document.createElement("div");
+  div.className = "p-2 bg-gray-800 rounded text-sm";
+  div.innerHTML = `
+    <b>${l.action}</b>
+    <div class="text-gray-400 text-xs">${l.category}</div>
+  `;
+  logsBox.appendChild(div);
+});
+
+/* ---------------- MESSAGES ---------------- */
+
+const msgBox = document.getElementById("messages");
+
+messages.forEach(m => {
+  const div = document.createElement("div");
+  div.className = "flex gap-2 p-2 bg-gray-800 rounded";
+
+  div.innerHTML = `
+    <div class="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center text-xs">
+      ${m.senderName[0]}
     </div>
-  );
-}
-
-export default function BillingPage() {
-  const { user, role } = useOutletContext();
-  const qc = useQueryClient();
-  const [modal, setModal] = useState(null);
-  const [filter, setFilter] = useState("all");
-
-  const { data: invoices = [] } = useQuery({
-    queryKey: ["invoices"],
-    queryFn: () => base44.entities.Invoice.list("-created_date"),
-  });
-
-  const createMut = useMutation({
-    mutationFn: (data) =>
-      base44.entities.Invoice.create({
-        ...data,
-        invoiceNumber: `INV-${Date.now()}`,
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["invoices"] });
-      toast.success("Facture créée");
-      setModal(null);
-    },
-  });
-
-  const updateMut = useMutation({
-    mutationFn: ({ id, data }) =>
-      base44.entities.Invoice.update(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["invoices"] });
-      toast.success("Facture mise à jour");
-      setModal(null);
-    },
-  });
-
-  const deleteMut = useMutation({
-    mutationFn: (id) => base44.entities.Invoice.delete(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["invoices"] });
-      toast.success("Supprimée");
-    },
-  });
-
-  if (!canManageBilling(role)) return <AccessDenied />;
-
-  const filtered =
-    filter === "all"
-      ? invoices
-      : invoices.filter((i) => i.status === filter);
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between">
-        <h1 className="text-xl font-bold">Facturation</h1>
-
-        <Button onClick={() => setModal({ mode: "create" })}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nouvelle facture
-        </Button>
-      </div>
-
-      <div className="flex gap-2">
-        {["all", "pending", "paid", "failed"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded ${
-              filter === f ? "bg-primary text-white" : "bg-muted"
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-2">
-        {filtered.map((inv) => {
-          const s = STATUS[inv.status] || STATUS.pending;
-          const Icon = s.icon;
-
-          return (
-            <div
-              key={inv.id}
-              className="flex justify-between p-3 border rounded"
-            >
-              <div>
-                <p className="font-semibold">{inv.targetName}</p>
-                <p className="text-sm opacity-60">{inv.amount}€</p>
-              </div>
-
-              <div className="flex gap-2 items-center">
-                <span className="text-sm flex items-center gap-1">
-                  <Icon className="w-4 h-4" />
-                  {s.label}
-                </span>
-
-                <button onClick={() => setModal({ mode: "edit", invoice: inv })}>
-                  <Edit2 className="w-4 h-4" />
-                </button>
-
-                <button onClick={() => deleteMut.mutate(inv.id)}>
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <AnimatePresence>
-        {modal && (
-          <InvoiceModal
-            invoice={modal.invoice}
-            onClose={() => setModal(null)}
-            onSave={(id, data) =>
-              id
-                ? updateMut.mutate({ id, data })
-                : createMut.mutate(data)
-            }
-          />
-        )}
-      </AnimatePresence>
+    <div>
+      <div class="text-sm">${m.senderName}</div>
+      <div class="text-xs text-gray-400">${m.content}</div>
     </div>
-  );
-}
+  `;
+
+  msgBox.appendChild(div);
+});
+
+/* ---------------- INVOICE STATUS ---------------- */
+
+const invBox = document.getElementById("invoiceStatus");
+
+const status = [
+  { label: "Payées", key: "paid", color: "text-emerald-400" },
+  { label: "En attente", key: "pending", color: "text-amber-400" },
+  { label: "Échouées", key: "failed", color: "text-red-400" }
+];
+
+status.forEach(s => {
+  const count = invoices.filter(i => i.status === s.key).length;
+
+  const div = document.createElement("div");
+  div.className = "flex justify-between text-sm";
+
+  div.innerHTML = `
+    <span class="${s.color}">${s.label}</span>
+    <span class="${s.color} font-bold">${count}</span>
+  `;
+
+  invBox.appendChild(div);
+});
+</script>
+
+</body>
+</html>
