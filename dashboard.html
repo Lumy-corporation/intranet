@@ -3,9 +3,10 @@ import {
   ShieldOff,
   FolderKanban,
   UserPlus,
-  Settings,
+  Settings as SettingsIcon, // Renommé pour éviter le conflit avec la page
   LayoutDashboard,
   LogOut,
+  Mail,
 } from "lucide-react";
 
 /**
@@ -55,13 +56,13 @@ function Login({ email, setEmail, onLogin }) {
       <div className="w-80 p-6 rounded-xl border border-white/10 bg-white/5">
         <h1 className="text-lg font-bold mb-4">LUMY CORE</h1>
         <input
-          className="w-full p-2 bg-black border border-white/10 rounded"
+          className="w-full p-2 bg-black border border-white/10 rounded text-white"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <button
-          className="w-full mt-3 p-2 bg-white text-black rounded"
+          className="w-full mt-3 p-2 bg-white text-black rounded font-bold hover:bg-white/90 transition"
           onClick={() => onLogin(email)}
         >
           Connexion
@@ -80,10 +81,10 @@ function NoRole({ user }) {
   return (
     <div className="h-screen flex items-center justify-center bg-black text-white">
       <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/10 text-center max-w-md">
-        <ShieldOff className="mx-auto mb-3" />
+        <ShieldOff className="mx-auto mb-3 text-red-500" />
         <h2 className="text-xl font-bold">Accès refusé</h2>
-        <p className="text-sm opacity-70 mt-2">Aucun rôle attribué</p>
-        <p className="text-xs mt-3">{user}</p>
+        <p className="text-sm opacity-70 mt-2">Aucun rôle attribué pour Lumy Corporation.</p>
+        <p className="text-xs mt-3 text-red-400 font-mono">{user}</p>
       </div>
     </div>
   );
@@ -99,41 +100,48 @@ function Dashboard({ user, role, onLogout }) {
 
   const nav = [
     { id: "home", label: "Dashboard", icon: LayoutDashboard },
+    { id: "lumymail", label: "Lumy Mail", icon: Mail }, // Ton nouvel onglet !
     { id: "projects", label: "Projets", icon: FolderKanban },
     { id: "recruitment", label: "Recrutement", icon: UserPlus },
-    { id: "settings", label: "Paramètres", icon: Settings },
+    { id: "settings", label: "Paramètres", icon: SettingsIcon },
   ];
 
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
-      <div className="w-64 border-r border-white/10 p-4">
-        <h2 className="font-bold mb-6">LUMY CORE</h2>
-
-        {nav.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setPage(item.id)}
-            className="flex items-center gap-2 w-full p-2 rounded hover:bg-white/10 text-left"
-          >
-            <item.icon size={16} /> {item.label}
-          </button>
-        ))}
+      <div className="w-64 border-r border-white/10 p-4 flex flex-col justify-between">
+        <div>
+          <h2 className="font-bold text-xl mb-6 tracking-wide text-blue-500">LUMY CORE</h2>
+          <div className="space-y-1">
+            {nav.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setPage(item.id)}
+                className={`flex items-center gap-3 w-full p-2.5 rounded transition text-left text-sm ${
+                  page === item.id ? "bg-white/10 font-medium text-white" : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <item.icon size={18} /> {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <button
           onClick={onLogout}
-          className="mt-6 flex items-center gap-2 text-red-400 hover:bg-red-500/10 w-full p-2 rounded"
+          className="flex items-center gap-3 text-red-400 hover:bg-red-500/10 w-full p-2.5 rounded transition text-sm"
         >
-          <LogOut size={16} /> Déconnexion
+          <LogOut size={18} /> Déconnexion
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto">
         {page === "home" && <Home user={user} role={role} />}
+        {page === "lumymail" && <LumyMailView />}
         {page === "projects" && <Projects role={role} />}
         {page === "recruitment" && <Recruitment role={role} />}
-        {page === "settings" && <Settings role={role} />}
+        {page === "settings" && <SettingsPage role={role} />}
       </div>
     </div>
   );
@@ -148,8 +156,29 @@ function Dashboard({ user, role, onLogout }) {
 function Home({ user, role }) {
   return (
     <div>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="opacity-70 mt-2">{user} — rôle: {role}</p>
+      <h1 className="text-3xl font-bold tracking-tight">Bienvenue sur Lumy Core</h1>
+      <p className="text-gray-400 mt-2">Connecté en tant que : <span className="text-white font-mono">{user}</span></p>
+      <div className="mt-4 inline-block px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold uppercase tracking-wider">
+        Rang : {role}
+      </div>
+    </div>
+  );
+}
+
+function LumyMailView() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">📧 Lumy Mail (Présentation)</h1>
+      <div className="p-6 bg-white/5 border border-white/10 rounded-xl max-w-2xl">
+        <h2 className="text-lg font-semibold text-blue-400 mb-2">Statut : En développement actif</h2>
+        <p className="text-gray-300 text-sm leading-relaxed">
+          Ceci est l'aperçu de ton interface souveraine. Lumy Mail garantit que les e-mails 
+          de tes utilisateurs canadiens restent hébergés sur place, chiffrés et intouchables par les GAFAM.
+        </p>
+        <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300 font-mono">
+          [Système en attente d'implémentation du serveur SMTP/IMAP souverain]
+        </div>
+      </div>
     </div>
   );
 }
@@ -159,13 +188,13 @@ function Projects({ role }) {
 
   return (
     <div>
-      <h1 className="text-xl font-bold">Projets</h1>
+      <h1 className="text-2xl font-bold">Projets</h1>
       {allowed ? (
-        <div className="mt-4 p-4 bg-white/5 rounded-xl">
-          Module Projets activé
+        <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl text-gray-300 text-sm">
+          🚀 Module d'administration des projets de Lumy Corporation activé.
         </div>
       ) : (
-        <p className="text-red-400 mt-4">Accès refusé</p>
+        <p className="text-red-400 mt-4 text-sm font-semibold">Accès refusé. Autorisation insuffisante.</p>
       )}
     </div>
   );
@@ -176,30 +205,31 @@ function Recruitment({ role }) {
 
   return (
     <div>
-      <h1 className="text-xl font-bold">Recrutement</h1>
+      <h1 className="text-2xl font-bold">Recrutement</h1>
       {allowed ? (
-        <div className="mt-4 p-4 bg-white/5 rounded-xl">
-          Module RH actif
+        <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl text-gray-300 text-sm">
+          🤝 Module RH actif. Gestion des équipes Canada en attente.
         </div>
       ) : (
-        <p className="text-red-400 mt-4">Réservé RH / Président</p>
+        <p className="text-red-400 mt-4 text-sm font-semibold">Réservé exclusivement aux rôles RH / Président.</p>
       )}
     </div>
   );
 }
 
-function Settings({ role }) {
+// Renommé d'office ici pour résoudre le bug de crash !
+function SettingsPage({ role }) {
   const allowed = role === "PRESIDENT";
 
   return (
     <div>
-      <h1 className="text-xl font-bold">Paramètres</h1>
+      <h1 className="text-2xl font-bold">Paramètres Système</h1>
       {allowed ? (
-        <div className="mt-4 p-4 bg-white/5 rounded-xl">
-          Accès système complet
+        <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl text-gray-300 text-sm">
+          🛠️ Accès système complet octroyé au Président Fondateur.
         </div>
       ) : (
-        <p className="text-red-400 mt-4">Accès Président uniquement</p>
+        <p className="text-red-400 mt-4 text-sm font-semibold">Accès restreint. Autorisé uniquement pour le Président.</p>
       )}
     </div>
   );
